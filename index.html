@@ -4,7 +4,7 @@
 <link rel="icon" href="data/logo_dark.png">
 <meta charset="utf-8">
 <title>Confident Picks</title>
-<meta name="description" content="NFL, college football and NHL picks from our own models, compared with the sportsbooks, with a tested and live record.">
+<meta name="description" content="NFL, college football, NHL and NBA picks from our own models, compared with the sportsbooks, with a tested and live record.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
@@ -289,7 +289,7 @@ footer{margin-top:34px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
   <header class="top">
     <div class="brand">
       <span class="mark" aria-hidden="true"><img src="data/logo_white.png" alt="" width="26" height="30" style="width:26px;height:auto"></span>
-      <div><b>Confident Picks</b><small>NFL · College · NHL, from our own models</small></div>
+      <div><b>Confident Picks</b><small>NFL · College · NHL · NBA, from our own models</small></div>
     </div>
     <div class="updated" id="updated"></div>
   </header>
@@ -388,7 +388,7 @@ function pickDetail(p){
   if(dkfd)rows.push(["DraftKings / FanDuel",`<span class="num">${dkfd}</span>`]);
   if(p.value!=null)rows.push(["Value at best price",`<span class="num">${signed(p.value)}</span>`]);
   if(p.books)rows.push(["Books quoting",String(p.books)]);
-  if(p.win_prob>=.6&&p.kind==="prop"&&p.sport!=="NHL"&&p.market_label!=="Sacks")rows.push(["Best time to bet",windowText(p.kickoff_utc)]);
+  if(p.win_prob>=.6&&p.kind==="prop"&&p.sport==="NFL"&&p.market_label!=="Sacks")rows.push(["Best time to bet",windowText(p.kickoff_utc)]);
   const t=tested(p);
   return `<div class="detail"><div><h4>Our number vs the book</h4>${fieldStrip(p)}${meter(p)}
     ${ladder(p)}${p.suggested?`<p class="sugg">${esc(p.suggested)}</p>`:""}</div>
@@ -443,7 +443,8 @@ function shareText(list,title){
 const SHORT={"Receptions":"rec","Receiving yards":"rec yds","Rushing yards":"rush yds","Passing yards":"pass yds","Rush attempts":"rush att",
   "Passing TDs":"pass TD","Completions":"comp","Pass attempts":"pass att","Longest reception":"long rec","Longest rush":"long rush",
   "Longest completion":"long comp","Rush + rec yards":"rush+rec yds","Tackles + assists":"tackles","Sacks":"sacks","Extra points made":"XP",
-  "1Q passing yards":"1Q pass yds","Shots on goal":"SOG","Points":"pts","Goals":"goals","Assists":"ast","Blocked shots":"blocks","Saves":"saves"};
+  "1Q passing yards":"1Q pass yds","Shots on goal":"SOG","Points":"pts","Goals":"goals","Assists":"ast","Blocked shots":"blocks","Saves":"saves","Rebounds":"reb","Threes made":"3PM","Steals":"stl","Blocks":"blk",
+  "Turnovers":"TO","Pts + reb + ast":"PRA","Pts + reb":"P+R","Pts + ast":"P+A","Reb + ast":"R+A"};
 const lastName=n=>{const w=String(n).trim().split(/\s+/);let i=w.length-1;if(i>0&&/^(jr\.?|sr\.?|ii|iii|iv|v)$/i.test(w[i]))i--;return i>0?w.slice(i).join(" "):w[0]};
 const etDay=iso=>new Date(iso).toLocaleDateString("en-CA",{...tz});
 const shortTime=iso=>new Date(iso).toLocaleTimeString("en-US",{...tz,hour:"numeric",minute:"2-digit"}).replace(":00","").replace(" AM","a").replace(" PM","p");
@@ -545,8 +546,8 @@ function copyTodayText(){
   const d=new Date();const head=`Confident Picks · ${d.toLocaleDateString("en-US",{...tz,weekday:"short"})} ${d.toLocaleDateString("en-US",{...tz,month:"numeric",day:"numeric"})}`;
   const lines=[head];
   if(L&&!started(L)&&etDay(L.kickoff_utc)===etDay(d.toISOString()))lines.push(`LOCK: ${pickShort({...L,grade:"\u2014"})}`);
-  const SPORT={NFL:"NFL",CFB:"College",NHL:"NHL"};
-  const ps=gradedToday().sort((a,b)=>["NFL","CFB","NHL"].indexOf(a.sport)-["NFL","CFB","NHL"].indexOf(b.sport)||(a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:0)||(a.market_label==="Winner"?-1:b.market_label==="Winner"?1:b.win_prob-a.win_prob));
+  const SPORT={NFL:"NFL",CFB:"College",NHL:"NHL",NBA:"NBA"};
+  const ps=gradedToday().sort((a,b)=>["NFL","CFB","NHL","NBA"].indexOf(a.sport)-["NFL","CFB","NHL","NBA"].indexOf(b.sport)||(a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:0)||(a.market_label==="Winner"?-1:b.market_label==="Winner"?1:b.win_prob-a.win_prob));
   let key="";
   for(const p of ps){const k=`${SPORT[p.sport]||p.sport} · ${shortTime(p.kickoff_utc)}`;if(k!==key){lines.push("",k);key=k}lines.push(pickShort(p))}
   if(!ps.length&&lines.length===1)lines.push("No graded picks left today.");
@@ -571,7 +572,7 @@ function lockCard(){
     <div><button class="share" id="share-lock">${SHARE_ICON}Share the lock</button><div id="lock-hold"></div></div></section>`;
 }
 function vToday(){
-  const m=D.meta,tr=m.track_record||{},nw=tr.nfl_winners||{},cw=tr.cfb_winners||{},hw=tr.nhl_winners||{},pr=(tr.props||{}).cal60||{};
+  const m=D.meta,tr=m.track_record||{},nw=tr.nfl_winners||{},cw=tr.cfb_winners||{},hw=tr.nhl_winners||{},bw=tr.nba_winners||{},pr=(tr.props||{}).cal60||{};
   const plRec=(tr.prop_lines||null);
   const live=(tr.live||{}).groups||[];
   const slate=D.picks.filter(isToday);
@@ -587,6 +588,7 @@ function vToday(){
     <div class="stat"><span class="k">NFL winners, 60%+ sure</span><span class="v">${pct(nw.conf60_win)}<small>of ${nw.conf60_games||"–"}</small></span><span class="s">Tested 2023-2025</span></div>
     <div class="stat"><span class="k">College winners, 60%+ sure</span><span class="v">${pct(cw.conf60_win)}<small>of ${cw.conf60_games||"–"}</small></span><span class="s">Tested 2023-2025</span></div>
     ${hw.conf60_games?`<div class="stat"><span class="k">NHL winners, 60%+ sure</span><span class="v">${pct(hw.conf60_win)}<small>of ${hw.conf60_games}</small></span><span class="s">Held back 2024-26</span></div>`:""}
+    ${bw.conf60_games?`<div class="stat"><span class="k">NBA winners, 60%+ sure</span><span class="v">${pct(bw.conf60_win)}<small>of ${bw.conf60_games}</small></span><span class="s">Tested 2019-2026</span></div>`:""}
     <div class="stat"><span class="k">Live, A and B picks</span><span class="v">${liveAll.length?pctR(liveAll.reduce((s,g)=>s+g.won*g.picks,0)/liveAll.reduce((s,g)=>s+g.picks,0)):"–"}<small>${liveAll.length?"of "+liveAll.reduce((s,g)=>s+g.picks,0):"starting"}</small></span><span class="s">Since Sep 26, 2026</span></div>
   </section>
   <section class="view" style="padding:0;gap:10px">
@@ -595,7 +597,7 @@ function vToday(){
     ${valuePicks.length?`<div class="rail">${valuePicks.map(valueCard).join("")}</div>`:'<div class="empty">No value picks at current prices. Check back after the next update.</div>'}
   </section>
   <section class="view" style="padding:0;gap:10px">
-    <div class="sec-h"><h2>Our strongest winners</h2><p>Our six most confident winner picks. Football: A 90%+, B 80-89%, C 70-79%, D 60-69%. NHL: A 70%+, B 65-69%, C 60-64%.</p></div>
+    <div class="sec-h"><h2>Our strongest winners</h2><p>Our six most confident winner picks. Football: A 90%+, B 80-89%, C 70-79%, D 60-69%. NHL and NBA: A 70%+, B 65-69%, C 60-64%.</p></div>
     ${winners.length?`<div class="list">${winners.map(pickRow).join("")}</div>`:'<div class="empty">No winner picks at 60%+ in the current window.</div>'}
   </section>`;
 }
@@ -615,7 +617,7 @@ function propFilters(list){
     <button class="chip" id="f-agree" aria-pressed="${state.agree}">Books agree</button>
     <span class="count" id="f-count"></span></div>`;
 }
-const SPORTS=[["","All sports"],["NFL","NFL"],["CFB","College"],["NHL","NHL"]];
+const SPORTS=[["","All sports"],["NFL","NFL"],["CFB","College"],["NHL","NHL"],["NBA","NBA"]];
 function sportOpts(){return SPORTS.filter(([k])=>!k||D.picks.some(p=>p.sport===k)).map(([k,l])=>`<option value="${k}" ${k===state.sport?"selected":""}>${l}</option>`).join("")}
 function filtered(list){
   const q=state.q.trim().toLowerCase();
@@ -626,7 +628,7 @@ function filtered(list){
 }
 function vProps(){
   const list=D.picks.filter(p=>p.kind==="prop"||p.kind==="td");
-  return `<div class="sec-h"><div><h2>Player props</h2><p class="lede">Our projection for every player with a book line. Grades: A 65%+, B 60-64% (graded), C 55-59%, D 50-54%. NHL props show our chance but no grade: in testing they won as often as we said, yet lost 3-5% at the books' prices. Tap a pick for the full breakdown.</p></div></div>
+  return `<div class="sec-h"><div><h2>Player props</h2><p class="lede">Our projection for every player with a book line. Grades: A 65%+, B 60-64% (graded), C 55-59%, D 50-54%. NHL and NBA props show our chance but no grade: in testing they won about as often as we said, yet lost money at the books' prices. Tap a pick for the full breakdown.</p></div></div>
   ${propFilters(list)}<div class="list" id="plist"></div>`;
 }
 function fillProps(){
@@ -664,7 +666,7 @@ function vGames(){
   const ents=[...byDay.entries()];
   const tod=ents.filter(([k,gs])=>isToday({kickoff_utc:gs[0].ko})),later=ents.filter(([k,gs])=>!isToday({kickoff_utc:gs[0].ko}));
   const nLater=later.reduce((n,[k,gs])=>n+gs.length,0);
-  return `<div class="sec-h"><div><h2>Games</h2><p class="lede">Winner, spread (puck line in hockey) and total all come from one projected score, so they never contradict each other. Winners are graded; spreads and totals are shown ungraded until they beat 58% on seasons the model never saw. NHL scores show expected goals.</p></div></div>${sw}
+  return `<div class="sec-h"><div><h2>Games</h2><p class="lede">Winner, spread (puck line in hockey) and total all come from one projected score, so they never contradict each other. Winners are graded; spreads and totals are shown ungraded until they beat 58% on seasons the model never saw. NHL scores show expected goals; NBA scores are our projected points.</p></div></div>${sw}
   <h2 style="font-size:22px;text-transform:uppercase">Today</h2>
   ${tod.length?block(tod):'<div class="empty">No games left today. See what is coming up below.</div>'}
   ${later.length?`<details class="upcoming"${tod.length?"":" open"}><summary><h2 style="font-size:22px;text-transform:uppercase;display:inline">Coming up</h2> <span class="muted">${nLater} game${nLater===1?"":"s"}</span></summary><div class="view" style="padding-top:12px">${block(later)}</div></details>`:""}`;
@@ -682,8 +684,8 @@ function gameCard(g){
       <span class="t">${favHome===true?'<i class="fav" aria-label="our pick"></i>':""}${esc(home)}</span><span class="sc">${esc(scoreOf(home))}</span></div>
     <div class="lines">
       ${cell("Winner",W,W?`${esc(W.player)} ${pct(W.win_prob)}`:"")}
-      ${cell(g.sport==="NHL"?"Puck line":"Spread",S,S?esc(pickText(S))+(g.sport==="NHL"?` ${pct(S.win_prob)}`:""):"")}
-      ${cell("Total",T,T?esc(pickText(T))+(g.sport==="NHL"?` ${pct(T.win_prob)}`:""):"")}
+      ${cell(g.sport==="NHL"?"Puck line":"Spread",S,S?esc(pickText(S))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(S.win_prob)}`:""):"")}
+      ${cell("Total",T,T?esc(pickText(T))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(T.win_prob)}`:""):"")}
     </div>
     ${W&&W.sport==="NHL"&&W.note?`<div class="extras"><span class="pill ng">${esc(W.note)}</span></div>`:""}
     ${W&&W.suggested?`<div class="extras"><span class="pill ng">${esc(W.suggested)}</span></div>`:""}
@@ -726,7 +728,7 @@ function bandChart(bands,key){
   </svg><p class="muted" style="font-size:12px;margin:0">Bars: how often we won. Orange line: the chance we stated. Close together means our percentages can be trusted.</p></div>`;
 }
 function vRecord(){
-  const tr=D.meta.track_record||{},live=tr.live||{},nw=tr.nfl_winners||{},cw=tr.cfb_winners||{},hw=tr.nhl_winners||{},pr=tr.props||{},st=tr.spreads_totals||{};
+  const tr=D.meta.track_record||{},live=tr.live||{},nw=tr.nfl_winners||{},cw=tr.cfb_winners||{},hw=tr.nhl_winners||{},bw=tr.nba_winners||{},pr=tr.props||{},st=tr.spreads_totals||{};
   const groups=(live.groups||[]);
   const clv=(live.clv||[]);
   const liveT=groups.length?`<div class="tbl"><table><thead><tr><th>Group</th><th class="r">Picks</th><th class="r">Won</th></tr></thead><tbody>${groups.map(g=>`<tr><td>${esc(g.sport==="all"?"":g.sport+" ")}${esc(g.market)}</td><td class="r">${g.picks}</td><td class="r">${pctR(g.won)}</td></tr>`).join("")}</tbody></table></div>`:'<p>Grading starts once this weekend\'s games are final.</p>';
@@ -743,6 +745,7 @@ function vRecord(){
   <div class="cols">
     <section class="panel"><h3>College winners (2023-2025)</h3><p>${pct(cw.win_rate)} of ${cw.games||"–"} games; ${pct(cw.conf60_win)} when 60%+ sure. The books' favorite won ${pct(cw.market_fav_win_rate)}.</p>${bandChart(cw.bands,"games")}</section>
     ${hw.games?`<section class="panel"><h3>NHL winners (held back: 2024-25, 2025-26)</h3><p>${pct(hw.win_rate)} of ${hw.games} games; ${pct(hw.conf60_win)} when 60%+ sure (${hw.conf60_games} games). Retrained every week on earlier games only; these two seasons were kept out of all model choices. At closing prices these picks returned about -3%: the grade tells you how often they win, not that they beat the price.</p>${bandChart(hw.bands,"games")}</section>`:""}
+    ${bw.games?`<section class="panel"><h3>NBA winners (2018-19 to 2025-26)</h3><p>${pct(bw.win_rate)} of ${bw.games} games; ${pct(bw.conf60_win)} when 60%+ sure (${bw.conf60_games} games). Retrained every week on earlier games only; model settings were chosen on 2009-2018. Like hockey, the grade tells you how often they win, not that they beat the price.</p>${bandChart(bw.bands,"games")}</section>`:""}
     <section class="panel"><h3>Spreads and totals</h3><p>Shown, not graded. Against closing lines our spread and total picks won about half in testing (2023-2025).</p>
       <div class="tbl"><table><thead><tr><th>Market</th><th class="r">Picks</th><th class="r">Won</th></tr></thead><tbody>
       ${["NFL_spread","NFL_total","CFB_spread","CFB_total"].filter(k=>st[k]).map(k=>`<tr><td>${k.replace("_"," ")}</td><td class="r">${st[k].picks_2023_2025}</td><td class="r">${pct(st[k].won_2023_2025)}</td></tr>`).join("")}
@@ -781,13 +784,14 @@ function vAbout(){
   const m=D.meta,gr=m.grade_rules||{};
   const gl=(t,l)=>`<div class="tbl"><table><thead><tr><th>Grade</th><th>${t}</th></tr></thead><tbody>${(l||[]).map(g=>`<tr><td>${gradeEl(g.grade)}</td><td>${esc(g.label)}</td></tr>`).join("")}</tbody></table></div>`;
   return `<div class="prose"><h2 style="font-size:28px;text-transform:uppercase">How it works</h2>
-  <p>Confident Picks is a new system. We build our own models from free public data: for football, game results, play-by-play, player tracking and charting, snap counts and injury reports; for hockey, NHL box scores since 2011, goalie form (goals saved above average), rest, travel and back-to-backs. Sportsbook lines are never inputs; we show them only to compare, and to know which line a prop is asking about.</p>
+  <p>Confident Picks is a new system. We build our own models from free public data: for football, game results, play-by-play, player tracking and charting, snap counts and injury reports; for hockey, NHL box scores since 2011, goalie form (goals saved above average), rest, travel and back-to-backs; for basketball, NBA box scores since 2003 (team efficiency and pace, who played, rest and back-to-backs). Sportsbook lines are never inputs; we show them only to compare, and to know which line a prop is asking about.</p>
   <h3>How we test</h3><p>${esc(m.method||"")}</p><p>A pick is graded only after its type held up on seasons the model never saw: 60% for winners and props, 58% for spreads and totals. Anything below that is still shown, marked ungraded.</p>
-  <h3>Grades</h3><div class="cols">${gl("Football winners: our chance",gr.winner)}${gl("Football props: our chance",gr.prop)}${(m.nhl_grade_rules||{}).winner?gl("NHL winners: our chance",m.nhl_grade_rules.winner):""}</div>
-  <p>NHL puck lines, totals and props are shown with our chance but ungraded: against 2021-26 prices they won about as often as we said, but lost money at the books' prices.</p>
+  <h3>Grades</h3><div class="cols">${gl("Football winners: our chance",gr.winner)}${gl("Football props: our chance",gr.prop)}${(m.nhl_grade_rules||{}).winner?gl("NHL winners: our chance",m.nhl_grade_rules.winner):""}${(m.nba_grade_rules||{}).winner?gl("NBA winners: our chance",m.nba_grade_rules.winner):""}</div>
+  <p>NHL puck lines, totals and props, and NBA spreads, totals and props, are shown with our chance but ungraded: against past prices they won about as often as we said, but lost money at the books' prices.</p>
   <h3>Value</h3><p>A pick has value when our chance times the payout beats what you risk. Among props we rated 60%+, the ones with value at the posted price won 62% and 65% in 2024 and 2025 and returned +11% and +14%; the rest lost money in 2024.</p>
   <h3>When to bet</h3><p>${esc(m.timing||"")}</p>
-  <h3>What we don't claim</h3><p>Books' closing lines are sharper than our game models; we are about half a point behind them on NFL margins. Our edge so far is in player props, and our live record decides what stays.</p></div>`;
+  <h3>What we don't claim</h3><p>Books' closing lines are sharper than our game models; we are about half a point behind them on NFL margins. Our edge so far is in player props, and our live record decides what stays.</p>
+  <h3>Data sources</h3><p>Football data from nflverse (CC BY 4.0) and cfbfastR / CollegeFootballData.com; hockey from the NHL's public statistics and MoneyPuck; basketball box scores via sportsdataverse's hoopR; sportsbook lines from The Odds API. We thank these projects; they don't endorse our picks.</p></div>`;
 }
 
 function render(){
@@ -813,7 +817,7 @@ function bindShare(){
 }
 function header(){
   const m=D.meta,oc=m.odds_captured_at||{};
-  $("#updated").innerHTML=`Updated <b>${esc(stamp(m.generated_at))}</b><br><span><span class="ln">Lines ${esc(stamp(oc.NFL))}${oc.NHL?" · NHL "+esc(stamp(oc.NHL)):""} · </span><button class="about-link" id="go-about">How it works</button></span>`;
+  $("#updated").innerHTML=`Updated <b>${esc(stamp(m.generated_at))}</b><br><span><span class="ln">Lines ${esc(stamp(oc.NFL))}${oc.NHL?" · NHL "+esc(stamp(oc.NHL)):""}${oc.NBA?" · NBA "+esc(stamp(oc.NBA)):""} · </span><button class="about-link" id="go-about">How it works</button></span>`;
   $("#go-about").onclick=()=>setTab("about");
 }
 const started=p=>{const t=Date.parse(p.kickoff_utc);return !isNaN(t)&&t<=Date.now()};
