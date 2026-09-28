@@ -277,6 +277,9 @@ td.r,th.r{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-
 .pmodal img{width:100%;height:auto;border-radius:10px;display:block;-webkit-touch-callout:default}
 .pmodal p{margin:0;font-size:13.5px;color:var(--ink-2);text-align:center}
 .pmodal .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+details.upcoming>summary{list-style:none;cursor:pointer;padding:10px 0;border-top:1px solid var(--line)}
+details.upcoming>summary::-webkit-details-marker{display:none}
+details.upcoming>summary::after{content:" ▾";color:var(--muted)}details.upcoming[open]>summary::after{content:" ▴"}
 .lock.none{background:var(--surface);color:var(--ink);border:1px dashed var(--line-2);box-shadow:none}
 @media (max-width:760px){.lock{grid-template-columns:1fr}.lock .nums{justify-items:start;text-align:left}.lock h2{font-size:28px}}
 footer{margin-top:34px;font-size:12px;color:var(--muted);display:grid;gap:4px;max-width:80ch}
@@ -571,8 +574,9 @@ function vToday(){
   const m=D.meta,tr=m.track_record||{},nw=tr.nfl_winners||{},cw=tr.cfb_winners||{},hw=tr.nhl_winners||{},pr=(tr.props||{}).cal60||{};
   const plRec=(tr.prop_lines||null);
   const live=(tr.live||{}).groups||[];
-  const valuePicks=D.picks.filter(p=>p.value_pick).sort((a,b)=>b.value-a.value).slice(0,12);
-  const winners=D.picks.filter(p=>p.market_label==="Winner"&&p.win_prob>=0.6).sort((a,b)=>b.win_prob-a.win_prob).slice(0,6);
+  const slate=D.picks.filter(isToday);
+  const valuePicks=slate.filter(p=>p.value_pick).sort((a,b)=>b.value-a.value).slice(0,12);
+  const winners=slate.filter(p=>p.market_label==="Winner"&&p.win_prob>=0.6).sort((a,b)=>b.win_prob-a.win_prob).slice(0,6);
   const propLine=(tr.lines||[]).find(l=>l.startsWith("NFL props"))||"";
   const propPct=(propLine.match(/(\d+)% of (\d+)/)||[]);
   const liveAll=live.filter(g=>g.sport==="all");
@@ -600,6 +604,7 @@ function propFilters(list){
   const markets=[...new Set(list.map(p=>p.market_label))].sort();
   const games=[...new Map(list.map(p=>[p.game,p.kickoff_utc])).entries()].sort((a,b)=>a[1]<b[1]?-1:1);
   return `<div class="filters" role="search">
+    <select id="f-when" aria-label="Day"><option value="today" ${(state.when||"today")==="today"?"selected":""}>Today</option><option value="up" ${state.when==="up"?"selected":""}>Coming up</option><option value="all" ${state.when==="all"?"selected":""}>All days</option></select>
     <select id="f-sport" aria-label="Sport">${sportOpts()}</select>
     <input type="search" id="f-q" placeholder="Search player or team" aria-label="Search player or team" value="${esc(state.q)}">
     <select id="f-market" aria-label="Prop type"><option value="">All prop types</option>${markets.map(m=>`<option ${m===state.market?"selected":""}>${esc(m)}</option>`).join("")}</select>
@@ -614,7 +619,7 @@ const SPORTS=[["","All sports"],["NFL","NFL"],["CFB","College"],["NHL","NHL"]];
 function sportOpts(){return SPORTS.filter(([k])=>!k||D.picks.some(p=>p.sport===k)).map(([k,l])=>`<option value="${k}" ${k===state.sport?"selected":""}>${l}</option>`).join("")}
 function filtered(list){
   const q=state.q.trim().toLowerCase();
-  let r=list.filter(p=>(!state.sport||p.sport===state.sport)&&(!state.market||p.market_label===state.market)&&(!state.game||p.game===state.game)&&(!state.ab||p.grade==="A"||p.grade==="B")
+  let r=list.filter(p=>inWhen(p)&&(!state.sport||p.sport===state.sport)&&(!state.market||p.market_label===state.market)&&(!state.game||p.game===state.game)&&(!state.ab||p.grade==="A"||p.grade==="B")
     &&(!state.value||p.value_pick)&&(!state.agree||p.agree===true)&&(!q||[p.player,p.team,p.game].join(" ").toLowerCase().includes(q)));
   const by={best:(a,b)=>b.win_prob-a.win_prob,value:(a,b)=>(b.value??-9)-(a.value??-9),time:(a,b)=>a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:b.win_prob-a.win_prob}[state.sort]||((a,b)=>b.win_prob-a.win_prob);
   return r.sort(by);
@@ -627,7 +632,7 @@ function vProps(){
 function fillProps(){
   const list=filtered(D.picks.filter(p=>p.kind==="prop"||p.kind==="td"));
   $("#f-count").textContent=`${list.length} picks`;
-  $("#plist").innerHTML=list.length?list.slice(0,state.shown).map(pickRow).join("")+(list.length>state.shown?`<button class="more" id="more">Show ${Math.min(60,list.length-state.shown)} more</button>`:""):'<div class="empty">No picks match. Clear the search or a filter.</div>';
+  $("#plist").innerHTML=list.length?list.slice(0,state.shown).map(pickRow).join("")+(list.length>state.shown?`<button class="more" id="more">Show ${Math.min(60,list.length-state.shown)} more</button>`:""):`<div class="empty">${(state.when||"today")==="today"?"No picks left for today that match. Set Day to Coming up to see the next games.":"No picks match. Clear the search or a filter."}</div>`;
   const mb=$("#more");if(mb)mb.onclick=()=>{state.shown+=60;fillProps()};
   bindShare();
 }
@@ -635,6 +640,7 @@ function bindProps(){
   const upd=()=>{state.shown=60;store.set("state",state);fillProps()};
   $("#f-q").oninput=e=>{state.q=e.target.value;upd()};
   $("#f-sport").onchange=e=>{state.sport=e.target.value;upd()};
+  $("#f-when").onchange=e=>{state.when=e.target.value;upd()};
   $("#f-market").onchange=e=>{state.market=e.target.value;upd()};
   $("#f-game").onchange=e=>{state.game=e.target.value;upd()};
   $("#f-sort").onchange=e=>{state.sort=e.target.value;upd()};
@@ -642,6 +648,10 @@ function bindProps(){
   fillProps();
 }
 
+/* today vs coming up (owner 2026-09-28): today's slate is today's games in ET; later days go under "Coming up" */
+const todayET=()=>new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"});
+const isToday=p=>new Date(p.kickoff_utc).toLocaleDateString("en-CA",{timeZone:"America/New_York"})===todayET();
+const inWhen=p=>state.when==="up"?!isToday(p):state.when==="all"?true:isToday(p);
 function vGames(){
   const gp=D.picks.filter(p=>p.kind==="game"&&!MULTI.has(p.market_label)&&(!state.sport||p.sport===state.sport));
   const by=new Map();
@@ -650,8 +660,14 @@ function vGames(){
   const byDay=new Map();for(const g of groups){const k=g.sport+" · "+day(g.ko);if(!byDay.has(k))byDay.set(k,[]);byDay.get(k).push(g)}
   const sw=`<div class="filters" role="group" aria-label="Sport">${SPORTS.filter(([k])=>!k||D.picks.some(p=>p.sport===k&&p.kind==="game")).map(([k,l])=>`<button class="chip g-sport" data-s="${k}" aria-pressed="${state.sport===k}">${l}</button>`).join("")}</div>`;
   if(!groups.length)return sw+'<div class="empty">No games in the current window.</div>';
+  const block=ents=>ents.map(([k,gs])=>`<section class="view" style="padding:0;gap:10px"><h3 class="muted" style="font-size:17px;text-transform:uppercase">${esc(k)}</h3><div class="games">${gs.map(gameCard).join("")}</div></section>`).join("");
+  const ents=[...byDay.entries()];
+  const tod=ents.filter(([k,gs])=>isToday({kickoff_utc:gs[0].ko})),later=ents.filter(([k,gs])=>!isToday({kickoff_utc:gs[0].ko}));
+  const nLater=later.reduce((n,[k,gs])=>n+gs.length,0);
   return `<div class="sec-h"><div><h2>Games</h2><p class="lede">Winner, spread (puck line in hockey) and total all come from one projected score, so they never contradict each other. Winners are graded; spreads and totals are shown ungraded until they beat 58% on seasons the model never saw. NHL scores show expected goals.</p></div></div>${sw}
-  ${[...byDay.entries()].map(([k,gs])=>`<section class="view" style="padding:0;gap:10px"><h3 class="muted" style="font-size:17px;text-transform:uppercase">${esc(k)}</h3><div class="games">${gs.map(gameCard).join("")}</div></section>`).join("")}`;
+  <h2 style="font-size:22px;text-transform:uppercase">Today</h2>
+  ${tod.length?block(tod):'<div class="empty">No games left today. See what is coming up below.</div>'}
+  ${later.length?`<details class="upcoming"${tod.length?"":" open"}><summary><h2 style="font-size:22px;text-transform:uppercase;display:inline">Coming up</h2> <span class="muted">${nLater} game${nLater===1?"":"s"}</span></summary><div class="view" style="padding-top:12px">${block(later)}</div></details>`:""}`;
 }
 function gameCard(g){
   const W=g.rows.find(r=>r.market_label==="Winner"),S=g.rows.find(r=>r.market_label==="Spread"||r.market_label==="Puck line"),T=g.rows.find(r=>r.market_label==="Total");
