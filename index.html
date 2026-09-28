@@ -449,7 +449,7 @@ const lastName=n=>{const w=String(n).trim().split(/\s+/);let i=w.length-1;if(i>0
 const etDay=iso=>new Date(iso).toLocaleDateString("en-CA",{...tz});
 const shortTime=iso=>new Date(iso).toLocaleTimeString("en-US",{...tz,hour:"numeric",minute:"2-digit"}).replace(":00","").replace(" AM","a").replace(" PM","p");
 function winnerShort(p){
-  if(p.sport==="CFB")return p.player;
+  if(p.sport==="CFB"||p.sport==="UFC")return p.player;
   const [a,h]=String(p.game).split(" @ ");return (p.pick_side==="home"?h:p.pick_side==="away"?a:p.player);
 }
 function pickShort(p){
@@ -546,8 +546,8 @@ function copyTodayText(){
   const d=new Date();const head=`Confident Picks · ${d.toLocaleDateString("en-US",{...tz,weekday:"short"})} ${d.toLocaleDateString("en-US",{...tz,month:"numeric",day:"numeric"})}`;
   const lines=[head];
   if(L&&!started(L)&&etDay(L.kickoff_utc)===etDay(d.toISOString()))lines.push(`LOCK: ${pickShort({...L,grade:"\u2014"})}`);
-  const SPORT={NFL:"NFL",CFB:"College",NHL:"NHL",NBA:"NBA"};
-  const ps=gradedToday().sort((a,b)=>["NFL","CFB","NHL","NBA"].indexOf(a.sport)-["NFL","CFB","NHL","NBA"].indexOf(b.sport)||(a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:0)||(a.market_label==="Winner"?-1:b.market_label==="Winner"?1:b.win_prob-a.win_prob));
+  const SPORT={NFL:"NFL",CFB:"College",NHL:"NHL",NBA:"NBA",UFC:"UFC"};
+  const ps=gradedToday().sort((a,b)=>["NFL","CFB","NHL","NBA","UFC"].indexOf(a.sport)-["NFL","CFB","NHL","NBA","UFC"].indexOf(b.sport)||(a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:0)||(a.market_label==="Winner"?-1:b.market_label==="Winner"?1:b.win_prob-a.win_prob));
   let key="";
   for(const p of ps){const k=`${SPORT[p.sport]||p.sport} · ${shortTime(p.kickoff_utc)}`;if(k!==key){lines.push("",k);key=k}lines.push(pickShort(p))}
   if(!ps.length&&lines.length===1)lines.push("No graded picks left today.");
@@ -617,7 +617,7 @@ function propFilters(list){
     <button class="chip" id="f-agree" aria-pressed="${state.agree}">Books agree</button>
     <span class="count" id="f-count"></span></div>`;
 }
-const SPORTS=[["","All sports"],["NFL","NFL"],["CFB","College"],["NHL","NHL"],["NBA","NBA"]];
+const SPORTS=[["","All sports"],["NFL","NFL"],["CFB","College"],["NHL","NHL"],["NBA","NBA"],["UFC","UFC"]];
 function sportOpts(){return SPORTS.filter(([k])=>!k||D.picks.some(p=>p.sport===k)).map(([k,l])=>`<option value="${k}" ${k===state.sport?"selected":""}>${l}</option>`).join("")}
 function filtered(list){
   const q=state.q.trim().toLowerCase();
@@ -673,7 +673,7 @@ function vGames(){
 }
 function gameCard(g){
   const W=g.rows.find(r=>r.market_label==="Winner"),S=g.rows.find(r=>r.market_label==="Spread"||r.market_label==="Puck line"),T=g.rows.find(r=>r.market_label==="Total");
-  const [away,home]=g.game.split(" @ ");
+  const ufc=g.sport==="UFC",parts=g.game.split(ufc?" vs ":" @ "),away=ufc?parts[1]:parts[0],home=ufc?parts[0]:parts[1];
   let sc={};if(W&&W.our_score){for(const part of W.our_score.split(",")){const m=part.trim().match(/^(.*)\s(\d+(?:\.\d)?)$/);if(m)sc[m[1].trim()]=m[2]}}
   const scoreOf=name=>{for(const k in sc){if(name===k||name.startsWith(k)||k.startsWith(name))return sc[k]}return Object.values(sc)[name===home?0:1]??""};
   const favHome=W?W.pick_side==="home":null;
@@ -684,8 +684,8 @@ function gameCard(g){
       <span class="t">${favHome===true?'<i class="fav" aria-label="our pick"></i>':""}${esc(home)}</span><span class="sc">${esc(scoreOf(home))}</span></div>
     <div class="lines">
       ${cell("Winner",W,W?`${esc(W.player)} ${pct(W.win_prob)}`:"")}
-      ${cell(g.sport==="NHL"?"Puck line":"Spread",S,S?esc(pickText(S))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(S.win_prob)}`:""):"")}
-      ${cell("Total",T,T?esc(pickText(T))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(T.win_prob)}`:""):"")}
+      ${ufc?"":cell(g.sport==="NHL"?"Puck line":"Spread",S,S?esc(pickText(S))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(S.win_prob)}`:""):"")}
+      ${ufc?"":cell("Total",T,T?esc(pickText(T))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(T.win_prob)}`:""):"")}
     </div>
     ${W&&W.sport==="NHL"&&W.note?`<div class="extras"><span class="pill ng">${esc(W.note)}</span></div>`:""}
     ${W&&W.suggested?`<div class="extras"><span class="pill ng">${esc(W.suggested)}</span></div>`:""}
