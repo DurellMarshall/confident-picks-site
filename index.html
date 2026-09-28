@@ -496,7 +496,7 @@ function gamePhoto(game){
   x.fillStyle="#fff";x.font=F(800,30);x.fillText("CONFIDENT PICKS",tx,56);
   const sp=(W||rows[0]||{}).sport||"";
   x.fillStyle="#D6E4F7";x.font=F(600,17);
-  x.fillText(ko?`${new Date(ko).toLocaleDateString("en-US",{...tz,weekday:"long",month:"short",day:"numeric"})} · ${sp==="CFB"?"College":sp} ${new Date(ko).toLocaleTimeString("en-US",{...tz,hour:"numeric",minute:"2-digit"})}`:(sp||""),tx,88);
+  x.fillText(ko?`${new Date(ko).toLocaleDateString("en-US",{...tz,weekday:"long",month:"short",day:"numeric"})} · ${sp==="CFB"?"College":sp==="CBB"?"College hoops":sp} ${new Date(ko).toLocaleTimeString("en-US",{...tz,hour:"numeric",minute:"2-digit"})}`:(sp||""),tx,88);
   let y=150;
   if(W){
     x.fillStyle="#fff";x.strokeStyle="#D3DCE8";x.lineWidth=1;
@@ -546,8 +546,8 @@ function copyTodayText(){
   const d=new Date();const head=`Confident Picks · ${d.toLocaleDateString("en-US",{...tz,weekday:"short"})} ${d.toLocaleDateString("en-US",{...tz,month:"numeric",day:"numeric"})}`;
   const lines=[head];
   if(L&&!started(L)&&etDay(L.kickoff_utc)===etDay(d.toISOString()))lines.push(`LOCK: ${pickShort({...L,grade:"\u2014"})}`);
-  const SPORT={NFL:"NFL",CFB:"College",NHL:"NHL",NBA:"NBA",UFC:"UFC"};
-  const ps=gradedToday().sort((a,b)=>["NFL","CFB","NHL","NBA","UFC"].indexOf(a.sport)-["NFL","CFB","NHL","NBA","UFC"].indexOf(b.sport)||(a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:0)||(a.market_label==="Winner"?-1:b.market_label==="Winner"?1:b.win_prob-a.win_prob));
+  const SPORT={NFL:"NFL",CFB:"College",NHL:"NHL",NBA:"NBA",CBB:"College hoops",UFC:"UFC"};
+  const ps=gradedToday().sort((a,b)=>["NFL","CFB","NHL","NBA","CBB","UFC"].indexOf(a.sport)-["NFL","CFB","NHL","NBA","CBB","UFC"].indexOf(b.sport)||(a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:0)||(a.market_label==="Winner"?-1:b.market_label==="Winner"?1:b.win_prob-a.win_prob));
   let key="";
   for(const p of ps){const k=`${SPORT[p.sport]||p.sport} · ${shortTime(p.kickoff_utc)}`;if(k!==key){lines.push("",k);key=k}lines.push(pickShort(p))}
   if(!ps.length&&lines.length===1)lines.push("No graded picks left today.");
@@ -617,7 +617,7 @@ function propFilters(list){
     <button class="chip" id="f-agree" aria-pressed="${state.agree}">Books agree</button>
     <span class="count" id="f-count"></span></div>`;
 }
-const SPORTS=[["","All sports"],["NFL","NFL"],["CFB","College"],["NHL","NHL"],["NBA","NBA"],["UFC","UFC"]];
+const SPORTS=[["","All sports"],["NFL","NFL"],["CFB","College"],["NHL","NHL"],["NBA","NBA"],["CBB","College hoops"],["UFC","UFC"]];
 function sportOpts(){return SPORTS.filter(([k])=>!k||D.picks.some(p=>p.sport===k)).map(([k,l])=>`<option value="${k}" ${k===state.sport?"selected":""}>${l}</option>`).join("")}
 function filtered(list){
   const q=state.q.trim().toLowerCase();
@@ -659,7 +659,7 @@ function vGames(){
   const by=new Map();
   for(const p of gp){if(!by.has(p.game))by.set(p.game,{game:p.game,sport:p.sport,ko:p.kickoff_utc,rows:[]});by.get(p.game).rows.push(p)}
   const groups=[...by.values()].sort((a,b)=>a.ko<b.ko?-1:1);
-  const byDay=new Map();for(const g of groups){const k=g.sport+" · "+day(g.ko);if(!byDay.has(k))byDay.set(k,[]);byDay.get(k).push(g)}
+  const byDay=new Map();for(const g of groups){const k=(g.sport==="CBB"?"College hoops":g.sport)+" · "+day(g.ko);if(!byDay.has(k))byDay.set(k,[]);byDay.get(k).push(g)}
   const sw=`<div class="filters" role="group" aria-label="Sport">${SPORTS.filter(([k])=>!k||D.picks.some(p=>p.sport===k&&p.kind==="game")).map(([k,l])=>`<button class="chip g-sport" data-s="${k}" aria-pressed="${state.sport===k}">${l}</button>`).join("")}</div>`;
   if(!groups.length)return sw+'<div class="empty">No games in the current window.</div>';
   const block=ents=>ents.map(([k,gs])=>`<section class="view" style="padding:0;gap:10px"><h3 class="muted" style="font-size:17px;text-transform:uppercase">${esc(k)}</h3><div class="games">${gs.map(gameCard).join("")}</div></section>`).join("");
@@ -679,13 +679,13 @@ function gameCard(g){
   const favHome=W?W.pick_side==="home":null;
   const extras=g.rows.filter(r=>!["Winner","Spread","Puck line","Total"].includes(r.market_label));
   const cell=(k,r,body)=>`<div><span class="k">${k}</span>${r?`<span class="p">${body}</span><span class="b">${esc(r.book_line||"")}</span>`:'<span class="b">No line</span>'}</div>`;
-  return `<article class="game"><div class="gh"><span>${esc(g.sport)} · ${esc(when(g.ko))}</span>${W?`<span>${gradeEl(W.grade)}</span>`:""}</div>
+  return `<article class="game"><div class="gh"><span>${esc(g.sport==="CBB"?"College hoops":g.sport)} · ${esc(when(g.ko))}</span>${W?`<span>${gradeEl(W.grade)}</span>`:""}</div>
     <div class="bug"><span class="t">${favHome===false?'<i class="fav" aria-label="our pick"></i>':""}${esc(away)}</span><span class="sc">${esc(scoreOf(away))}</span>
       <span class="t">${favHome===true?'<i class="fav" aria-label="our pick"></i>':""}${esc(home)}</span><span class="sc">${esc(scoreOf(home))}</span></div>
     <div class="lines">
       ${cell("Winner",W,W?`${esc(W.player)} ${pct(W.win_prob)}`:"")}
-      ${ufc?"":cell(g.sport==="NHL"?"Puck line":"Spread",S,S?esc(pickText(S))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(S.win_prob)}`:""):"")}
-      ${ufc?"":cell("Total",T,T?esc(pickText(T))+(g.sport==="NHL"||g.sport==="NBA"?` ${pct(T.win_prob)}`:""):"")}
+      ${ufc?"":cell(g.sport==="NHL"?"Puck line":"Spread",S,S?esc(pickText(S))+(["NHL","NBA","CBB"].includes(g.sport)?` ${pct(S.win_prob)}`:""):"")}
+      ${ufc?"":cell("Total",T,T?esc(pickText(T))+(["NHL","NBA","CBB"].includes(g.sport)?` ${pct(T.win_prob)}`:""):"")}
     </div>
     ${W&&W.sport==="NHL"&&W.note?`<div class="extras"><span class="pill ng">${esc(W.note)}</span></div>`:""}
     ${W&&W.suggested?`<div class="extras"><span class="pill ng">${esc(W.suggested)}</span></div>`:""}
