@@ -597,7 +597,7 @@ function vToday(){
     ${valuePicks.length?`<div class="rail">${valuePicks.map(valueCard).join("")}</div>`:'<div class="empty">No value picks at current prices. Check back after the next update.</div>'}
   </section>
   <section class="view" style="padding:0;gap:10px">
-    <div class="sec-h"><h2>Our strongest winners</h2><p>Our six most confident winner picks. Football: A 90%+, B 80-89%, C 70-79%, D 60-69%. NHL, NBA and soccer: A 70%+, B 65-69%, C 60-64%.</p></div>
+    <div class="sec-h"><h2>Our strongest winners</h2><p>Our six most confident winner picks. Football: A 90%+, B 80-89%, C 70-79%, D 60-69%. NHL, NBA, soccer and UFC: A 70%+, B 65-69%, C 60-64%. College basketball uses the football scale.</p></div>
     ${winners.length?`<div class="list">${winners.map(pickRow).join("")}</div>`:'<div class="empty">No winner picks at 60%+ in the current window.</div>'}
   </section>`;
 }
@@ -786,12 +786,12 @@ function vAbout(){
   return `<div class="prose"><h2 style="font-size:28px;text-transform:uppercase">How it works</h2>
   <p>Confident Picks is a new system. We build our own models from free public data: for football, game results, play-by-play, player tracking and charting, snap counts and injury reports; for hockey, NHL box scores since 2011, goalie form (goals saved above average), rest, travel and back-to-backs; for basketball, NBA box scores since 2003 and college box scores since 2006 (team efficiency and pace, who played, rest and back-to-backs); for soccer, results and shots on target in six leagues since 2016. Sportsbook lines are never inputs; we show them only to compare, and to know which line a prop is asking about.</p>
   <h3>How we test</h3><p>${esc(m.method||"")}</p><p>A pick is graded only after its type held up on seasons the model never saw: 60% for winners and props, 58% for spreads and totals. Anything below that is still shown, marked ungraded.</p>
-  <h3>Grades</h3><div class="cols">${gl("Football winners: our chance",gr.winner)}${gl("Football props: our chance",gr.prop)}${(m.nhl_grade_rules||{}).winner?gl("NHL winners: our chance",m.nhl_grade_rules.winner):""}${(m.nba_grade_rules||{}).winner?gl("NBA winners: our chance",m.nba_grade_rules.winner):""}${(m.soc_grade_rules||{}).winner?gl("Soccer results: our chance",m.soc_grade_rules.winner):""}</div>
+  <h3>Grades</h3><div class="cols">${gl("Football winners: our chance",gr.winner)}${gl("Football props: our chance",gr.prop)}${(m.nhl_grade_rules||{}).winner?gl("NHL winners: our chance",m.nhl_grade_rules.winner):""}${(m.nba_grade_rules||{}).winner?gl("NBA winners: our chance",m.nba_grade_rules.winner):""}${(m.soc_grade_rules||{}).winner?gl("Soccer results: our chance",m.soc_grade_rules.winner):""}${(m.cbb_grade_rules||{}).winner?gl("College basketball winners: our chance",m.cbb_grade_rules.winner):""}${(m.ufc_grade_rules||{}).winner?gl("UFC fights: our chance",m.ufc_grade_rules.winner):""}</div>
   <p>NHL puck lines, totals and props, NBA spreads, totals and most props, and soccer totals, are shown with our chance but ungraded: against past prices they won about as often as we said, but lost money at the books' prices.</p>
   <h3>Value</h3><p>A pick has value when our chance times the payout beats what you risk. Among props we rated 60%+, the ones with value at the posted price won 62% and 65% in 2024 and 2025 and returned +11% and +14%; the rest lost money in 2024.</p>
   <h3>When to bet</h3><p>${esc(m.timing||"")}</p>
   <h3>What we don't claim</h3><p>Books' closing lines are sharper than our game models; we are about half a point behind them on NFL margins. Our edge so far is in player props, and our live record decides what stays.</p>
-  <h3>Data sources</h3><p>Football data from nflverse (CC BY 4.0) and cfbfastR / CollegeFootballData.com; hockey from the NHL's public statistics and MoneyPuck; basketball box scores via sportsdataverse's hoopR; soccer results from football-data.co.uk; sportsbook lines from The Odds API. We thank these projects; they don't endorse our picks.</p></div>`;
+  <h3>Data sources</h3><p>Football data from nflverse (CC BY 4.0) and cfbfastR / CollegeFootballData.com; hockey from the NHL's public statistics and MoneyPuck; UFC fight statistics from UFCStats; basketball box scores via sportsdataverse's hoopR; soccer results from football-data.co.uk; sportsbook lines from The Odds API. We thank these projects; they don't endorse our picks.</p></div>`;
 }
 
 function render(){
