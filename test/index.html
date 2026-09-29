@@ -430,7 +430,7 @@ function vAccount(){
     <section class="panel"><h3>Plan</h3><p><b>${pro?"Pro monthly":"Free"}</b>${pro?" · renews Oct 28, 2026 · "+PLAN_PRICES.month+"/month":""}</p>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${pro?`<button class="btn" disabled title="Opens Stripe's billing page">Manage billing and invoices</button><button class="btn" disabled>Cancel plan</button>`:`<button class="btn hot" data-go="plans">Upgrade to Pro</button>`}</div>
       <p class="lede" style="font-size:12.5px">Billing changes open Stripe's secure customer page.</p></section>
-    <section class="panel"><h3>Alerts</h3><p>Email me the Lock of the Day at 6 AM ET <span class="badge">Coming later</span></p></section>
+    <section class="panel"><h3>Alerts</h3><p>Email me the Lock of the Day at 10 AM ET <span class="badge">Coming later</span></p></section>
     <button class="btn" data-tier="visitor">Sign out</button>
   </div>`;
 }
@@ -685,7 +685,7 @@ function lastLockLine(){
 }
 function lockCard(){
   const L=(D.meta&&D.meta.lock)||D.picks.find(p=>p.lock);
-  if(!L)return `<section class="lock none" aria-label="Lock of the day"><div><span class="lk"><i></i>Lock of the day</span><div class="who" style="margin-top:6px">Chosen at 6 AM ET on NFL game days: our highest-chance NFL prop that pays +100 or better. ${Number(new Date().toLocaleString("en-US",{...tz,hour:"numeric",hour12:false}))<6?"Today's lock posts at 6 AM ET.":"No lock today (no NFL games left today, or no prop at +100 or better)."}</div>${lastLockLine()}</div></section>`;
+  if(!L)return `<section class="lock none" aria-label="Lock of the day"><div><span class="lk"><i></i>Lock of the day</span><div class="who" style="margin-top:6px">Chosen at about 10 AM ET: our highest-chance player prop from any sport (NFL, NBA, NHL) that pays +100 or better. ${Number(new Date().toLocaleString("en-US",{...tz,hour:"numeric",hour12:false}))<10?"Today's lock posts at about 10 AM ET.":"No lock today (no NFL, NBA or NHL games left today, or no prop at +100 or better)."}</div>${lastLockLine()}</div></section>`;
   const lp=[L.locked_price,L.locked_best_price].filter(x=>x!=null);
   const bp=lp.length?lp.reduce((a,b)=>(b>0?1+b/100:1+100/-b)>(a>0?1+a/100:1+100/-a)?b:a):bestPrice(L);
   const bk=L.locked_best_price!=null&&bp===L.locked_best_price?L.locked_best_book:(L.locked_price!=null?"":L.best_book);
@@ -693,9 +693,9 @@ function lockCard(){
   const st=L.result==="W"?'<span class="lstat W">&#10003; Won</span>':L.result==="L"?'<span class="lstat L">&#10007; Lost</span>':L.result==="P"?'<span class="lstat">Push</span>':started(L)?'<span class="lstat">In progress</span>':"";
   return `<section class="lock" aria-label="Lock of the day"><div><span class="lk"><i></i>Lock of the day · ${esc(new Date(L.locked_at||L.kickoff_utc).toLocaleDateString("en-US",{...tz,weekday:"long",month:"short",day:"numeric"}))}</span>
     <h2 style="margin-top:8px">${esc(L.player)}: ${esc(pickText(L))} ${esc(String(L.market_label).toLowerCase())}</h2>${st?`<div style="margin-top:6px">${st}</div>`:""}
-    <div class="who">${esc(L.game)} · ${esc(when(L.kickoff_utc))} ET${L.proj!=null?` · our projection ${num(L.proj)}`:""}</div></div>
+    <div class="who">${esc(L.sport||"")} · ${esc(L.game)} · ${esc(when(L.kickoff_utc))} ET${L.proj!=null?` · our projection ${num(L.proj)}`:""}</div></div>
     <div class="nums"><b>${price(bp)}</b><span>${esc(bk||"price when picked")}</span><span>Our chance ${pct(L.win_prob)}</span></div>
-    <p>+100 or better at the time it was picked${at?" ("+esc(at)+")":""}. Prices move, so check your book before betting. Tested on every NFL game day: 2024 won 57.9% at about +106 (+24% return); 2025 won 57.4% at about +110 (+21%). Chosen once a day at 6 AM ET and never changed.</p>
+    <p>+100 or better at the time it was picked${at?" ("+esc(at)+")":""}. Prices move, so check your book before betting. Tested on every day with NFL, NBA or NHL games: won 52-56% a season at about +105 (returns +9%, +10% and +17% over the last three seasons). Chosen once a day at about 10 AM ET and never changed.</p>
     <div><button class="share" id="share-lock">${SHARE_ICON}Share the lock</button><div id="lock-hold"></div></div></section>`;
 }
 function vToday(){
