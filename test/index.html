@@ -284,6 +284,42 @@ details.upcoming>summary::after{content:" ▾";color:var(--muted)}details.upcomi
 .lock.none{background:var(--surface);color:var(--ink);border:1px dashed var(--line-2);box-shadow:none}
 @media (max-width:760px){.lock{grid-template-columns:1fr}.lock .nums{justify-items:start;text-align:left}.lock h2{font-size:28px}}
 footer{margin-top:34px;font-size:12px;color:var(--muted);display:grid;gap:4px;max-width:80ch}
+
+/* ---- paywall / accounts preview (test page) ---- */
+.pv-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;padding:8px;margin:0 -16px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:13px}
+.pv-bar b{font-weight:700;margin-right:4px}
+.acct{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+.btn{appearance:none;border:1px solid var(--turf);background:var(--surface);color:var(--turf);font-weight:700;font-size:13.5px;padding:7px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.btn.solid{background:var(--turf);color:var(--turf-ink)}
+.btn.hot{background:var(--pylon);border-color:var(--pylon);color:#fff}
+.btn[disabled]{opacity:.55;cursor:not-allowed}
+.badge{display:inline-block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--pylon-soft);color:var(--pylon)}
+.gate{position:relative;border:1px solid var(--line);border-radius:16px;background:var(--surface);overflow:hidden;min-height:280px}
+.gate .blur{filter:blur(6px);opacity:.55;pointer-events:none;user-select:none;max-height:260px;overflow:hidden}
+.gate .over{position:absolute;inset:0;display:grid;place-items:center;padding:18px;background:linear-gradient(180deg,transparent,var(--surface) 55%)}
+.gate .card{max-width:440px;text-align:center;display:grid;gap:10px;justify-items:center}
+.gate .card h3{font-size:24px;text-transform:uppercase}
+.gate .card p{margin:0;color:var(--ink-2);font-size:14px}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.plan{border:1px solid var(--line);border-radius:18px;background:var(--surface);padding:20px;display:grid;gap:12px;align-content:start}
+.plan.best{border:2px solid var(--turf);box-shadow:var(--shadow)}
+.plan h3{font-size:26px;text-transform:uppercase}
+.plan .price{font-family:var(--disp);font-size:40px;font-weight:700;line-height:1}
+.plan .price small{font-size:15px;color:var(--muted);font-weight:600}
+.plan ul{margin:0;padding-left:18px;display:grid;gap:6px;font-size:14px}
+.plan li.no{color:var(--muted);text-decoration:line-through}
+.modal{position:fixed;inset:0;z-index:100;background:rgba(6,12,22,.55);display:grid;place-items:center;padding:16px}
+.modal .box{width:min(440px,100%);background:var(--surface);color:var(--ink);border-radius:18px;padding:22px;display:grid;gap:12px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.modal .box h3{font-size:26px;text-transform:uppercase}
+.modal input{width:100%;padding:10px 12px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface-2);font:inherit;color:var(--ink)}
+.modal .note{font-size:12.5px;color:var(--muted);margin:0}
+.modal .row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.summary{border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:4px;font-size:14px}
+.summary .t{display:flex;justify-content:space-between}
+.acctpage{display:grid;gap:14px;max-width:640px}
+.pin{position:fixed;inset:0;z-index:200;background:var(--ground);display:grid;place-items:center;padding:16px}
+.pin .box{width:min(360px,100%);display:grid;gap:12px;text-align:center}
+.pin input{font:600 28px var(--mono);letter-spacing:.4em;text-align:center;padding:10px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);color:var(--ink)}
 </style>
 
 <div class="wrap">
@@ -332,17 +368,100 @@ const ICON={
   record:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 19V11M12 19V5M19 19v-5" stroke-linecap="round"/></svg>',
   history:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 };
-const TABS=[["today","Today"],["props","Props"],["games","Games"],["tickets","Tickets"],["record","Record"],["history","History"],["about","How it works"]];
+const TABS=[["today","Today"],["props","Props"],["games","Games"],["tickets","Tickets"],["record","Record"],["history","History"],["plans","Plans"],["about","How it works"]];
 const MULTI=new Set(["2-leg ticket","3-leg ticket","Same-game pair","Game-script stack","Big-favorite combo"]);
 const TARGET_LABEL={};
 let D=null, state=Object.assign({tab:"today",sport:"",q:"",market:"",game:"",ab:false,value:false,agree:false,sort:"best",shown:60},store.get("state",{}));
 
 function setTab(t){state.tab=t;state.shown=60;store.set("state",state);try{history.replaceState(null,"","#"+t)}catch(e){}render();window.scrollTo({top:0})}
 
+
+/* ================= paywall / accounts PREVIEW (test page only) ================= */
+const TIER_NAMES={visitor:"Visitor",free:"Free member",pro:"Pro member"};
+const PLAN_PRICES={month:"$19",season:"$149"};   // placeholders until the owner sets prices
+let tier=store.get("pv_tier","visitor");
+const LIMIT={visitor:{props:3,games:2},free:{props:5,games:999},pro:{props:1e9,games:999}};
+function setTier(t){tier=t;store.set("pv_tier",t);render();acctBar()}
+function acctBar(){
+  const pv=`<div class="pv-bar" role="group" aria-label="Preview as"><b>Preview as:</b>${Object.entries(TIER_NAMES).map(([k,l])=>`<button class="chip" data-tier="${k}" aria-pressed="${tier===k}">${l}</button>`).join("")}<span class="badge">Design preview, not connected</span></div>`;
+  let host=document.getElementById("pv-host");
+  if(!host){host=document.createElement("div");host.id="pv-host";document.querySelector(".wrap").prepend(host)}
+  host.innerHTML=pv;
+  const a=tier==="visitor"?`<button class="btn" data-modal="signin">Sign in</button><button class="btn hot" data-go="plans">Join Pro</button>`
+    :tier==="free"?`<button class="btn" data-go="account">My account</button><button class="btn hot" data-go="plans">Upgrade to Pro</button>`
+    :`<span class="badge" style="background:var(--turf-soft);color:var(--turf)">Pro</span><button class="btn" data-go="account">My account</button>`;
+  let ab=document.getElementById("acct");
+  if(!ab){ab=document.createElement("div");ab.id="acct";ab.className="acct";document.getElementById("updated").after(ab)}
+  ab.innerHTML=a;
+  bindPreview();
+}
+function bindPreview(){
+  document.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>setTier(b.dataset.tier));
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setTab(b.dataset.go));
+  document.querySelectorAll("[data-modal]").forEach(b=>b.onclick=()=>openModal(b.dataset.modal,b.dataset.plan));
+}
+function gate(inner,need,title,why){
+  const cta=need==="free"?`<button class="btn solid" data-modal="signup">Create a free account</button><button class="btn" data-modal="signin">Sign in</button>`
+    :`<button class="btn hot" data-go="plans">See Pro plans</button>${tier==="visitor"?'<button class="btn" data-modal="signin">Sign in</button>':""}`;
+  return `<div class="gate"><div class="blur" aria-hidden="true">${inner}</div><div class="over"><div class="card"><span class="badge">${need==="free"?"Free account":"Pro"}</span><h3>${title}</h3><p>${why}</p><div class="row" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">${cta}</div></div></div></div>`;
+}
+function vPlans(){
+  const f=(ok,t)=>`<li class="${ok?"":"no"}">${t}</li>`;
+  return `<div class="sec-h"><div><h2>Plans</h2><p class="lede">Every plan shows the same honest record. Pro unlocks every pick we make, the value picks and the tickets. Cancel any time. <span class="badge">Prices are placeholders</span></p></div></div>
+  <div class="plans">
+    <section class="plan"><h3>Free</h3><div class="price">$0</div>
+      <ul>${f(1,"Lock of the Day")}${f(1,"Every game winner, spread and total")}${f(1,"5 player props a day")}${f(1,"Full record and History")}${f(0,"All player props (400+ on NFL Sundays)")}${f(0,"Best value picks")}${f(0,"2- and 3-leg tickets")}</ul>
+      <button class="btn solid" data-modal="signup" ${tier!=="visitor"?"disabled":""}>${tier==="visitor"?"Create a free account":"Your plan"}</button></section>
+    <section class="plan best"><span class="badge">Most popular</span><h3>Pro monthly</h3><div class="price">${PLAN_PRICES.month}<small> / month</small></div>
+      <ul>${f(1,"Everything in Free")}${f(1,"Every player prop, all sports")}${f(1,"Best value picks (60%+ that beat the price)")}${f(1,"2- and 3-leg tickets, plus-money singles")}${f(1,"Picks photos to share")}${f(1,"Cancel any time")}</ul>
+      <button class="btn hot" data-modal="checkout" data-plan="month" ${tier==="pro"?"disabled":""}>${tier==="pro"?"Your plan":"Start Pro"}</button></section>
+    <section class="plan"><h3>Pro season</h3><div class="price">${PLAN_PRICES.season}<small> / season</small></div>
+      <ul>${f(1,"Everything in Pro")}${f(1,"One payment for the football season")}${f(1,"About 2 months free vs monthly")}</ul>
+      <button class="btn" data-modal="checkout" data-plan="season" ${tier==="pro"?"disabled":""}>${tier==="pro"?"Your plan":"Get the season"}</button></section>
+  </div>
+  <p class="lede">Payments would run on Stripe's secure checkout page; card numbers never touch this site. 21+ where legal. Picks are our models' opinion, not guarantees.</p>`;
+}
+function vAccount(){
+  if(tier==="visitor")return gate(`<div style="height:200px"></div>`,"free","Sign in to see your account","Your plan, billing and saved settings live here.");
+  const pro=tier==="pro";
+  return `<div class="sec-h"><div><h2>My account</h2><p class="lede">Preview with sample details.</p></div></div>
+  <div class="acctpage">
+    <section class="panel"><h3>Profile</h3><p>you@example.com</p><button class="btn" disabled>Change email</button></section>
+    <section class="panel"><h3>Plan</h3><p><b>${pro?"Pro monthly":"Free"}</b>${pro?" · renews Oct 28, 2026 · "+PLAN_PRICES.month+"/month":""}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">${pro?`<button class="btn" disabled title="Opens Stripe's billing page">Manage billing and invoices</button><button class="btn" disabled>Cancel plan</button>`:`<button class="btn hot" data-go="plans">Upgrade to Pro</button>`}</div>
+      <p class="lede" style="font-size:12.5px">Billing changes open Stripe's secure customer page.</p></section>
+    <section class="panel"><h3>Alerts</h3><p>Email me the Lock of the Day at 6 AM ET <span class="badge">Coming later</span></p></section>
+    <button class="btn" data-tier="visitor">Sign out</button>
+  </div>`;
+}
+function openModal(kind,plan){
+  const close=()=>m.remove();
+  const m=document.createElement("div");m.className="modal";m.setAttribute("role","dialog");m.setAttribute("aria-modal","true");
+  const note='<p class="note">Design preview: nothing is sent and no account is created. When live, sign-in runs on AWS Cognito and payments on Stripe.</p>';
+  if(kind==="signin"||kind==="signup"){
+    m.innerHTML=`<div class="box"><h3>${kind==="signup"?"Create your free account":"Sign in"}</h3>
+      <label>Email<input type="email" placeholder="you@example.com" disabled></label>
+      <button class="btn solid" disabled>Email me a sign-in code</button>
+      <button class="btn" disabled>Continue with Google</button>
+      <p class="note">${kind==="signup"?"Free: Lock of the Day, every game pick and 5 props a day. You must be 21+.":"No password to remember: we email you a one-time code."}</p>
+      <div class="row"><button class="btn" data-demo="${kind==="signup"?"free":"free"}">Show me as signed in</button><button class="btn" data-x>Close</button></div>${note}</div>`;
+  }else if(kind==="checkout"){
+    const season=plan==="season";
+    m.innerHTML=`<div class="box"><h3>Start Pro</h3>
+      <div class="summary"><div class="t"><span>${season?"Pro season":"Pro monthly"}</span><b>${season?PLAN_PRICES.season:PLAN_PRICES.month+"/mo"}</b></div>
+      <div class="t" style="color:var(--muted)"><span>${season?"One payment, through the Super Bowl":"Renews monthly · cancel any time"}</span></div></div>
+      <button class="btn hot" disabled>Continue to secure checkout</button>
+      <p class="note">You'd go to Stripe's checkout page to pay (card, Apple Pay, Google Pay), then come back here as Pro. Card details never reach this site.</p>
+      <div class="row"><button class="btn" data-demo="pro">Show me as Pro</button><button class="btn" data-x>Close</button></div>${note}</div>`;
+  }
+  document.body.appendChild(m);
+  m.onclick=e=>{if(e.target===m||e.target.hasAttribute("data-x"))close();const d=e.target.getAttribute&&e.target.getAttribute("data-demo");if(d){close();setTier(d)}};
+}
+
 function nav(){
   const counts={props:D.picks.filter(p=>p.kind==="prop"||p.kind==="td").length,games:new Set(D.picks.filter(p=>p.kind==="game"&&!MULTI.has(p.market_label)).map(p=>p.game)).size,tickets:D.picks.filter(p=>MULTI.has(p.market_label)||p.plus_money).length};
   $("#tabs").innerHTML=TABS.map(([k,l])=>`<button class="tab" role="tab" id="tab-${k}" aria-selected="${state.tab===k}" data-tab="${k}">${l}${counts[k]?`<span class="ct">${counts[k]}</span>`:""}</button>`).join("");
-  $("#bottom").innerHTML=TABS.filter(t=>t[0]!=="about").map(([k,l])=>`<button data-tab="${k}" aria-selected="${state.tab===k}">${ICON[k]}${l}</button>`).join("");
+  $("#bottom").innerHTML=TABS.filter(t=>t[0]!=="about"&&t[0]!=="plans").map(([k,l])=>`<button data-tab="${k}" aria-selected="${state.tab===k}">${ICON[k]}${l}</button>`).join("");
   document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));
 }
 
@@ -595,7 +714,7 @@ function vToday(){
   <section class="view" style="padding:0;gap:10px">
     <div class="sec-h"><h2>Best value right now</h2>${valuePicks.length?`<button class="share" id="share-today">${SHARE_ICON}Share today's picks</button>`:""}</div>
     <p class="lede" style="margin:0">Picks we rate 60%+ that also pay more than our chance says they should. In 2024-2025 testing these returned +11% and +14%.</p><div id="today-hold"></div>
-    ${valuePicks.length?`<div class="rail">${valuePicks.map(valueCard).join("")}</div>`:'<div class="empty">No value picks at current prices. Check back after the next update.</div>'}
+    ${tier!=="pro"?gate(valuePicks.length?`<div class="rail">${valuePicks.slice(0,3).map(valueCard).join("")}</div>`:'<div style="height:140px"></div>',"pro","Best value picks are Pro","Picks we rate 60%+ that also pay more than our chance says they should (+11% and +14% in 2024-2025 testing)."):(valuePicks.length?`<div class="rail">${valuePicks.map(valueCard).join("")}</div>`:'<div class="empty">No value picks at current prices. Check back after the next update.</div>')}
   </section>
   <section class="view" style="padding:0;gap:10px">
     <div class="sec-h"><h2>Our strongest winners</h2><p>Our six most confident winner picks. Football: A 90%+, B 80-89%, C 70-79%, D 60-69%. NHL, NBA, soccer and UFC: A 70%+, B 65-69%, C 60-64%. College basketball uses the football scale.</p></div>
@@ -635,7 +754,9 @@ function vProps(){
 function fillProps(){
   const list=filtered(D.picks.filter(p=>p.kind==="prop"||p.kind==="td"));
   $("#f-count").textContent=`${list.length} picks`;
-  $("#plist").innerHTML=list.length?list.slice(0,state.shown).map(pickRow).join("")+(list.length>state.shown?`<button class="more" id="more">Show ${Math.min(60,list.length-state.shown)} more</button>`:""):`<div class="empty">${(state.when||"today")==="today"?"No picks left for today that match. Set Day to Coming up to see the next games.":"No picks match. Clear the search or a filter."}</div>`;
+  const lim=LIMIT[tier].props;
+  $("#plist").innerHTML=list.length>lim?list.slice(0,lim).map(pickRow).join("")+gate(list.slice(lim,lim+4).map(pickRow).join(""),tier==="visitor"?"free":"pro",`${list.length-lim} more props`,tier==="visitor"?"Create a free account for 5 props a day, or go Pro for every prop.":"Pro unlocks every prop we grade, all sports."):list.length?list.slice(0,state.shown).map(pickRow).join("")+(list.length>state.shown?`<button class="more" id="more">Show ${Math.min(60,list.length-state.shown)} more</button>`:""):`<div class="empty">${(state.when||"today")==="today"?"No picks left for today that match. Set Day to Coming up to see the next games.":"No picks match. Clear the search or a filter."}</div>`;
+  bindPreview();
   const mb=$("#more");if(mb)mb.onclick=()=>{state.shown+=60;fillProps()};
   bindShare();
 }
@@ -663,7 +784,8 @@ function vGames(){
   const byDay=new Map();for(const g of groups){const k=(g.sport==="CBB"?"College hoops":g.sport==="SOC"?"Soccer":g.sport)+" · "+day(g.ko);if(!byDay.has(k))byDay.set(k,[]);byDay.get(k).push(g)}
   const sw=`<div class="filters" role="group" aria-label="Sport">${SPORTS.filter(([k])=>!k||D.picks.some(p=>p.sport===k&&p.kind==="game")).map(([k,l])=>`<button class="chip g-sport" data-s="${k}" aria-pressed="${state.sport===k}">${l}</button>`).join("")}</div>`;
   if(!groups.length)return sw+'<div class="empty">No games in the current window.</div>';
-  const block=ents=>ents.map(([k,gs])=>`<section class="view" style="padding:0;gap:10px"><h3 class="muted" style="font-size:17px;text-transform:uppercase">${esc(k)}</h3><div class="games">${gs.map(gameCard).join("")}</div></section>`).join("");
+  let shownG=0;const lg=LIMIT[tier].games;
+  const block=ents=>ents.map(([k,gs])=>`<section class="view" style="padding:0;gap:10px"><h3 class="muted" style="font-size:17px;text-transform:uppercase">${esc(k)}</h3><div class="games">${gs.map(g=>{shownG++;return shownG<=lg?gameCard(g):(shownG===lg+1?gate(gameCard(g),"free","See every game","A free account shows every game pick: winner, spread and total, all sports."):"")}).join("")}</div></section>`).join("");
   const ents=[...byDay.entries()];
   const tod=ents.filter(([k,gs])=>isToday({kickoff_utc:gs[0].ko})),later=ents.filter(([k,gs])=>!isToday({kickoff_utc:gs[0].ko}));
   const nLater=later.reduce((n,[k,gs])=>n+gs.length,0);
@@ -797,8 +919,11 @@ function vAbout(){
 
 function render(){
   nav();
-  const v={today:vToday,props:vProps,games:vGames,tickets:vTickets,record:vRecord,history:vHistory,about:vAbout}[state.tab]||vToday;
-  $("#main").innerHTML=`<div class="view">${v()}</div>`;
+  const v={today:vToday,props:vProps,games:vGames,tickets:vTickets,record:vRecord,history:vHistory,about:vAbout,plans:vPlans,account:vAccount}[state.tab]||vToday;
+  let html=v();
+  if(state.tab==="tickets"&&tier!=="pro")html=gate(html,"pro","Tickets are Pro","2- and 3-leg tickets and plus-money singles, built from picks that held up in testing.");
+  $("#main").innerHTML=`<div class="view">${html}</div>`;
+  acctBar();
   if(state.tab==="props")bindProps();
   if(state.tab==="history")bindHistory();
   document.querySelectorAll(".g-sport").forEach(b=>b.onclick=()=>{state.sport=b.dataset.s;store.set("state",state);render()});
@@ -832,6 +957,22 @@ function init(data){
 }
 fetch("../data/picks.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(init)
  .catch(()=>{$("#main").innerHTML='<div class="empty" style="margin-top:20px">This week\'s picks are not posted yet. Check back after the next update.</div>'});
+})();
+
+/* optional viewing PIN for the test page (a light screen, not real security: the data file is public) */
+(function(){
+  const H="__PIN_HASH__";
+  if(!H||H.indexOf("PIN_HASH")>=0)return;
+  try{if(sessionStorage.getItem("cp_pin_ok")===H)return}catch(e){}
+  const d=document.createElement("div");d.className="pin";
+  d.innerHTML='<div class="box"><h2 style="text-transform:uppercase">Test page</h2><p class="lede" style="margin:0">Enter the PIN to view.</p><input id="pin-in" inputmode="numeric" autocomplete="off" maxlength="12" aria-label="PIN"><button class="btn solid" id="pin-go">View</button><p id="pin-msg" class="lede" style="margin:0"></p></div>';
+  document.body.appendChild(d);
+  const hex=b=>Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,"0")).join("");
+  const go=async()=>{const v=document.getElementById("pin-in").value.trim();
+    const h=hex(await crypto.subtle.digest("SHA-256",new TextEncoder().encode("cp-test:"+v)));
+    if(h===H){try{sessionStorage.setItem("cp_pin_ok",H)}catch(e){}d.remove()}else{document.getElementById("pin-msg").textContent="Wrong PIN."}};
+  document.getElementById("pin-go").onclick=go;
+  document.getElementById("pin-in").onkeydown=e=>{if(e.key==="Enter")go()};
 })();
 </script>
 
