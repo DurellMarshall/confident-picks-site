@@ -556,9 +556,16 @@ function copyTodayText(){
 }
 
 /* ---------- views ---------- */
+function lastLockLine(){
+  const P=D.meta&&D.meta.last_lock;if(!P)return "";
+  const g=((D.meta.track_record||{}).live||{}).groups||[],rec=g.find(x=>x.market==="Lock of the day");
+  const r=P.result==="W"?'<span class="lstat W">&#10003; Won</span>':P.result==="L"?'<span class="lstat L">&#10007; Lost</span>':P.result==="P"?'<span class="lstat">Push</span>':'<span class="lstat">Grading</span>';
+  const d=new Date(P.date+"T12:00:00Z").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"});
+  return `<div class="who" style="margin-top:8px">Last lock (${esc(d)}): <b>${esc(P.player)}: ${esc(pickText(P))} ${esc(String(P.market_label||"").toLowerCase())}</b> ${r}${rec?` · Lock record ${Math.round(rec.won*rec.picks)}-${rec.picks-Math.round(rec.won*rec.picks)}`:""}</div>`;
+}
 function lockCard(){
   const L=(D.meta&&D.meta.lock)||D.picks.find(p=>p.lock);
-  if(!L)return `<section class="lock none" aria-label="Lock of the day"><div><span class="lk"><i></i>Lock of the day</span><div class="who" style="margin-top:6px">Chosen at 6 AM ET on NFL game days: our highest-chance NFL prop that pays +100 or better. ${Number(new Date().toLocaleString("en-US",{...tz,hour:"numeric",hour12:false}))<6?"Today's lock posts at 6 AM ET.":"No lock today (no NFL games left today, or no prop at +100 or better)."}</div></div></section>`;
+  if(!L)return `<section class="lock none" aria-label="Lock of the day"><div><span class="lk"><i></i>Lock of the day</span><div class="who" style="margin-top:6px">Chosen at 6 AM ET on NFL game days: our highest-chance NFL prop that pays +100 or better. ${Number(new Date().toLocaleString("en-US",{...tz,hour:"numeric",hour12:false}))<6?"Today's lock posts at 6 AM ET.":"No lock today (no NFL games left today, or no prop at +100 or better)."}</div>${lastLockLine()}</div></section>`;
   const lp=[L.locked_price,L.locked_best_price].filter(x=>x!=null);
   const bp=lp.length?lp.reduce((a,b)=>(b>0?1+b/100:1+100/-b)>(a>0?1+a/100:1+100/-a)?b:a):bestPrice(L);
   const bk=L.locked_best_price!=null&&bp===L.locked_best_price?L.locked_best_book:(L.locked_price!=null?"":L.best_book);
