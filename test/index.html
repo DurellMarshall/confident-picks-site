@@ -961,7 +961,7 @@ fetch("../data/picks.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error
 
 /* optional viewing PIN for the test page (a light screen, not real security: the data file is public) */
 (function(){
-  const H="__PIN_HASH__";
+  const H="68396bcbee3df44284239bd25b39cda6591b63dc2418dd673f8f7a4d1759b7f4";
   if(!H||H.indexOf("PIN_HASH")>=0)return;
   try{if(sessionStorage.getItem("cp_pin_ok")===H)return}catch(e){}
   const d=document.createElement("div");d.className="pin";
