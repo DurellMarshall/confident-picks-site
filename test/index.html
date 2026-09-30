@@ -827,10 +827,9 @@ function gameCard(g){
 function stub(p,kind){
   const legs=(p.pick_text||"").split(" AND ");
   const pay=p.plus_price!=null?price(p.plus_price):p.price!=null&&MULTI.has(p.market_label)?price(p.price):"";
-  const need=(p.book_line||"").match(/[+-]\d+/);
   return `<article class="stub"><div class="legs"><span class="kind">${esc(kind||p.market_label)} · ${esc(p.game)}</span>
     <ol>${legs.map(l=>`<li>${esc(l)}</li>`).join("")}</ol>${p.note?`<p class="note">${esc(p.note)}</p>`:""}</div>
-    <div class="pay"><span>All hit</span><b>${pct(p.win_prob)}</b><span>${pay?"Pays about":need?"Take at":""}</span><b style="font-size:17px">${pay||(need?need[0]+"+":"")}</b></div></article>`;
+    <div class="pay"><span>All hit</span><b>${pct(p.win_prob)}</b><span>${pay?"Pays":""}</span><b style="font-size:17px">${pay}</b>${pay&&p.best_book&&p.plus_price==null?`<span>at ${esc(p.best_book)}</span>`:""}</div></article>`;
 }
 function vTickets(){
   const S=(lab,title,desc)=>{const xs=D.picks.filter(p=>p.market_label===lab);return xs.length?`<section class="view" style="padding:0;gap:10px"><div class="sec-h"><h2>${title}</h2><p>${desc}</p></div><div class="tickets">${xs.map(p=>stub(p)).join("")}</div></section>`:""};
