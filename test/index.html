@@ -330,14 +330,14 @@ footer{margin-top:34px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .lad{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px;min-width:0}
 .lad-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
 .lad-h b{font-size:15px}.lad-h span{font-size:12px;color:var(--muted)}
-.rungs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
-.rung{flex:0 0 auto;min-width:96px;scroll-snap-align:start;border:1px solid var(--line);border-radius:10px;background:var(--ground);color:var(--ink);padding:7px 9px;text-align:left;cursor:pointer;display:grid;gap:2px;font:inherit}
-.rung .at{font:700 18px/1 var(--disp)}.rung .px{font:600 14px var(--mono)}.rung .px.none{color:var(--muted);font-weight:400}
-.rung .ch{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
-.rung.edge{border-color:var(--good)}.rung.edge .ours{color:var(--good);font-weight:700}
-.rung[aria-pressed="true"]{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
-.rung[aria-pressed="true"] .ch,.rung[aria-pressed="true"] .px.none,.rung[aria-pressed="true"] .ours{color:var(--turf-ink)}
-.rung:focus-visible{outline:2px solid var(--pylon);outline-offset:2px}
+.mrungs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
+.mrungs .mrung{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;flex:0 0 auto;min-width:104px;scroll-snap-align:start;border:1px solid var(--line);border-radius:10px;background:var(--ground);color:var(--ink);padding:7px 9px;text-align:left;cursor:pointer;display:grid;gap:2px;font:inherit}
+.mrung .at{font:700 18px/1 var(--disp)}.mrung .px{font:600 14px var(--mono)}.mrung .px.none{color:var(--muted);font-weight:400}
+.mrung .ch{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
+.mrung.edge{border-color:var(--good)}.mrung.edge .ours{color:var(--good);font-weight:700}
+.mrung[aria-pressed="true"]{background:var(--turf);color:var(--turf-ink);border-color:var(--turf)}
+.mrung[aria-pressed="true"] .ch,.mrung[aria-pressed="true"] .px,.mrung[aria-pressed="true"] .ours{color:var(--turf-ink)}
+.mrung:focus-visible{outline:2px solid var(--pylon);outline-offset:2px}
 .cart{position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;box-shadow:var(--shadow)}
 @media (max-width:900px){.cart{position:static}}
 .cart h3{margin:0;font:700 20px var(--disp)}
@@ -352,6 +352,7 @@ footer{margin-top:34px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .stack ol{margin:0;padding-left:18px}
 .btnrow{display:flex;flex-wrap:wrap;gap:8px}
 .btnrow button,.stack button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--ground);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
+@media (max-width:760px){.bottom{grid-template-columns:repeat(7,1fr)}.bottom button{font-size:10px}}
 .btnrow button.primary{background:var(--pylon);border-color:var(--pylon);color:#fff}
 </style>
 
@@ -513,7 +514,7 @@ function bindBuilder(){
 function booksIn(){const s=new Set();LAD.ladders.forEach(l=>l.rungs.forEach(r=>Object.keys(r.books).forEach(b=>s.add(b))));return [...s].sort((a,b)=>a==="DraftKings"?-1:b==="DraftKings"?1:a.localeCompare(b))}
 function rungChip(l,r){
   const px=r.books[BS.book], imp=px!=null?1/decOf(px):null, k=legKey(l,r), on=BS.cart.includes(k), edge=imp!=null&&r.ours>imp+0.02;
-  return `<button class="rung${edge?" edge":""}" data-leg="${esc(k)}" aria-pressed="${on}"><span class="at">${r.at}+</span><span class="px${px==null?" none":""}">${px!=null?price(px):"not at "+esc(BS.book)}</span><span class="ch">${imp!=null?`Book ${pct(imp)} · `:""}<span class="ours">Ours ${pct(r.ours)}</span></span></button>`;
+  return `<button class="mrung${edge?" edge":""}" data-leg="${esc(k)}" aria-pressed="${on}"><span class="at">${r.at}+</span><span class="px${px==null?" none":""}">${px!=null?price(px):"not at "+esc(BS.book)}</span><span class="ch">${imp!=null?`Book ${pct(imp)} · `:""}<span class="ours">Ours ${pct(r.ours)}</span></span></button>`;
 }
 function stacks(){
   // short-price stacks at the chosen book: rungs priced -1000 to -150, different games, the stack pays +100 or more;
@@ -562,7 +563,7 @@ function fillBuilder(){
     ${st.length?`<div><h3 style="margin:0 0 4px;font:700 18px var(--disp)">Short-price stacks</h3><p class="muted" style="margin:0 0 8px;font-size:13px">Built from milestones priced −150 to −1000 at ${esc(BS.book)}, one per game, paying +100 or more. Ranked by how well our chances back the price.</p>
       <div class="stacks">${st.map((s,i)=>`<div class="stack"><b>${s.n} legs · pays ${price(amOf(s.d))}</b><ol>${s.ch.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} (${price(x.px)})</li>`).join("")}</ol><span class="muted">Our chance all hit ${pct(s.p)} · break-even ${pct(1/s.d)}</span><button data-stack="${i}">Add to cart</button></div>`).join("")}</div></div>`:""}
     <p class="muted" style="margin:0;font-size:12px">Green border: our chance beats the book's by 2+ points at ${esc(BS.book)}. Milestones far from a player's usual numbers are the least tested.</p>
-    ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="rungs">${l.rungs.map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}
+    ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}
   </div><aside class="cart" aria-label="Your stack"><h3>Your stack (${BS.cart.length})</h3><div id="cart-body">${cartSummary()}</div></aside></div>`;
   const re=()=>{saveCart();fillBuilder()};
   $("#b-book").onchange=e=>{BS.book=e.target.value;re()};
