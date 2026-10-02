@@ -74,6 +74,8 @@ small{font-size:12px}
   .bottom button[aria-selected="true"]{color:var(--turf)}
   .top-r .upd{display:none}
   .brand b{font-size:19px}.mark{width:30px;height:30px}
+  #go-about,.acct .badge{display:none}.top-r{gap:6px}
+  .pv-bar{font-size:12px;gap:4px;padding:6px}.pv-bar .badge{display:none}.pv-bar button{padding:3px 8px;font-size:12px}
 }
 
 /* lock strip */
@@ -109,9 +111,10 @@ small{font-size:12px}
 /* the table */
 .tbl{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow)}
 .th,.tr{display:grid;gap:10px;align-items:center;padding:9px 14px}
-.props .th,.props .tr{grid-template-columns:minmax(140px,1.2fr) minmax(160px,1.4fr) 90px 50px 48px 112px 86px 86px 86px minmax(104px,.8fr)}
-.games .th,.games .tr{grid-template-columns:minmax(150px,1.2fr) minmax(170px,1.4fr) 96px 62px 118px minmax(130px,1fr) minmax(130px,1fr)}
-@media (max-width:1180px) and (min-width:861px){.props .th,.props .tr{grid-template-columns:minmax(130px,1.2fr) minmax(150px,1.4fr) 90px 48px 112px 86px 86px 86px}.props .c-ed,.props .c-gm{display:none!important}.props .th .h-ed,.props .th .h-gm{display:none}}
+.props .th,.props .tr{grid-template-columns:24px minmax(140px,1.2fr) minmax(160px,1.4fr) 90px 50px 48px 112px 86px 86px 86px minmax(104px,.8fr)}
+.games .th,.games .tr{grid-template-columns:24px minmax(150px,1.2fr) minmax(170px,1.4fr) 96px 62px 118px minmax(130px,1fr) minmax(130px,1fr)}
+.c-rk{font:600 12px var(--mono);color:var(--muted);text-align:center}
+@media (max-width:1180px) and (min-width:861px){.props .th,.props .tr{grid-template-columns:24px minmax(130px,1.2fr) minmax(150px,1.4fr) 90px 48px 112px 86px 86px 86px}.props .c-ed,.props .c-gm{display:none!important}.props .th .h-ed,.props .th .h-gm{display:none}}
 .th{background:var(--surface-2);border-bottom:1px solid var(--line);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);padding-block:8px}
 .th button{background:none;border:0;padding:0;font:inherit;color:inherit;cursor:pointer;text-transform:inherit;letter-spacing:inherit;text-align:inherit}
 .th button[aria-sort]::after{content:" ↓";color:var(--ink)}.th button[aria-sort="ascending"]::after{content:" ↑"}
@@ -145,7 +148,7 @@ small{font-size:12px}
   .props .c-who,.games .c-who{grid-area:who}.props .c-ch,.games .c-ch{grid-area:ch;justify-self:end}
   .props .c-pick,.games .c-pick{grid-area:pick}.props .c-px,.games .c-px{grid-area:px;justify-self:end;text-align:right}
   .c-meta{grid-area:meta;display:flex!important;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
-  .c-bk,.c-ed,.c-fm,.c-gm,.c-sp,.c-to{display:none!important}
+  .c-bk,.c-ed,.c-fm,.c-gm,.c-sp,.c-to,.c-rk{display:none!important}
   .c-meta .hr{min-width:0;font-size:12px}
 }
 @media (min-width:861px){.c-meta{display:none!important}}
@@ -169,6 +172,7 @@ small{font-size:12px}
 .kv{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;margin:0;font-size:14px}
 .kv dt{color:var(--muted)}.kv dd{margin:0;text-align:right}
 .note{font-size:12.5px;color:var(--muted);margin:0}
+.note.rec{background:var(--surface-2);border-radius:9px;padding:7px 10px;color:var(--ink-2)}
 .spark{width:100%;height:auto;display:block}
 .rungs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
 .rg{flex:0 0 auto;min-width:92px;border:1px solid var(--line);border-radius:9px;background:var(--surface-2);padding:6px 8px;display:grid;gap:1px;text-align:left;cursor:pointer;font:inherit}
@@ -203,6 +207,23 @@ details.day>summary{list-style:none;cursor:pointer;display:flex;justify-content:
 details.day>summary::-webkit-details-marker{display:none}
 .hrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 52px 40px;gap:10px;padding:8px 14px;border-top:1px solid var(--line);font-size:13.5px;align-items:center}
 .prose{max-width:75ch;display:grid;gap:10px}.prose p{margin:0;color:var(--ink-2)}
+.pv-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;padding:7px;margin:0 -16px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:13px}
+.pv-bar button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;cursor:pointer}
+.pv-bar button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--surface)}
+.badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--pylon-soft);color:var(--pylon)}
+.badge.pro{background:var(--turf-soft);color:var(--turf)}
+.btn.sm{padding:5px 10px;font-size:13px}.btn.hot{background:var(--pylon);border-color:var(--pylon);color:#fff}.btn[disabled]{opacity:.55;cursor:not-allowed}
+.gate{position:relative;overflow:hidden;min-height:230px;border-top:1px solid var(--line)}
+.gate .blur{filter:blur(5px);opacity:.5;pointer-events:none;user-select:none;max-height:230px;overflow:hidden}
+.gate .over{position:absolute;inset:0;display:grid;place-items:center;padding:16px;background:linear-gradient(180deg,transparent,var(--surface) 60%)}
+.gcard{max-width:440px;text-align:center;display:grid;gap:8px;justify-items:center}.gcard h3{font-size:24px;text-transform:uppercase}.gcard p{margin:0;color:var(--ink-2);font-size:14px}
+.tbl>.gate{border-radius:0}
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.plan{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:18px;display:grid;gap:10px;align-content:start}
+.plan.best{border:2px solid var(--turf);box-shadow:var(--shadow)}.plan h3{font-size:24px;text-transform:uppercase}
+.plan .price{font:700 38px/1 var(--disp)}.plan .price small{font:600 14px var(--body);color:var(--muted)}
+.plan ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:14px}.plan li.no{color:var(--muted);text-decoration:line-through}
+.acct{display:flex;gap:6px;align-items:center}
 footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;max-width:80ch}
 
 /* ---------- Builder (test page, owner 2026-09-30) ---------- */
@@ -251,12 +272,13 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 <div class="wrap">
   <header class="top">
     <div class="brand"><span class="mark" aria-hidden="true"><img src="../data/logo_white.png" alt="" width="24" height="28" style="width:24px;height:auto"></span><b>Confident Picks</b></div>
-    <div class="top-r"><span class="upd" id="updated"></span><button class="linkbtn" id="go-about">How it works</button></div>
+    <div class="top-r"><span class="upd" id="updated"></span><button class="linkbtn" id="go-about">How it works</button><span class="acct" id="acct"></span></div>
   </header>
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
   <main id="main"></main>
   <footer>
     <div>Our picks are our models' opinion, not guarantees. Every number is either tested on past seasons or tracked live since Sep 26, 2026. Prices are real quotes from the books at the last odds update.</div>
+    <div><b>Bet flat:</b> the same small stake on every pick, and never chase losses. Even a 60% record has losing streaks of 5 or more.</div>
     <div>21+ where legal. If you or someone you know has a gambling problem, call 1-800-GAMBLER.</div>
   </footer>
 </div>
@@ -285,8 +307,8 @@ const MULTI=new Set(["2-leg ticket","3-leg ticket","Same-game pair","Game-script
 const SPORTS=[["","All"],["NFL","NFL"],["CFB","College"],["NHL","NHL"],["NBA","NBA"],["CBB","College hoops"],["SOC","Soccer"],["UFC","UFC"]];
 const SPORT_NAME={NFL:"NFL",CFB:"College",NHL:"NHL",NBA:"NBA",CBB:"College hoops",SOC:"Soccer",UFC:"UFC"};
 const BOOKS=[["best","Best price"],["dk","DraftKings"],["fd","FanDuel"]];
-let D=null,FORM={},LADI=null;
-let S=Object.assign({tab:"picks",seg:"props",sport:"",q:"",day:"all",market:"",game:"",book:"best",graded:false,sort:"chance",asc:false,shown:50},store.get("state",{}));
+let D=null,FORM={},REC={},LADI=null;
+let S=Object.assign({tab:"picks",seg:"props",sport:"",q:"",day:"all",market:"",game:"",book:"best",graded:false,sort:"rank",asc:false,shown:50},store.get("state",{}));
 S.shown=50;
 const save=()=>store.set("state",S);
 
@@ -309,7 +331,12 @@ function quote(p){   // a real quote and the book it came from, for the chosen b
 const BK_SHORT={"DraftKings":"DK","FanDuel":"FD","BetMGM":"MGM","Caesars":"CZR","ESPN BET":"ESPN","BetRivers":"BR","Fanatics":"FAN","Hard Rock Bet":"HR","Hard Rock":"HR","BetOnline":"BOL","betparx":"PARX","BetParx":"PARX","Bet365":"365","bet365":"365","Bally Bet":"BALLY","BetOnline.ag":"BOL","Bovada":"BOV","LowVig.ag":"LV","MyBookie.ag":"MYB","BetUS":"BUS"};
 const pxCell=p=>{const q=quote(p);return q?`<span class="px">${price(q.px)}</span>${q.bk?` <span class="bk" title="${esc(q.bk)}">${esc(BK_SHORT[q.bk]||q.bk)}</span>`:""}`:'<span class="muted">–</span>'};
 const graded=p=>["A","B","C","D"].includes(p.grade);
-const chip=p=>`<span class="chip ${graded(p)?p.grade:""}" title="${graded(p)?"Grade "+p.grade:"Not graded: shown for information"}">${pct(p.win_prob)}${graded(p)?`<i>${p.grade}</i>`:""}</span>`;
+const topGrade=p=>p&&(p.grade==="A"||p.grade==="B");
+const rankScore=p=>(topGrade(p)?10:0)+p.win_prob;   // owner 2026-10-02: graded picks rank above ungraded ones
+const TYPE_NAME=p=>p.market_label==="Winner"?"winners":p.kind==="td"?"touchdown picks":"props";
+const recOf=p=>REC[`${p.sport}|${p.market_label==="Winner"?"winner":p.kind}|${p.grade}`];
+const recText=p=>{const r=recOf(p);return r&&r[0]+r[1]?`${r[0]}-${r[1]} (${Math.round(r[0]/(r[0]+r[1])*100)}%)`:""};
+const chip=p=>`<span class="chip ${graded(p)?p.grade:""}" title="${graded(p)?"Grade "+p.grade:"Not graded: shown for information"}${recText(p)?` · live ${SPORT_NAME[p.sport]||p.sport} ${graded(p)?p.grade+" ":"ungraded "}${TYPE_NAME(p)}: ${recText(p)}`:""}">${pct(p.win_prob)}${graded(p)?`<i>${p.grade}</i>`:""}</span>`;
 const edgeOf=p=>p.book_prob==null?null:p.win_prob-p.book_prob;
 const edgeCell=p=>{const e=edgeOf(p);if(e==null)return '<span class="muted">–</span>';const v=Math.round(e*100);return `<span class="edge ${v>0?"up":v<0?"dn":""}">${v>0?"+":""}${v}</span>`};
 const seasonOf=iso=>{const d=new Date(iso);return d.getUTCMonth()>=6?d.getUTCFullYear():d.getUTCFullYear()-1};
@@ -328,7 +355,8 @@ const started=p=>{const t=Date.parse(p.kickoff_utc);return !isNaN(t)&&t<=Date.no
 
 /* ---------- header, nav ---------- */
 function header(){
-  $("#updated").innerHTML=`Updated <b>${esc(stamp(D.meta.generated_at))}</b>`;
+  const oc=D.meta.odds_captured_at||{},od=Object.values(oc).filter(Boolean).sort().pop();
+  $("#updated").innerHTML=`Updated <b>${esc(stamp(D.meta.generated_at))}</b>${od?` · prices from <b>${esc(stamp(od))}</b>`:""}`;
   $("#go-about").onclick=()=>setTab("about");
 }
 function nav(){
@@ -377,7 +405,7 @@ function propList(){
   const base=pool().filter(p=>segOf(p)===(S.seg==="tds"?"tds":"props")&&(!S.sport||p.sport===S.sport));
   let r=base.filter(p=>inDay(p)&&(!S.market||p.market_label===S.market)&&(!S.game||p.game===S.game)&&(!S.graded||p.grade==="A"||p.grade==="B")
     &&(!q||[p.player,p.team,p.game].join(" ").toLowerCase().includes(q)));
-  const key={chance:p=>p.win_prob,edge:p=>edgeOf(p)??-9,price:p=>{const x=quote(p);return x?dec(x.px):0},l5:p=>fr((formOf(p)||{}).l5),l10:p=>fr((formOf(p)||{}).l10),ssn:p=>fr((formOf(p)||{}).ssn),time:p=>Date.parse(p.kickoff_utc)}[S.sort]||(p=>p.win_prob);
+  const key={rank:rankScore,chance:p=>p.win_prob,edge:p=>edgeOf(p)??-9,price:p=>{const x=quote(p);return x?dec(x.px):0},l5:p=>fr((formOf(p)||{}).l5),l10:p=>fr((formOf(p)||{}).l10),ssn:p=>fr((formOf(p)||{}).ssn),time:p=>Date.parse(p.kickoff_utc)}[S.sort]||(p=>p.win_prob);
   const dir=S.asc?1:-1;
   r.sort((a,b)=>(key(a)-key(b))*dir||b.win_prob-a.win_prob);
   return {base,r};
@@ -396,9 +424,9 @@ function toolbar(base,showMarket){
     <span class="count" id="f-count"></span></div>`;
 }
 const sortBtn=(k,l,cls)=>`<button data-sort="${k}" class="${cls||""}" ${S.sort===k?`aria-sort="${S.asc?"ascending":"descending"}"`:""}>${l}</button>`;
-function propRow(p){
+function propRow(p,i){
   const f=formOf(p);
-  return `<button class="tr" data-id="${p._id}">
+  return `<button class="tr" data-id="${p._id}"><span class="c-rk">${S.sort==="rank"?i+1:""}</span>
     <span class="cell c-who"><b>${esc(p.player)}</b><small>${esc([p.team,p.pos].filter(Boolean).join(" · ")||p.sport)}</small></span>
     <span class="cell c-pick"><span>${esc(pickText(p))}</span><small>${p.proj!=null&&p.kind==="prop"?"Our projection "+num(p.proj):p.kind==="td"?"Touchdown":esc(p.market_label)}</small></span>
     <span class="c-ch">${chip(p)}</span>
@@ -416,16 +444,17 @@ function fillProps(){
   const {base,r}=propList();
   const B=$("#seg-body");
   B.innerHTML=toolbar(base,S.seg==="props")+(r.length?`<div class="tbl props" role="table" aria-label="Player props">
-    <div class="th" role="row"><span>Player</span><span>Pick</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("edge","Edge","r h-ed")}${sortBtn("price","Price","r")}${sortBtn("l5","Last 5")}${sortBtn("l10","Last 10")}${sortBtn("ssn","Season")}<span class="h-gm">${sortBtn("time","Game")}</span></div>
-    ${r.slice(0,S.shown).map(propRow).join("")}
-    ${r.length>S.shown?`<button class="more" id="more">Show ${Math.min(50,r.length-S.shown)} more of ${r.length-S.shown}</button>`:""}</div>
-    <p class="hint">Our chance comes from our model; the letter is its grade (A and B held up in testing; no letter = shown, not graded). Book = the chance the book's price implies. Edge = ours minus the book's, in points. Last 5 and Last 10 count back into last season; Season is this season only. They show how often he cleared this line: context only, since in our 2023-25 testing a hot streak did not carry into the next game. Ranked by our chance.</p>`
+    <div class="th" role="row">${sortBtn("rank","#")}<span>Player</span><span>Pick</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("edge","Edge","r h-ed")}${sortBtn("price","Price","r")}${sortBtn("l5","Last 5")}${sortBtn("l10","Last 10")}${sortBtn("ssn","Season")}<span class="h-gm">${sortBtn("time","Game")}</span></div>
+    ${shownRows(r).map(propRow).join("")}${lockedRows(r,propRow)}
+    ${r.length>S.shown&&S.shown<LIMIT[tier].props?`<button class="more" id="more">Show ${Math.min(50,r.length-S.shown)} more of ${r.length-S.shown}</button>`:""}</div>
+    <p class="hint">Our chance comes from our model; the letter is its grade (A and B held up in testing; no letter = shown, not graded). Book = the chance the book's price implies. Edge = ours minus the book's, in points. Last 5 and Last 10 count back into last season; Season is this season only. They show how often he cleared this line: context only, since in our 2023-25 testing a hot streak did not carry into the next game. Ranked: A and B picks first (the grades that held up in testing), then the rest, each by our chance.</p>`
     :`<div class="empty">No picks match. Clear the search or a filter.</div>`);
   $("#f-count").textContent=`${r.length} pick${r.length===1?"":"s"}`;
   bindTools(fillProps);
   const mb=$("#more");if(mb)mb.onclick=()=>{S.shown+=50;fillProps()};
   B.querySelectorAll("[data-sort]").forEach(b=>b.onclick=()=>{const k=b.dataset.sort;if(S.sort===k)S.asc=!S.asc;else{S.sort=k;S.asc=k==="time"}save();fillProps()});
   B.querySelectorAll(".tr[data-id]").forEach(b=>b.onclick=()=>openPick(b.dataset.id));
+  bindPreview();
 }
 function bindTools(fill){
   const upd=()=>{S.shown=50;save();fill()};
@@ -445,9 +474,9 @@ function gameGroups(){
   for(const p of gp){if(!by.has(p.game))by.set(p.game,{game:p.game,sport:p.sport,ko:p.kickoff_utc,rows:[]});by.get(p.game).rows.push(p)}
   return [...by.values()].map(g=>({...g,W:g.rows.find(r=>r.market_label==="Winner"),Sp:g.rows.find(r=>r.market_label==="Spread"||r.market_label==="Puck line"),T:g.rows.find(r=>r.market_label==="Total")}));
 }
-function gameRow(g){
+function gameRow(g,i){
   const W=g.W,sp=g.Sp,T=g.T,show=r=>r?`<span>${esc(pickText(r))}</span><small>${["NHL","NBA","CBB","SOC"].includes(g.sport)?"our chance "+pct(r.win_prob):"shown, not graded"}</small>`:'<span class="muted">–</span>';
-  return `<button class="tr" data-game="${esc(g.game)}">
+  return `<button class="tr" data-game="${esc(g.game)}"><span class="c-rk">${S.sort==="rank"?i+1:""}</span>
     <span class="cell c-who"><b>${esc(g.game)}</b><small>${esc(SPORT_NAME[g.sport]||g.sport)} · ${esc(when(g.ko))}</small></span>
     <span class="cell c-pick"><span>${W?esc(W.player)+(g.sport==="SOC"?"":" win"):"–"}</span><small>${W&&W.our_score?"Projected "+esc(W.our_score):""}</small></span>
     <span class="c-ch">${W?chip(W):""}</span>
@@ -462,13 +491,13 @@ function fillGames(){
   const q=S.q.trim().toLowerCase();
   const all=gameGroups();
   let gs=all.filter(g=>(S.day==="all"||etDay(g.ko)===S.day)&&(!S.game||g.game===S.game)&&(!S.graded||(g.W&&["A","B"].includes(g.W.grade)))&&(!q||(g.game+" "+g.rows.map(r=>r.player).join(" ")).toLowerCase().includes(q)));
-  const key={chance:g=>g.W?g.W.win_prob:0,edge:g=>g.W?edgeOf(g.W)??-9:-9,price:g=>{const x=g.W&&quote(g.W);return x?dec(x.px):0},time:g=>Date.parse(g.ko)}[S.sort]||(g=>Date.parse(g.ko));
+  const key={rank:g=>g.W?rankScore(g.W):0,chance:g=>g.W?g.W.win_prob:0,edge:g=>g.W?edgeOf(g.W)??-9:-9,price:g=>{const x=g.W&&quote(g.W);return x?dec(x.px):0},time:g=>Date.parse(g.ko)}[S.sort]||(g=>Date.parse(g.ko));
   const dir=S.asc?1:-1;gs.sort((a,b)=>(key(a)-key(b))*dir);
   const base=all.flatMap(g=>g.rows);
   const B=$("#seg-body");
   B.innerHTML=toolbar(base,false)+(gs.length?`<div class="tbl games" role="table" aria-label="Games">
-    <div class="th" role="row">${sortBtn("time","Game")}<span>Our winner</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("price","Price","r")}<span>Spread</span><span>Total</span></div>
-    ${gs.slice(0,S.shown).map(gameRow).join("")}${gs.length>S.shown?`<button class="more" id="more">Show more</button>`:""}</div>
+    <div class="th" role="row">${sortBtn("rank","#")}${sortBtn("time","Game")}<span>Our winner</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("price","Price","r")}<span>Spread</span><span>Total</span></div>
+    ${gs.slice(0,Math.min(S.shown,LIMIT[tier].games)).map(gameRow).join("")}${gs.length>LIMIT[tier].games?gate(gs.slice(LIMIT[tier].games,LIMIT[tier].games+3).map(gameRow).join(""),"free","See every game","A free account shows every game pick: winner, projected score, spread and total, all sports."):gs.length>S.shown?`<button class="more" id="more">Show more</button>`:""}</div>
     <p class="hint">Winner, spread and total all come from one projected score, so they never contradict each other. Winners are graded; spreads and totals are shown, not graded, until they hold up at 58% on seasons the model never saw.</p>`
     :`<div class="empty">No games match.</div>`);
   $("#f-count").textContent=`${gs.length} game${gs.length===1?"":"s"}`;
@@ -476,9 +505,11 @@ function fillGames(){
   const mb=$("#more");if(mb)mb.onclick=()=>{S.shown+=50;fillGames()};
   B.querySelectorAll("[data-sort]").forEach(b=>b.onclick=()=>{const k=b.dataset.sort;if(S.sort===k)S.asc=!S.asc;else{S.sort=k;S.asc=k==="time"}save();fillGames()});
   B.querySelectorAll(".tr[data-game]").forEach(b=>b.onclick=()=>openGame(b.dataset.game));
+  bindPreview();
 }
 /* tickets & more */
 function fillMore(){
+  if(tier!=="pro"){$("#seg-body").innerHTML=gate('<div style="height:200px"></div>',"pro","Tickets are Pro","2- and 3-leg tickets priced at one book, teaser legs and slow prices.");bindPreview();return}
   const P=pool().filter(p=>segOf(p)==="more"&&(!S.sport||p.sport===S.sport));
   const card=p=>{const legs=String(p.pick_text||"").split(" AND ");const q=quote(p);
     return `<article class="card"><b>${esc(p.market_label)} · ${esc(p.game)}</b><ol>${legs.map(l=>`<li>${esc(l)}</li>`).join("")}</ol>
@@ -514,6 +545,16 @@ function sparkSVG(p,f){
 }
 const STAT_OF={"Receiving yards":"Receiving yards","Receptions":"Receptions","Rushing yards":"Rushing yards","Passing yards":"Passing yards","Rush + rec yards":"Rush + rec yards","Rush attempts":"Rush attempts","Passing TDs":"Passing TDs","Completions":"Completions","Pass attempts":"Pass attempts","Longest reception":"Longest reception","Longest rush":"Longest rush","Longest completion":"Longest completion"};
 function laddersFor(p){if(!LADI)return null;return LADI.get(`${p.player}~${STAT_OF[p.market_label]||p.market_label}`)||null}
+function recLine(p){
+  const t=recText(p);if(!t)return "";
+  const who=`${SPORT_NAME[p.sport]||p.sport} ${graded(p)?"grade "+p.grade+" ":"ungraded "}${TYPE_NAME(p)}`;
+  return `<p class="note rec"><b>Live record, ${esc(who)}: ${t}</b> since Sep 26, 2026.${topGrade(p)?"":graded(p)?" Below the A and B bar, so not one of our graded picks.":" Not graded: in testing these lost money at the books' prices."}</p>`;
+}
+function bestTime(p){   // tested: our 60%+ NFL props paid more 1 to 6 hours before kickoff than a day or two early
+  if(!(p.sport==="NFL"&&p.kind==="prop"&&p.win_prob>=.6))return "";
+  const k=Date.parse(p.kickoff_utc),t=x=>new Date(x).toLocaleString("en-US",{...tz,weekday:"short",hour:"numeric",minute:"2-digit"});
+  return `<p class="note">Best time to bet: <b>${t(k-6*36e5)} to ${t(k-36e5)} ET</b>. In 2024-2025 testing these paid more 1 to 6 hours before kickoff than a day or two early.</p>`;
+}
 function openPick(id){
   const p=D.picks.find(x=>x._id===id);if(!p)return;
   const f=formOf(p),q=quote(p);
@@ -524,6 +565,7 @@ function openPick(id){
   if(p.books)rows.push(["Books quoting",String(p.books)]);
   const legs=[p.safe_leg&&["Safer",p.safe_leg],p.stretch_leg&&["Stretch",p.stretch_leg]].filter(Boolean);
   const body=`<div class="p-sec"><div class="big">${esc(pickText(p))}</div>${p.proj!=null&&p.kind==="prop"?`<p class="note" style="margin-top:4px">Our projection: <b>${num(p.proj)}</b> against a line of ${p.line}</p>`:""}</div>
+    ${recLine(p)}${bestTime(p)}
     <div class="cmp"><div class="ours"><b>${pct(p.win_prob)}</b><span>Our chance${graded(p)?" · grade "+p.grade:" · not graded"}</span></div><div><b>${pct(p.book_prob)}</b><span>Book's chance${q?" at "+price(q.px):""}</span></div></div>
     ${f?`<div class="p-sec"><h4>Last ${f.rows.length} games against this line</h4><p class="note" style="margin:0 0 6px">Last 5 <b>${hrText(f.l5)}</b> · Last 10 <b>${hrText(f.l10)}</b> · This season <b>${hrText(f.ssn)}</b></p>${sparkSVG(p,f)}<p class="note">Context only: in 2023-25 testing, players on a hot streak won 50% on their next pick.</p></div>`:""}
     ${legs.length?`<div class="p-sec"><h4>Other lines</h4><dl class="kv">${legs.map(([k,l])=>`<dt>${k}: ${esc(l.text)}</dt><dd><span class="num">${pct(l.chance)}</span>${l.price!=null?` · <span class="num">${price(l.price)}</span> ${esc(l.book||"")}`:" · not offered now"}</dd>`).join("")}</dl></div>`:""}
@@ -538,7 +580,7 @@ function openGame(game){
   const g=gameGroups().find(x=>x.game===game)||{rows:D.picks.filter(p=>p.game===game)};
   const rows=D.picks.filter(p=>p.game===game&&p.kind==="game");const W=rows.find(r=>r.market_label==="Winner");
   const line=r=>{const q=quote(r);return `<dt>${esc(r.market_label)}: ${esc(pickText(r))}</dt><dd><span class="num">${pct(r.win_prob)}</span>${q?` · <span class="num">${price(q.px)}</span>`:""}${r.book_line?`<br><small class="muted">Book: ${esc(r.book_line)}</small>`:""}</dd>`};
-  const body=`${W?`<div class="p-sec"><div class="big">${esc(W.player)}${g.sport==="SOC"?"":" win"}</div>${W.our_score?`<p class="note" style="margin-top:4px">Our projected score: <b>${esc(W.our_score)}</b></p>`:""}</div>
+  const body=`${W?`<div class="p-sec"><div class="big">${esc(W.player)}${g.sport==="SOC"?"":" win"}</div>${W.our_score?`<p class="note" style="margin-top:4px">Our projected score: <b>${esc(W.our_score)}</b></p>`:""}</div>${recLine(W)}
     <div class="cmp"><div class="ours"><b>${pct(W.win_prob)}</b><span>Our chance${graded(W)?" · grade "+W.grade:" · not graded"}</span></div><div><b>${pct(W.book_prob)}</b><span>Book's chance</span></div></div>`:""}
     <div class="p-sec"><h4>Every pick in this game</h4><dl class="kv">${rows.map(line).join("")}</dl></div>
     ${[W&&W.note,W&&W.suggested,W&&W.plus_note].filter(Boolean).map(t=>`<p class="note">${esc(t)}</p>`).join("")}
@@ -555,9 +597,9 @@ function rankedNow(){   // what the table shows (same filters), ranked by our ch
   if(S.seg==="games"){
     const q=S.q.trim().toLowerCase();
     return gameGroups().filter(g=>g.W&&(S.day==="all"||etDay(g.ko)===S.day)&&(!S.game||g.game===S.game)&&(!S.graded||["A","B"].includes(g.W.grade))&&(!q||(g.game+" "+g.rows.map(r=>r.player).join(" ")).toLowerCase().includes(q)))
-      .sort((a,b)=>b.W.win_prob-a.W.win_prob);
+      .sort((a,b)=>rankScore(b.W)-rankScore(a.W)).slice(0,LIMIT[tier].games);
   }
-  return propList().r.slice().sort((a,b)=>b.win_prob-a.win_prob);
+  return propList().r.slice().sort((a,b)=>rankScore(b)-rankScore(a)).slice(0,LIMIT[tier].props);
 }
 function filterText(){
   const bits=[S.sport?SPORT_NAME[S.sport]:"All sports",S.day==="all"?"all upcoming":dayLabel(S.day)];
@@ -572,7 +614,7 @@ function shareRows(list){
 }
 const shareHead=()=>S.seg==="games"?["#","Game","Our winner","Our chance","Book","Price","Projected score","Spread","Total","Time (ET)"]:["#","Player","Pick","Our chance","Book","Price","Last 5","Last 10","Season","Game (ET)"];
 function shareTextOf(list){
-  const L=[`CONFIDENT PICKS · Top ${list.length} ${SEG_NAME[S.seg]||"picks"}`,filterText()+" · ranked by our chance",""];
+  const L=[`CONFIDENT PICKS · Top ${list.length} ${SEG_NAME[S.seg]||"picks"}`,filterText()+" · ranked: A and B first, then by our chance",""];
   if(S.seg==="games")list.forEach((g,i)=>L.push(`${i+1}. ${g.W.player}${g.sport==="SOC"?"":" win"} (${g.game}) · ${pct(g.W.win_prob)}${gradeTxt(g.W)} · ${qTxt(g.W)}${g.W.our_score?` · projected ${g.W.our_score}`:""} · ${when(g.ko)}`));
   else list.forEach((p,i)=>{const f=formOf(p);L.push(`${i+1}. ${p.player}: ${pickText(p)} · ${pct(p.win_prob)}${gradeTxt(p)} · ${qTxt(p)}${f?` · L10 ${hrText(f.l10)}`:""} · ${when(p.kickoff_utc)}`)});
   L.push("",TESTING,`More at ${siteLink()}`,"Our models' opinion, not guarantees. 21+.");
@@ -594,7 +636,7 @@ async function makePDF(list){
   const title=`Top ${list.length} ${SEG_NAME[S.seg]||"picks"}`;
   const head=()=>{doc.setFillColor(31,95,174);doc.rect(0,0,W,58,"F");if(logo)doc.addImage(logo,"PNG",28,13,28,32);
     doc.setTextColor(255,255,255);doc.setFont("helvetica","bold");doc.setFontSize(20);doc.text("CONFIDENT PICKS",logo?64:28,30);
-    doc.setFont("helvetica","normal");doc.setFontSize(10.5);doc.text(`${title} · ${filterText()} · ranked by our chance`,logo?64:28,46);
+    doc.setFont("helvetica","normal");doc.setFontSize(10.5);doc.text(`${title} · ${filterText()} · ranked: A and B first, then by our chance`,logo?64:28,46);
     doc.setFontSize(9);doc.text(`Made ${new Date().toLocaleString("en-US",{...tz,weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET`,W-28,26,{align:"right"});
     if(odds)doc.text(`Prices: real quotes at ${stamp(odds)}`,W-28,40,{align:"right"});};
   const rows=shareRows(list),items=list;
@@ -612,10 +654,11 @@ async function makePDF(list){
   return doc;
 }
 function openShare(){
+  if(tier==="visitor"){openModal("signup");return}
   const all=rankedNow(),n0=Math.min(25,all.length);
   if(!all.length){toast("Nothing to share with these filters");return}
   const canFile=!!(navigator.canShare&&window.File&&navigator.canShare({files:[new File(["x"],"x.pdf",{type:"application/pdf"})]}));
-  const body=`<p class="note" style="margin:0">Ranked by our chance, using your filters: <b>${esc(filterText())}</b></p>
+  const body=`<p class="note" style="margin:0">Ranked like the table (A and B first, then by our chance), using your filters: <b>${esc(filterText())}</b></p>
     <label class="note" style="display:grid;gap:4px">How many<select id="sh-n" style="font:inherit;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink)">${[10,25,50,100].filter(k=>k<all.length).map(k=>`<option value="${k}" ${k===n0?"selected":""}>Top ${k}</option>`).join("")}<option value="${all.length}" ${all.length<=25?"selected":""}>All ${all.length}</option></select></label>
     <div class="btns"><button class="btn pri" id="sh-pdf">Download PDF</button>${canFile?'<button class="btn" id="sh-send">Share PDF</button>':""}<button class="btn" id="sh-text">Copy as text</button></div>
     <div id="sh-hold"></div><div class="p-sec"><h4>Preview</h4><ol id="sh-prev" style="margin:0;padding-left:20px;display:grid;gap:4px;font-size:13.5px"></ol></div>`;
@@ -639,9 +682,72 @@ function copyText(text,holder){
 }
 const siteLink=()=>(D&&D.meta&&D.meta.public_url)||"https://confident-picks.com/";
 
+/* ---------- accounts and plans PREVIEW (test page only: nothing signs in or takes payment) ----------
+   Real accounts (AWS Cognito) and payments (Stripe hosted checkout) come with the AWS move. */
+const TIER_NAMES={visitor:"Visitor",free:"Free member",pro:"Pro member"};
+const PLAN_PRICES={month:"$19",season:"$149"};   // placeholders until the owner sets prices
+let tier=store.get("pv_tier","pro");
+const LIMIT={visitor:{props:3,games:2},free:{props:5,games:999},pro:{props:1e9,games:1e9}};
+function setTier(t){tier=t;store.set("pv_tier",t);S.shown=50;render()}
+function pvBar(){return `<div class="pv-bar" role="group" aria-label="Preview as"><b>Preview as:</b>${Object.entries(TIER_NAMES).map(([k,l])=>`<button data-tier="${k}" aria-pressed="${tier===k}">${l}</button>`).join("")}<span class="badge">Design preview, not connected</span></div>`}
+function acctBtns(){return tier==="visitor"?`<button class="btn sm" data-modal="signin">Sign in</button><button class="btn sm hot" data-go="plans">Join Pro</button>`
+  :tier==="free"?`<button class="btn sm" data-go="account">My account</button><button class="btn sm hot" data-go="plans">Upgrade</button>`
+  :`<span class="badge pro">Pro</span><button class="btn sm" data-go="account">My account</button>`}
+function gate(inner,need,title,why){
+  const cta=need==="free"?`<button class="btn pri" data-modal="signup">Create a free account</button><button class="btn" data-modal="signin">Sign in</button>`
+    :`<button class="btn hot" data-go="plans">See Pro plans</button>${tier==="visitor"?'<button class="btn" data-modal="signin">Sign in</button>':""}`;
+  return `<div class="gate"><div class="blur" aria-hidden="true">${inner}</div><div class="over"><div class="gcard"><span class="badge">${need==="free"?"Free account":"Pro"}</span><h3>${esc(title)}</h3><p>${esc(why)}</p><div class="btns" style="justify-content:center">${cta}</div></div></div></div>`;
+}
+const shownRows=r=>r.slice(0,Math.min(S.shown,LIMIT[tier].props));
+function lockedRows(r,row){const lim=LIMIT[tier].props;if(r.length<=lim)return "";
+  return gate(r.slice(lim,lim+3).map(row).join(""),tier==="visitor"?"free":"pro",`${r.length-lim} more picks`,tier==="visitor"?"Create a free account for 5 props a day, or go Pro for every prop we make.":"Pro unlocks every prop we grade, all sports, plus tickets and the share sheet.")}
+function vPlans(){
+  const f=(ok,t)=>`<li class="${ok?"":"no"}">${t}</li>`;
+  return `<h2 class="h2">Plans</h2><p class="lede">Every plan shows the same honest record. Pro unlocks every pick, the tickets and full sharing. Cancel any time. <span class="badge">Prices are placeholders</span></p>
+  <div class="plans">
+    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Top 5 player props a day")}${f(1,"Full record and results")}${f(1,"The Builder")}${f(0,"Every player prop (700+ on NFL Sundays)")}${f(0,"Tickets")}${f(0,"Full PDF and share sheet")}</ul>
+      <button class="btn pri" data-modal="signup" ${tier!=="visitor"?"disabled":""}>${tier==="visitor"?"Create a free account":"Your plan"}</button></section>
+    <section class="plan best"><span class="badge">Most popular</span><h3>Pro monthly</h3><div class="price">${PLAN_PRICES.month}<small> / month</small></div><ul>${f(1,"Everything in Free")}${f(1,"Every player prop, all sports, with Last 5 / Last 10 / Season")}${f(1,"2- and 3-leg tickets")}${f(1,"Ranked PDFs and the share sheet")}${f(1,"Cancel any time")}</ul>
+      <button class="btn hot" data-modal="checkout" data-plan="month" ${tier==="pro"?"disabled":""}>${tier==="pro"?"Your plan":"Start Pro"}</button></section>
+    <section class="plan"><h3>Pro season</h3><div class="price">${PLAN_PRICES.season}<small> / season</small></div><ul>${f(1,"Everything in Pro")}${f(1,"One payment for the football season")}${f(1,"About 2 months free vs monthly")}</ul>
+      <button class="btn" data-modal="checkout" data-plan="season" ${tier==="pro"?"disabled":""}>${tier==="pro"?"Your plan":"Get the season"}</button></section>
+  </div><p class="hint">Payments would run on Stripe's secure checkout page; card numbers never touch this site. 21+ where legal. Picks are our models' opinion, not guarantees.</p>`;
+}
+function vAccount(){
+  if(tier==="visitor")return gate('<div style="height:220px"></div>',"free","Sign in to see your account","Your plan, billing and saved settings live here.");
+  const pro=tier==="pro";
+  return `<h2 class="h2">My account</h2><p class="lede">Preview with sample details.</p><div class="cards" style="max-width:720px">
+    <section class="card"><b>Profile</b><span>you@example.com</span><button class="btn" disabled>Change email</button></section>
+    <section class="card"><b>Plan</b><span>${pro?`Pro monthly · renews Oct 28, 2026 · ${PLAN_PRICES.month}/month`:"Free"}</span><div class="btns">${pro?'<button class="btn" disabled>Manage billing</button><button class="btn" disabled>Cancel plan</button>':'<button class="btn hot" data-go="plans">Upgrade to Pro</button>'}</div></section>
+    <section class="card"><b>Alerts</b><span>Email me the Lock of the Day at 10 AM ET <span class="badge">Coming later</span></span></section>
+    <section class="card"><button class="btn" data-tier="visitor">Sign out</button></section></div>`;
+}
+function openModal(kind,plan){
+  const note='<p class="note">Design preview: nothing is sent and no account is created. When live, sign-in runs on AWS Cognito and payments on Stripe.</p>';
+  let body="";
+  if(kind==="signin"||kind==="signup")body=`<label class="note" style="display:grid;gap:4px">Email<input type="email" placeholder="you@example.com" disabled style="font:inherit;padding:9px;border:1px solid var(--line);border-radius:8px"></label>
+    <div class="btns"><button class="btn pri" disabled>Email me a sign-in code</button><button class="btn" disabled>Continue with Google</button></div>
+    <p class="note">${kind==="signup"?"Free: Lock of the Day, every game pick, the Builder and 5 props a day. You must be 21+.":"No password to remember: we email you a one-time code."}</p>
+    <div class="btns"><button class="btn" data-demo="free">Show me as signed in</button></div>${note}`;
+  else{const season=plan==="season";body=`<dl class="kv"><dt>${season?"Pro season":"Pro monthly"}</dt><dd><b>${season?PLAN_PRICES.season:PLAN_PRICES.month+"/mo"}</b></dd><dt>${season?"One payment, through the Super Bowl":"Renews monthly"}</dt><dd>Cancel any time</dd></dl>
+    <div class="btns"><button class="btn hot" disabled>Continue to secure checkout</button></div><p class="note">You'd pay on Stripe's checkout page (card, Apple Pay, Google Pay), then come back here as Pro. Card details never reach this site.</p>
+    <div class="btns"><button class="btn" data-demo="pro">Show me as Pro</button></div>${note}`}
+  openPanel(kind==="signup"?"Create your free account":kind==="signin"?"Sign in":"Start Pro","",body,P=>{P.querySelectorAll("[data-demo]").forEach(b=>b.onclick=()=>{closePanel();setTier(b.dataset.demo)})});
+}
+function bindPreview(){
+  document.querySelectorAll("[data-tier]").forEach(b=>b.onclick=()=>setTier(b.dataset.tier));
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setTab(b.dataset.go));
+  document.querySelectorAll("[data-modal]").forEach(b=>b.onclick=()=>openModal(b.dataset.modal,b.dataset.plan));
+}
+
 /* ---------- results ---------- */
 const hPct=r=>r.w+r.l?Math.round(r.w/(r.w+r.l)*100)+"%":"–";
 const hRec=r=>`${r.w}-${r.l}${r.p?"-"+r.p:""}`;
+function clvTable(tr){
+  const c=((tr.live||{}).clv)||[];if(!c.length)return "";
+  return `<h2 class="h2" style="margin-top:4px">Beating the closing line</h2><p class="lede">The price a line closes at, minutes before kickoff, is the sharpest number there is. Getting a better number than the close, again and again, is the clearest early sign of skill, long before win rates settle. 50% means no edge yet.</p>
+  <div class="tbl" style="margin-bottom:14px"><table class="std"><thead><tr><th>Posted picks</th><th class="r">Picks</th><th class="r">Beat the close</th><th class="r">Avg points</th></tr></thead><tbody>${c.map(x=>`<tr><td>${esc(x.group)}</td><td class="r num">${x.picks}</td><td class="r num">${Math.round(x.beat_close*100)}%</td><td class="r num">${x.avg_points==null?"–":(x.avg_points>0?"+":"")+x.avg_points}</td></tr>`).join("")}</tbody></table></div>`;
+}
 function vResults(){
   const tr=D.meta.track_record||{},live=(tr.live||{}).groups||[],nw=tr.nfl_winners||{},cw=tr.cfb_winners||{};
   const all=live.filter(g=>g.sport==="all"),n=all.reduce((s,g)=>s+g.picks,0),w=all.reduce((s,g)=>s+g.won*g.picks,0);
@@ -649,7 +755,7 @@ function vResults(){
   const H=D.history||{};const seasons=(H.seasons||[]);
   if(!S.hs||!seasons.some(s=>s.sport===S.hs))S.hs=((seasons.find(s=>s.days&&s.days.length))||seasons[0]||{}).sport;
   const SE=seasons.find(s=>s.sport===S.hs);
-  const days=SE?SE.days.filter(d=>d.picks.length).map((d,i)=>`<details class="day"${i===0?" open":""}><summary><b>${esc(dayLabel(d.date))}</b><span class="muted">A and B <b>${hRec(d.graded)}</b> · all graded ${hRec(d.all)}${d.all.open?` · ${d.all.open} open`:""}</span></summary>
+  const days=SE?SE.days.filter(d=>d.picks.length).map((d,i)=>`<details class="day"><summary><b>${esc(dayLabel(d.date))}</b><span class="muted">A and B <b>${hRec(d.graded)}</b> · all graded ${hRec(d.all)}${d.all.open?` · ${d.all.open} open`:""}</span></summary>
     ${d.picks.map(p=>`<div class="hrow"><span class="cell"><b>${esc(p.lock?"Lock: "+p.p:p.p)}</b><small>${esc(p.game)} · ${esc(p.m)}</small></span><span class="cell"><span>${esc(p.t)}</span><small>${esc(p.d||"")}</small></span><span class="num">${pct(p.c)}</span><span class="res ${p.r||""}">${p.r||"…"}</span></div>`).join("")}</details>`).join(""):"";
   return `<div class="tiles">
     <div class="tile"><span class="k">Live, A and B picks</span><span class="v">${n?Math.round(w/n*100)+"%":"–"}<small>of ${n||0}</small></span><span class="s">Posted since Sep 26, 2026</span></div>
@@ -657,7 +763,8 @@ function vResults(){
     <div class="tile"><span class="k">NFL winners, 60%+ sure</span><span class="v">${pct(nw.conf60_win)}<small>of ${nw.conf60_games||"–"}</small></span><span class="s">Tested 2023-2025</span></div>
     <div class="tile"><span class="k">College winners, 60%+ sure</span><span class="v">${pct(cw.conf60_win)}<small>of ${cw.conf60_games||"–"}</small></span><span class="s">Tested 2023-2025</span></div>
     <div class="tile"><span class="k">Lock of the day</span><span class="v">${esc(lockRec().replace("Lock record ","")||"–")}</span><span class="s">Live record</span></div></div>
-  ${live.length?`<div class="tbl" style="margin-bottom:14px"><table class="std"><thead><tr><th>Live record by group</th><th class="r">Picks</th><th class="r">Won</th></tr></thead><tbody>${live.map(g=>`<tr><td>${esc(g.sport==="all"?"":g.sport+" ")}${esc(g.market)}</td><td class="r num">${g.picks}</td><td class="r num">${Math.round(g.won*100)}%</td></tr>`).join("")}</tbody></table></div>`:""}
+  ${clvTable(tr)}
+  ${live.length?`<details class="day" style="margin-bottom:14px"><summary><b>Live record by pick type</b><span class="muted">${live.length} groups · tap to open</span></summary><table class="std"><thead><tr><th>Group</th><th class="r">Picks</th><th class="r">Won</th></tr></thead><tbody>${live.map(g=>`<tr><td>${esc(g.sport==="all"?"":g.sport+" ")}${esc(g.market)}</td><td class="r num">${g.picks}</td><td class="r num">${Math.round(g.won*100)}%</td></tr>`).join("")}</tbody></table></details>`:""}
   ${seasons.length?`<div class="bar1"><h2 class="h2" style="margin:6px 0">Every graded pick</h2><div class="pills">${seasons.map(s=>`<button data-hs="${esc(s.sport)}" aria-pressed="${s.sport===S.hs}">${esc(s.label)}</button>`).join("")}</div></div>
   ${SE&&SE.summary&&SE.summary.length?`<div class="tbl" style="margin-bottom:10px"><table class="std"><thead><tr><th>${esc(SE.label)}</th><th class="r">Record</th><th class="r">Won</th><th class="r">Posted live</th></tr></thead><tbody>${SE.summary.map(g=>`<tr><td>${esc(g.group)}</td><td class="r num">${hRec(g)}</td><td class="r num">${hPct(g)}</td><td class="r num">${g.live.w+g.live.l?hRec(g.live):"–"}</td></tr>`).join("")}</tbody></table></div>`:""}
   ${days||`<div class="empty">${esc((SE&&SE.note)||"No graded picks yet.")}</div>`}<p class="hint">${esc(H.backtest_note||"")}</p>`:""}`;
@@ -669,8 +776,30 @@ function vAbout(){
   <h3>How we test</h3><p>${esc(m.method||"")}</p><p>A pick type gets a grade only after it held up on seasons the model never saw: 60% for winners and props, 58% for spreads and totals. Everything else is shown with our chance and no letter.</p>
   <h3>Reading the table</h3><p>Our chance is our model's. Book is the chance the book's price implies. Edge is the gap in points. L5 · L10 shows how often the player cleared this line in his last 5 and 10 games; it is context, not a signal, because in our testing hot streaks did not carry forward.</p>
   <h3>When to bet</h3><p>${esc(m.timing||"")}</p>
-  <h3>What we don't claim</h3><p>The books' closing lines are sharper than our game models. Our edge so far is in player props, and our live record decides what stays.</p>
+  <h3>How to use it</h3><p>Bet flat: the same small stake on every pick (one unit), and never raise it to win back a loss. A 60% picker still loses 5 or more in a row now and then; flat stakes are how the record gets the chance to show. Prices move, so check your book: every price here is a real quote at the time shown at the top.</p>
+  <h3>What we don't claim</h3><p>The books' closing lines are sharper than our game models. Our edge so far is in player props, and our live record decides what stays. Our models are new and still being tested.</p>
   <p><button class="btn" id="back-picks">Back to picks</button></p></div>`;
+}
+
+/* ---------- Builder milestones, matched to our main pick (owner 2026-10-02) ----------
+   The milestone chances come from the projection's spread, the main pick from the calibrated model, and they could differ
+   by 5+ points.  Each ladder is shifted (same amount on the log-odds scale for every rung, so the order never changes)
+   until the rung at the book's line equals the chance we post for that pick.  Where the two disagree by more than 15
+   points the model is unsure about the player (a role or injury change), so that ladder is left out. */
+const lgt=x=>Math.log(x/(1-x)),sgm=x=>1/(1+Math.exp(-x)),clampP=x=>Math.min(.995,Math.max(.005,x));
+function reconcileLadders(d){
+  if(!d||!d.ladders||d._matched)return d;
+  const by=new Map();for(const p of D.picks)if(p.kind==="prop"&&p.line!=null)by.set(`${p.player}~${p.market_label}`,p);
+  let dropped=0;
+  d.ladders=d.ladders.filter(l=>{
+    const p=by.get(`${l.player}~${l.stat}`);if(!p)return true;
+    const r0=l.rungs.find(r=>r.at===Math.floor(p.line)+1);if(!r0)return true;
+    const posted=p.side==="Over"?p.win_prob:1-p.win_prob;
+    if(Math.abs(r0.ours-posted)>.15){dropped++;return false}
+    const delta=lgt(clampP(posted))-lgt(clampP(r0.ours));
+    l.rungs.forEach(r=>{r.ours=Math.round(sgm(lgt(clampP(r.ours))+delta)*1000)/1000});
+    return true});
+  d._matched=true;d._dropped=dropped;return d;
 }
 
 /* ---------- Builder (shared with the old test page) ---------- */
@@ -686,12 +815,12 @@ function findLeg(k){if(!LAD)return null;const [pl,st,at]=k.split("~");for(const 
 (function(){try{const s=new URLSearchParams(location.search).get("slip");if(s){BS.cart=decodeURIComponent(escape(atob(s.replace(/-/g,"+").replace(/_/g,"/")))).split("|").filter(Boolean);BS.fromLink=true}}catch(e){}})();
 if(typeof ICON==="object")ICON.build='<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
 function vBuilder(){
-  return `<section class="view" style="padding:0;gap:14px"><div class="sec-h"><div><h2>Builder</h2><p class="lede">Pick the milestones you like and stack them. Every price is a real quote from that book at the last odds update. Next to it: the book's chance (from its price) and our model's chance of reaching that number.</p></div></div>
+  return `<section class="view" style="padding:0;gap:14px"><div class="sec-h"><div><h2>Builder</h2><p class="lede">Pick the milestones you like and stack them. Every price is a real quote from that book at the last odds update. Next to it: the book's chance (from its price) and our model's chance of reaching that number, matched to the chance we post for that player's main pick.</p></div></div>
   <div id="bld-body"><div class="empty">Loading this week's milestones…</div></div></section>`;
 }
 function bindBuilder(){
   if(LAD){fillBuilder();return}
-  fetch("../data/ladders.json").then(r=>r.json()).then(d=>{LAD=d;BS.cart=BS.cart.filter(k=>findLeg(k));fillBuilder()})
+  fetch("../data/ladders.json").then(r=>r.json()).then(d=>{LAD=reconcileLadders(d);BS.cart=BS.cart.filter(k=>findLeg(k));fillBuilder()})
     .catch(()=>{const b=$("#bld-body");if(b)b.innerHTML='<div class="empty">No milestones posted yet. They appear once the books post this week\'s props.</div>'});
 }
 function booksIn(){const s=new Set();LAD.ladders.forEach(l=>l.rungs.forEach(r=>Object.keys(r.books).forEach(b=>s.add(b))));return [...s].sort((a,b)=>a==="DraftKings"?-1:b==="DraftKings"?1:a.localeCompare(b))}
@@ -772,17 +901,20 @@ window.CP_ADD=(k,on)=>{BS.cart=on?[...new Set([...BS.cart,k])]:BS.cart.filter(x=
 /* ---------- render ---------- */
 function render(){
   nav();closePanel();
-  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder}[S.tab]||vPicks;
-  $("#main").innerHTML=v();
+  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount}[S.tab]||vPicks;
+  let html=v();
+  if(S.tab==="build"&&tier==="visitor")html=gate(html,"free","The Builder is free with an account","Stack milestones with real prices, see the book's chance next to ours, and share your stack.");
+  $("#main").innerHTML=pvBar()+html;$("#acct").innerHTML=acctBtns();
   if(S.tab==="picks"){
-    document.querySelectorAll("[data-seg]").forEach(b=>b.onclick=()=>{S.seg=b.dataset.seg;S.market="";S.game="";S.sort=S.seg==="games"?"time":"chance";S.asc=S.seg==="games";S.shown=50;save();render()});
+    document.querySelectorAll("[data-seg]").forEach(b=>b.onclick=()=>{S.seg=b.dataset.seg;S.market="";S.game="";S.sort="rank";S.asc=false;S.shown=50;save();render()});
     document.querySelectorAll("[data-sport]").forEach(b=>b.onclick=()=>{S.sport=b.dataset.sport;S.market="";S.game="";S.shown=50;save();render()});
     const sl=$("#share-lock");if(sl)sl.onclick=()=>{const L=D.meta.lock||D.picks.find(p=>p.lock);if(L)copyText(`LOCK OF THE DAY\n${L.player}: ${pickText(L)} · our chance ${pct(L.win_prob)} · ${L.game}, ${when(L.kickoff_utc)} ET\n(+100 or better when picked; prices move.)\n\n${siteLink()}\n21+. Not a guarantee.`,null)};
     ({props:fillProps,tds:fillProps,games:fillGames,more:fillMore}[S.seg]||fillProps)();
   }
   if(S.tab==="results")document.querySelectorAll("[data-hs]").forEach(b=>b.onclick=()=>{S.hs=b.dataset.hs;save();render()});
   if(S.tab==="about"){const b=$("#back-picks");if(b)b.onclick=()=>setTab("picks")}
-  if(S.tab==="build")bindBuilder();
+  if(S.tab==="build"&&tier!=="visitor")bindBuilder();
+  bindPreview();
 }
 function init(data){
   D=data;
@@ -792,11 +924,12 @@ function init(data){
   for(const p of D.picks){const k=nk(p),o=seen.get(k);if(!o||p.win_prob>o.win_prob||(p.win_prob===o.win_prob&&p.best_price!=null&&(o.best_price==null||dec(p.best_price)>dec(o.best_price))))seen.set(k,p)}
   D.picks=D.picks.filter(p=>seen.get(nk(p))===p);
   D.picks.forEach((p,i)=>p._id="p"+i);
-  const h=(location.hash||"").slice(1);if(["picks","build","results","about"].includes(h))S.tab=h;
+  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account"].includes(h))S.tab=h;
   header();render();
+  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account"].includes(t)){S.tab=t;save();render()}});
   setInterval(()=>{if(S.tab==="picks"&&!$("#panel"))render()},120000);
-  fetch("../data/form.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(f=>{if(f&&f.rows){FORM=f.rows;if(S.tab==="picks"&&!$("#panel"))render()}}).catch(()=>{});
-  fetch("../data/ladders.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;LAD=LAD||d;LADI=new Map(d.ladders.map(l=>[`${l.player}~${l.stat}`,l]))}).catch(()=>{});
+  fetch("../data/form.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(f=>{if(f&&f.rows){FORM=f.rows;REC=f.record||{};if(S.tab==="picks"&&!$("#panel"))render()}}).catch(()=>{});
+  fetch("../data/ladders.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;LAD=LAD||reconcileLadders(d);LADI=new Map(d.ladders.map(l=>[`${l.player}~${l.stat}`,l]))}).catch(()=>{});
 }
 fetch("../data/picks.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(init)
   .catch(()=>{$("#main").innerHTML='<div class="empty" style="margin-top:20px">This week\'s picks are not posted yet. Check back after the next update.</div>'});
