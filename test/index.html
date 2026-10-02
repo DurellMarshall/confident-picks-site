@@ -549,6 +549,7 @@ function openGame(game){
 }
 
 /* ---------- share or PDF (owner 2026-10-02: "pdf export or some way people can share, sorted by rank") ---------- */
+const TESTING="Our models are new and still being tested: every pick is graded live since Sep 26, 2026, and the record decides what stays.";
 const SEG_NAME={props:"player props",tds:"anytime touchdowns",games:"games"};
 function rankedNow(){   // what the table shows (same filters), ranked by our chance
   if(S.seg==="games"){
@@ -566,15 +567,15 @@ function filterText(){
 const gradeTxt=p=>graded(p)?" "+p.grade:"";
 const qTxt=p=>{const q=quote(p);return q?`${price(q.px)}${q.bk?" "+q.bk:""}`:"–"};
 function shareRows(list){
-  if(S.seg==="games")return list.map((g,i)=>[String(i+1),g.game,`${g.W.player}${g.sport==="SOC"?"":" win"}`,pct(g.W.win_prob)+gradeTxt(g.W),pct(g.W.book_prob),qTxt(g.W),g.Sp?pickText(g.Sp):"–",g.T?pickText(g.T):"–",when(g.ko)]);
+  if(S.seg==="games")return list.map((g,i)=>[String(i+1),g.game,`${g.W.player}${g.sport==="SOC"?"":" win"}`,pct(g.W.win_prob)+gradeTxt(g.W),pct(g.W.book_prob),qTxt(g.W),g.W.our_score||"–",g.Sp?pickText(g.Sp):"–",g.T?pickText(g.T):"–",when(g.ko)]);
   return list.map((p,i)=>{const f=formOf(p);return [String(i+1),`${p.player}${p.team?" ("+[p.team,p.pos].filter(Boolean).join(" ")+")":""}`,pickText(p),pct(p.win_prob)+gradeTxt(p),pct(p.book_prob),qTxt(p),f?hrText(f.l5):"–",f?hrText(f.l10):"–",f?hrText(f.ssn):"–",`${p.game} · ${when(p.kickoff_utc)}`]});
 }
-const shareHead=()=>S.seg==="games"?["#","Game","Our winner","Our chance","Book","Price","Spread","Total","Time (ET)"]:["#","Player","Pick","Our chance","Book","Price","Last 5","Last 10","Season","Game (ET)"];
+const shareHead=()=>S.seg==="games"?["#","Game","Our winner","Our chance","Book","Price","Projected score","Spread","Total","Time (ET)"]:["#","Player","Pick","Our chance","Book","Price","Last 5","Last 10","Season","Game (ET)"];
 function shareTextOf(list){
   const L=[`CONFIDENT PICKS · Top ${list.length} ${SEG_NAME[S.seg]||"picks"}`,filterText()+" · ranked by our chance",""];
-  if(S.seg==="games")list.forEach((g,i)=>L.push(`${i+1}. ${g.W.player}${g.sport==="SOC"?"":" win"} (${g.game}) · ${pct(g.W.win_prob)}${gradeTxt(g.W)} · ${qTxt(g.W)} · ${when(g.ko)}`));
+  if(S.seg==="games")list.forEach((g,i)=>L.push(`${i+1}. ${g.W.player}${g.sport==="SOC"?"":" win"} (${g.game}) · ${pct(g.W.win_prob)}${gradeTxt(g.W)} · ${qTxt(g.W)}${g.W.our_score?` · projected ${g.W.our_score}`:""} · ${when(g.ko)}`));
   else list.forEach((p,i)=>{const f=formOf(p);L.push(`${i+1}. ${p.player}: ${pickText(p)} · ${pct(p.win_prob)}${gradeTxt(p)} · ${qTxt(p)}${f?` · L10 ${hrText(f.l10)}`:""} · ${when(p.kickoff_utc)}`)});
-  L.push("",`More at ${siteLink()}`,"Our models' opinion, not guarantees. 21+.");
+  L.push("",TESTING,`More at ${siteLink()}`,"Our models' opinion, not guarantees. 21+.");
   return L.join("\n");
 }
 function loadJS(urls){return urls.reduce((pr,u)=>pr.catch(()=>new Promise((ok,no)=>{const s=document.createElement("script");s.src=u;s.onload=ok;s.onerror=()=>{s.remove();no()};document.head.appendChild(s)})),Promise.reject())}
@@ -597,14 +598,15 @@ async function makePDF(list){
     doc.setFontSize(9);doc.text(`Made ${new Date().toLocaleString("en-US",{...tz,weekday:"short",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})} ET`,W-28,26,{align:"right"});
     if(odds)doc.text(`Prices: real quotes at ${stamp(odds)}`,W-28,40,{align:"right"});};
   const rows=shareRows(list),items=list;
-  doc.autoTable({head:[shareHead()],body:rows,startY:72,margin:{top:72,left:28,right:28,bottom:40},theme:"grid",
+  doc.autoTable({head:[shareHead()],body:rows,startY:72,margin:{top:72,left:28,right:28,bottom:52},theme:"grid",
     styles:{font:"helvetica",fontSize:8.6,cellPadding:4,lineColor:[211,220,232],lineWidth:.5,textColor:[15,26,43],valign:"middle"},
     headStyles:{fillColor:[245,247,251],textColor:[102,116,138],fontStyle:"bold",fontSize:7.6},
     columnStyles:{0:{halign:"center",cellWidth:22,fontStyle:"bold"},1:{fontStyle:"bold"},3:{halign:"center",fontStyle:"bold"},4:{halign:"center"}},
     didParseCell:d=>{if(d.section!=="body")return;const it=items[d.row.index],p=S.seg==="games"?it.W:it;
       if(d.column.index===3&&graded(p)){const C={A:[[220,240,227],[23,120,74]],B:[[224,233,246],[40,93,166]],C:[[245,234,210],[143,99,16]],D:[[230,234,240],[95,107,125]]}[p.grade];d.cell.styles.fillColor=C[0];d.cell.styles.textColor=C[1]}
       if(S.seg!=="games"&&d.column.index>=6&&d.column.index<=8){const m=String(d.cell.raw).match(/\((\d+)%\)/);if(m){const r=+m[1];d.cell.styles.fillColor=r>=70?[220,240,227]:r>=50?[255,244,222]:[248,225,222];d.cell.styles.halign="center"}}},
-    didDrawPage:()=>{head();doc.setFontSize(8);doc.setTextColor(102,116,138);
+    didDrawPage:()=>{head();doc.setFontSize(8.5);doc.setTextColor(224,96,15);doc.setFont("helvetica","bold");
+      doc.text(TESTING,28,H-34);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(102,116,138);
       doc.text(`${siteLink()} · Our models' opinion, not guarantees. ${S.seg==="games"?"Winners are graded; spreads and totals are shown, not graded.":"Grades A and B held up in testing. Last 5 / Last 10 count back into last season; Season is this season only."} 21+ · 1-800-GAMBLER`,28,H-20);
       doc.text(`Page ${doc.internal.getNumberOfPages()}`,W-28,H-20,{align:"right"})}});
   return doc;
