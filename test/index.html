@@ -242,6 +242,9 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .mrung .hit.g{background:var(--good-bg,#DCF0E3);color:var(--good)}.mrung .hit.y{background:var(--warn-bg);color:var(--warn-ink)}.mrung .hit.r{background:var(--bad-bg,#F8E1DE);color:var(--bad)}
 .mrung[aria-pressed="true"] .hit{background:rgba(255,255,255,.25);color:var(--turf-ink)}
 .cart-note{margin:0;font-size:12px;color:var(--muted)}
+.slipbtn{display:block;text-align:center;background:#15803D;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700;text-decoration:none}
+.slipbtn.sm{display:inline-block;padding:5px 9px;font-size:12.5px}.slipbtn.off{opacity:.5}
+.cart select{font:inherit;font-size:13px;padding:4px 6px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink)}
 .bseg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--surface);justify-self:start}
 .bseg button{border:0;background:none;border-radius:7px;padding:6px 12px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink-2)}
 .bseg button[aria-pressed="true"]{background:var(--turf);color:var(--turf-ink)}.bseg .ct{font-size:11px;opacity:.75}
@@ -813,9 +816,32 @@ function reconcileLadders(d){
 /* ---------- Builder (shared with the old test page) ---------- */
 
 /* ---------- Builder: real milestone prices, the book's chance and ours; a cart you can share ---------- */
-let LAD=null, BS={book:"DraftKings",sport:"",game:"",stat:"",q:"",cart:[],view:"milestones"};
+let LAD=null, BS={book:"DraftKings",sport:"",game:"",stat:"",q:"",cart:[],view:"milestones",state:""};
 try{const c=JSON.parse(localStorage.getItem("cp-cart")||"null");if(c)Object.assign(BS,c)}catch(e){}
-const saveCart=()=>{try{localStorage.setItem("cp-cart",JSON.stringify({book:BS.book,cart:BS.cart}))}catch(e){}};
+const saveCart=()=>{try{localStorage.setItem("cp-cart",JSON.stringify({book:BS.book,cart:BS.cart,state:BS.state}))}catch(e){}};
+/* Send the stack to the sportsbook (owner 2026-10-03): each price in our odds feed comes with that book's own
+   add-to-slip link.  Books whose links take several picks get one button; the others get one link per pick.
+   Opening a link only fills the slip at the book; nothing is placed. */
+const STATES=["az","co","ct","dc","ia","il","in","ks","ky","la","ma","md","mi","nc","nh","nj","ny","oh","pa","tn","va","vt","wv","wy"];
+const qget=(u,k)=>{try{return new URL(u.replace(/\{state\}/g,BS.state||"nj").replace(/\{[a-zA-Z]+\}/g,"")).searchParams.get(k)}catch(e){return null}};
+const SLIP={
+  "DraftKings":ls=>"https://sportsbook.draftkings.com/?outcomes="+ls.map(u=>encodeURIComponent(qget(u,"outcomes")||"")).join("+"),
+  "FanDuel":ls=>"https://sportsbook.fanduel.com/addToBetslip?"+ls.map((u,i)=>`marketId[${i}]=${qget(u,"marketId")}&selectionId[${i}]=${qget(u,"selectionId")}`).join("&"),
+  "ESPN BET":ls=>"https://sportsbook.thescore.bet/?"+ls.map((u,i)=>`market_selection_id[${i}]=${qget(u,"market_selection_id[0]")}`).join("&")};
+const fillState=u=>u.replace(/\{state\}/g,BS.state||"").replace(/\{[a-zA-Z]+\}/g,"");
+function slipBlock(legs){
+  const withL=legs.filter(x=>x.r.links&&x.r.links[BS.book]),miss=legs.filter(x=>!(x.r.links&&x.r.links[BS.book]));
+  if(!withL.length)return legs.length?`<p class="cart-note">${esc(BS.book)} didn't send add-to-slip links for these picks.</p>`:"";
+  const urls=withL.map(x=>x.r.links[BS.book]),needState=urls.some(u=>u.includes("{state}"));
+  let h="";
+  if(needState)h+=`<label class="cart-note" style="display:flex;gap:6px;align-items:center">Your state<select id="slip-state"><option value="">Pick</option>${STATES.map(s=>`<option${s===BS.state?" selected":""}>${s.toUpperCase()}</option>`).join("")}</select></label>`;
+  const ready=!needState||BS.state;
+  if(SLIP[BS.book]&&withL.length>1)h+=`<a class="slipbtn${ready?"":" off"}" href="${ready?esc(SLIP[BS.book](urls)):"#"}" target="_blank" rel="noopener">Open slip at ${esc(BS.book)} (${withL.length} pick${withL.length===1?"":"s"})</a>`;
+  else if(withL.length===1)h+=`<a class="slipbtn${ready?"":" off"}" href="${ready?esc(fillState(urls[0])):"#"}" target="_blank" rel="noopener">Open slip at ${esc(BS.book)}</a>`;
+  else h+=`<p class="cart-note">${esc(BS.book)} adds one pick per link:</p><div class="btnrow">${withL.map((x,i)=>`<a class="slipbtn sm${ready?"":" off"}" href="${ready?esc(fillState(urls[i])):"#"}" target="_blank" rel="noopener">${esc(x.l.player.split(" ").slice(-1)[0])} ${x.r.at}+</a>`).join("")}</div>`;
+  if(miss.length)h+=`<p class="cart-note">Left out (not offered at ${esc(BS.book)} or no link): ${miss.map(x=>esc(`${x.l.player} ${x.r.at}+ ${x.l.stat.toLowerCase()}`)).join(", ")}.</p>`;
+  return h+`<p class="cart-note">Opens ${esc(BS.book)} with these picks in your slip. Nothing is placed until you confirm there. Prices can change. 21+.</p>`;
+}
 const decOf=a=>a>0?1+a/100:1+100/Math.abs(a);
 const amOf=d=>d>=2?Math.round((d-1)*100):Math.round(-100/(d-1));
 const legKey=(l,r)=>`${l.player}~${l.stat}~${r.at}`;
@@ -865,6 +891,7 @@ function cartSummary(){
   h+=`<div class="sum">`;
   if(priced){const d=legs.reduce((a,x)=>a*decOf(x.r.books[BS.book]),1);h+=`<span>Projected payout at ${esc(BS.book)}</span><b>${price(amOf(d))}</b>`}
   h+=`</div><p class="cart-note">${priced?"":`A leg in your stack isn't offered at ${esc(BS.book)}, so no payout is shown. `}Projected odds: each leg's price multiplied together. Does not include same-game parlay pricing or promotions, so your book's price may differ.</p>`;
+  h+=slipBlock(legs);
   h+=`<div class="btnrow"><button class="primary" id="slip-link">Copy share link</button><button id="slip-text">Copy as text</button><button id="slip-clear">Clear</button></div><div id="slip-hold"></div>`;
   return h;
 }
@@ -901,6 +928,8 @@ function fillBuilder(){
   B.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{BS.cart=BS.cart.filter(x=>x!==b.dataset.rm);re()});
   B.querySelectorAll("[data-stack]").forEach(b=>b.onclick=()=>{const s=st[+b.dataset.stack];s.ch.forEach(x=>{const k=legKey(x.l,x.r);if(!BS.cart.includes(k))BS.cart.push(k)});re()});
   const cl=$("#slip-clear");if(cl)cl.onclick=()=>{BS.cart=[];re()};
+  const sst=$("#slip-state");if(sst)sst.onchange=e=>{BS.state=e.target.value.toLowerCase();re()};
+  B.querySelectorAll(".slipbtn.off").forEach(a=>a.onclick=e=>{e.preventDefault();toast("Pick your state first")});
   const lk=$("#slip-link");if(lk)lk.onclick=()=>{const enc=btoa(unescape(encodeURIComponent(BS.cart.join("|")))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
     copyText(`${location.origin}${location.pathname}?slip=${enc}#build`,$("#slip-hold"))};
   const tx=$("#slip-text");if(tx)tx.onclick=()=>{const legs=BS.cart.map(findLeg).filter(Boolean);
