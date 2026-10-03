@@ -242,6 +242,9 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .mrung .hit.g{background:var(--good-bg,#DCF0E3);color:var(--good)}.mrung .hit.y{background:var(--warn-bg);color:var(--warn-ink)}.mrung .hit.r{background:var(--bad-bg,#F8E1DE);color:var(--bad)}
 .mrung[aria-pressed="true"] .hit{background:rgba(255,255,255,.25);color:var(--turf-ink)}
 .cart-note{margin:0;font-size:12px;color:var(--muted)}
+.bseg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:10px;background:var(--surface);justify-self:start}
+.bseg button{border:0;background:none;border-radius:7px;padding:6px 12px;font-weight:600;font-size:14px;cursor:pointer;color:var(--ink-2)}
+.bseg button[aria-pressed="true"]{background:var(--turf);color:var(--turf-ink)}.bseg .ct{font-size:11px;opacity:.75}
 .mrung .at{font:700 18px/1 var(--disp)}.mrung .px{font:600 14px var(--mono)}.mrung .px.none{color:var(--muted);font-weight:400}
 .mrung .ch{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .mrung.edge{border-color:var(--good)}.mrung.edge .ours{color:var(--good);font-weight:700}
@@ -810,7 +813,7 @@ function reconcileLadders(d){
 /* ---------- Builder (shared with the old test page) ---------- */
 
 /* ---------- Builder: real milestone prices, the book's chance and ours; a cart you can share ---------- */
-let LAD=null, BS={book:"DraftKings",sport:"",game:"",stat:"",q:"",cart:[]};
+let LAD=null, BS={book:"DraftKings",sport:"",game:"",stat:"",q:"",cart:[],view:"milestones"};
 try{const c=JSON.parse(localStorage.getItem("cp-cart")||"null");if(c)Object.assign(BS,c)}catch(e){}
 const saveCart=()=>{try{localStorage.setItem("cp-cart",JSON.stringify({book:BS.book,cart:BS.cart}))}catch(e){}};
 const decOf=a=>a>0?1+a/100:1+100/Math.abs(a);
@@ -881,12 +884,14 @@ function fillBuilder(){
       <label for="b-game">Game<select id="b-game"><option value="">All games</option>${gamesL.map(g=>`<option${g===BS.game?" selected":""}>${esc(g)}</option>`).join("")}</select></label>
       <label for="b-stat">Stat<select id="b-stat"><option value="">All stats</option>${stats.map(s=>`<option${s===BS.stat?" selected":""}>${esc(s)}</option>`).join("")}</select></label>
       <label for="b-q">Find<input id="b-q" type="search" placeholder="Player or team" value="${esc(BS.q)}"></label></div>
-    ${st.length?`<div><h3 style="margin:0 0 4px;font:700 18px var(--disp)">Short-price stacks</h3><p class="muted" style="margin:0 0 8px;font-size:13px">Built from milestones priced −150 to −1000 at ${esc(BS.book)}, one per game, paying +100 or more. Ranked by how well our chances back the price.</p>
-      <div class="stacks">${st.map((s,i)=>`<div class="stack"><b>${s.n} legs · pays ${price(amOf(s.d))}</b><ol>${s.ch.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} (${price(x.px)})</li>`).join("")}</ol><span class="muted">Our chance all hit ${pct(s.p)} · break-even ${pct(1/s.d)}</span><button data-stack="${i}">Add to cart</button></div>`).join("")}</div></div>`:""}
-    <p class="muted" style="margin:0;font-size:12px">Green border: our chance beats the book's by 2+ points at ${esc(BS.book)}. Top right of each card: how many of his games this season he reached that number. Milestones far from a player's usual numbers are the least tested.</p>
-    ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.filter(r=>r.books[BS.book]!=null).map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}
+    <div class="bseg" role="group" aria-label="Builder view"><button data-bview="milestones" aria-pressed="${BS.view!=="stacks"}">Milestones</button><button data-bview="stacks" aria-pressed="${BS.view==="stacks"}">Ready-made stacks${st.length?` <span class="ct">${st.length}</span>`:""}</button></div>
+    ${BS.view!=="stacks"?"":st.length?`<div><h3 style="margin:0 0 4px;font:700 18px var(--disp)">Short-price stacks</h3><p class="muted" style="margin:0 0 8px;font-size:13px">Built from milestones priced −150 to −1000 at ${esc(BS.book)}, one per game, paying +100 or more. Ranked by how well our chances back the price.</p>
+      <div class="stacks">${st.map((s,i)=>`<div class="stack"><b>${s.n} legs · pays ${price(amOf(s.d))}</b><ol>${s.ch.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} (${price(x.px)})</li>`).join("")}</ol><span class="muted">Our chance all hit ${pct(s.p)} · break-even ${pct(1/s.d)}</span><button data-stack="${i}">Add to cart</button></div>`).join("")}</div></div>`:'<div class="empty">No ready-made stacks at this book right now.</div>'}
+    <div style="display:${BS.view==="stacks"?"none":"grid"};gap:14px"><p class="muted" style="margin:0;font-size:12px">Green border: our chance beats the book's by 2+ points at ${esc(BS.book)}. Top right of each card: how many of his games this season he reached that number. Milestones far from a player's usual numbers are the least tested.</p>
+    ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.filter(r=>r.books[BS.book]!=null).map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}</div>
   </div><aside class="cart" aria-label="Your stack"><h3>Your stack (${BS.cart.length})</h3><div id="cart-body">${cartSummary()}</div></aside></div>`;
   const re=()=>{saveCart();fillBuilder()};
+  B.querySelectorAll("[data-bview]").forEach(b=>b.onclick=()=>{BS.view=b.dataset.bview;fillBuilder()});
   $("#b-book").onchange=e=>{BS.book=e.target.value;re()};
   const bsp=$("#b-sport");if(bsp)bsp.onchange=e=>{BS.sport=e.target.value;BS.game="";BS.stat="";re()};
   $("#b-game").onchange=e=>{BS.game=e.target.value;re()};
@@ -938,7 +943,7 @@ function init(data){
   header();render();
   window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account"].includes(t)){S.tab=t;save();render()}});
   setInterval(()=>{if(S.tab==="picks"&&!$("#panel"))render()},120000);
-  fetch("../data/form.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(f=>{if(f&&f.rows){FORM=f.rows;REC=f.record||{};if(S.tab==="picks"&&!$("#panel"))render()}}).catch(()=>{});
+  fetch("../data/form.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(f=>{if(f&&f.rows){FORM=f.rows;REC=f.record||{};if(S.tab==="picks"&&!$("#panel"))render();if(S.tab==="build"&&LAD&&typeof fillBuilder==="function")fillBuilder()}}).catch(()=>{});
   fetch("../data/ladders.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;LAD=LAD||reconcileLadders(d);LADI=new Map(d.ladders.map(l=>[`${l.player}~${l.stat}`,l]))}).catch(()=>{});
 }
 fetch("../data/picks.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()}).then(init)
