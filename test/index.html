@@ -237,6 +237,11 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .lad-h b{font-size:15px}.lad-h span{font-size:12px;color:var(--muted)}
 .mrungs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
 .mrungs .mrung{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;flex:0 0 auto;min-width:104px;scroll-snap-align:start;border:1px solid var(--line);border-radius:10px;background:var(--ground);color:var(--ink);padding:7px 9px;text-align:left;cursor:pointer;display:grid;gap:2px;font:inherit}
+.mrungs .mrung{position:relative;min-width:118px}
+.mrung .hit{position:absolute;top:6px;right:7px;font:600 11px var(--mono);padding:1px 5px;border-radius:5px}
+.mrung .hit.g{background:var(--good-bg,#DCF0E3);color:var(--good)}.mrung .hit.y{background:var(--warn-bg);color:var(--warn-ink)}.mrung .hit.r{background:var(--bad-bg,#F8E1DE);color:var(--bad)}
+.mrung[aria-pressed="true"] .hit{background:rgba(255,255,255,.25);color:var(--turf-ink)}
+.cart-note{margin:0;font-size:12px;color:var(--muted)}
 .mrung .at{font:700 18px/1 var(--disp)}.mrung .px{font:600 14px var(--mono)}.mrung .px.none{color:var(--muted);font-weight:400}
 .mrung .ch{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums}
 .mrung.edge{border-color:var(--good)}.mrung.edge .ours{color:var(--good);font-weight:700}
@@ -805,7 +810,7 @@ function reconcileLadders(d){
 /* ---------- Builder (shared with the old test page) ---------- */
 
 /* ---------- Builder: real milestone prices, the book's chance and ours; a cart you can share ---------- */
-let LAD=null, BS={book:"DraftKings",game:"",stat:"",q:"",cart:[]};
+let LAD=null, BS={book:"DraftKings",sport:"",game:"",stat:"",q:"",cart:[]};
 try{const c=JSON.parse(localStorage.getItem("cp-cart")||"null");if(c)Object.assign(BS,c)}catch(e){}
 const saveCart=()=>{try{localStorage.setItem("cp-cart",JSON.stringify({book:BS.book,cart:BS.cart}))}catch(e){}};
 const decOf=a=>a>0?1+a/100:1+100/Math.abs(a);
@@ -824,14 +829,20 @@ function bindBuilder(){
     .catch(()=>{const b=$("#bld-body");if(b)b.innerHTML='<div class="empty">No milestones posted yet. They appear once the books post this week\'s props.</div>'});
 }
 function booksIn(){const s=new Set();LAD.ladders.forEach(l=>l.rungs.forEach(r=>Object.keys(r.books).forEach(b=>s.add(b))));return [...s].sort((a,b)=>a==="DraftKings"?-1:b==="DraftKings"?1:a.localeCompare(b))}
+function hitAt(l,r){   // owner 2026-10-03: how often he reached this number in his last 10 games
+  if(typeof FORM!=="object"||!FORM)return null;
+  const rows=FORM[`${l.sport||"NFL"}|${l.player}|${l.stat}`];if(!rows||!rows.length)return null;
+  const xs=rows.slice(0,10);return [xs.filter(x=>x[0]>=r.at).length,xs.length];
+}
 function rungChip(l,r){
   const px=r.books[BS.book], imp=px!=null?1/decOf(px):null, k=legKey(l,r), on=BS.cart.includes(k), edge=imp!=null&&r.ours>imp+0.02;
-  return `<button class="mrung${edge?" edge":""}" data-leg="${esc(k)}" aria-pressed="${on}"><span class="at">${r.at}+</span><span class="px${px==null?" none":""}">${px!=null?price(px):"not at "+esc(BS.book)}</span><span class="ch">${imp!=null?`Book ${pct(imp)} · `:""}<span class="ours">Ours ${pct(r.ours)}</span></span></button>`;
+  const h=hitAt(l,r),hr=h&&h[1]?h[0]/h[1]:null;
+  return `<button class="mrung${edge?" edge":""}" data-leg="${esc(k)}" aria-pressed="${on}">${h?`<span class="hit ${hr>=.7?"g":hr>=.5?"y":"r"}" title="Reached ${r.at}+ in ${h[0]} of his last ${h[1]} games">${h[0]}/${h[1]}</span>`:""}<span class="at">${r.at}+</span><span class="px${px==null?" none":""}">${px!=null?price(px):"not at "+esc(BS.book)}</span><span class="ch">${imp!=null?`Book ${pct(imp)} · `:""}<span class="ours">Ours ${pct(r.ours)}</span></span></button>`;
 }
 function stacks(){
   // short-price stacks at the chosen book: rungs priced -1000 to -150, different games, the stack pays +100 or more;
   // ranked by our chance x payout (the stacks our numbers like best)
-  const pool=[];LAD.ladders.forEach(l=>l.rungs.forEach(r=>{const px=r.books[BS.book];if(px!=null&&px<=-150&&px>=-1000)pool.push({l,r,px,d:decOf(px)})}));
+  const pool=[];LAD.ladders.filter(l=>!BS.sport||(l.sport||"NFL")===BS.sport).forEach(l=>l.rungs.forEach(r=>{const px=r.books[BS.book];if(px!=null&&px<=-150&&px>=-1000)pool.push({l,r,px,d:decOf(px)})}));
   pool.sort((a,b)=>(b.r.ours*b.d)-(a.r.ours*a.d));
   const top=pool.slice(0,40), out=[];
   for(const n of [3,4]){let best=[];
@@ -845,16 +856,11 @@ function cartSummary(){
   const legs=BS.cart.map(findLeg).filter(Boolean);
   if(!legs.length)return `<p class="muted" style="margin:0;font-size:13px">Tap any milestone to add it. Your stack stays here while you browse.</p>`;
   const priced=legs.every(x=>x.r.books[BS.book]!=null);
-  const games=new Set(legs.map(x=>x.l.game)), same=games.size<legs.length;
   const ours=legs.reduce((a,x)=>a*x.r.ours,1);
   let h=`<ol>${legs.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} <span class="muted">${x.r.books[BS.book]!=null?price(x.r.books[BS.book]):"not at "+esc(BS.book)} · ours ${pct(x.r.ours)}</span><button data-rm="${esc(legKey(x.l,x.r))}" aria-label="Remove">×</button></li>`).join("")}</ol>`;
   h+=`<div class="sum"><span>Our chance all ${legs.length} hit</span><b>${pct(ours)}</b>`;
-  if(priced&&!same){const d=legs.reduce((a,x)=>a*decOf(x.r.books[BS.book]),1);
-    h+=`<span>Pays at ${esc(BS.book)}</span><b>${price(amOf(d))}</b><span>Break-even chance</span><b>${pct(1/d)}</b></div>`;
-    const ok=ours>=1/d;
-    h+=`<div class="verdict ${ok?"ok":"no"}">${ok?`Our numbers like this stack: ${pct(ours)} to hit against ${pct(1/d)} needed.`:`Priced too short for our numbers: ${pct(ours)} to hit, but ${pct(1/d)} is needed to break even at ${price(amOf(d))}.`}</div>`;
-  }else if(same){h+=`</div><div class="verdict no">Two or more legs are in the same game, so ${esc(BS.book)} prices this as a same-game parlay. We don't have same-game prices, so check the price in your book. Legs in one game often move together, so treat our chance as rough.</div>`}
-  else{h+=`</div><div class="verdict no">Not every leg is offered at ${esc(BS.book)}. Pick another book or remove the leg marked "not at ${esc(BS.book)}".</div>`}
+  if(priced){const d=legs.reduce((a,x)=>a*decOf(x.r.books[BS.book]),1);h+=`<span>Projected payout at ${esc(BS.book)}</span><b>${price(amOf(d))}</b>`}
+  h+=`</div><p class="cart-note">${priced?"":`Not every leg is offered at ${esc(BS.book)}, so no payout is shown. `}Projected odds: each leg's price multiplied together. Does not include same-game parlay pricing or promotions, so your book's price may differ.</p>`;
   h+=`<div class="btnrow"><button class="primary" id="slip-link">Copy share link</button><button id="slip-text">Copy as text</button><button id="slip-clear">Clear</button></div><div id="slip-hold"></div>`;
   return h;
 }
@@ -862,23 +868,26 @@ function fillBuilder(){
   const B=$("#bld-body");if(!B)return;
   if(!LAD.ladders.length){B.innerHTML='<div class="empty">No milestones posted yet. They appear once the books post this week\'s props.</div>';return}
   const books=booksIn();if(!books.includes(BS.book))BS.book=books[0];
-  const gamesL=[...new Set(LAD.ladders.map(l=>l.game))], stats=[...new Set(LAD.ladders.map(l=>l.stat))].sort();
+  const sportsL=[...new Set(LAD.ladders.map(l=>l.sport||"NFL"))].sort();if(BS.sport&&!sportsL.includes(BS.sport))BS.sport="";
+  const inS=LAD.ladders.filter(l=>!BS.sport||(l.sport||"NFL")===BS.sport);
+  const gamesL=[...new Set(inS.map(l=>l.game))], stats=[...new Set(inS.map(l=>l.stat))].sort();
   const q=BS.q.toLowerCase();
-  const list=LAD.ladders.filter(l=>(!BS.game||l.game===BS.game)&&(!BS.stat||l.stat===BS.stat)&&(!q||l.player.toLowerCase().includes(q)||String(l.team).toLowerCase()===q));
+  const list=inS.filter(l=>(!BS.game||l.game===BS.game)&&(!BS.stat||l.stat===BS.stat)&&(!q||l.player.toLowerCase().includes(q)||String(l.team).toLowerCase()===q));
   const st=stacks();
   B.innerHTML=`<div class="bld"><div style="display:grid;gap:14px;min-width:0">
     ${BS.fromLink?'<div class="verdict ok">Someone shared this stack with you. It is in your cart on the right; prices are today\'s.</div>':""}
-    <div class="bld-tools"><label for="b-book">Book<select id="b-book">${books.map(b=>`<option${b===BS.book?" selected":""}>${esc(b)}</option>`).join("")}</select></label>
+    <div class="bld-tools">${sportsL.length>1?`<label for="b-sport">Sport<select id="b-sport"><option value="">All sports</option>${sportsL.map(x=>`<option${x===BS.sport?" selected":""}>${esc(x)}</option>`).join("")}</select></label>`:""}<label for="b-book">Book<select id="b-book">${books.map(b=>`<option${b===BS.book?" selected":""}>${esc(b)}</option>`).join("")}</select></label>
       <label for="b-game">Game<select id="b-game"><option value="">All games</option>${gamesL.map(g=>`<option${g===BS.game?" selected":""}>${esc(g)}</option>`).join("")}</select></label>
       <label for="b-stat">Stat<select id="b-stat"><option value="">All stats</option>${stats.map(s=>`<option${s===BS.stat?" selected":""}>${esc(s)}</option>`).join("")}</select></label>
       <label for="b-q">Find<input id="b-q" type="search" placeholder="Player or team" value="${esc(BS.q)}"></label></div>
     ${st.length?`<div><h3 style="margin:0 0 4px;font:700 18px var(--disp)">Short-price stacks</h3><p class="muted" style="margin:0 0 8px;font-size:13px">Built from milestones priced −150 to −1000 at ${esc(BS.book)}, one per game, paying +100 or more. Ranked by how well our chances back the price.</p>
       <div class="stacks">${st.map((s,i)=>`<div class="stack"><b>${s.n} legs · pays ${price(amOf(s.d))}</b><ol>${s.ch.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} (${price(x.px)})</li>`).join("")}</ol><span class="muted">Our chance all hit ${pct(s.p)} · break-even ${pct(1/s.d)}</span><button data-stack="${i}">Add to cart</button></div>`).join("")}</div></div>`:""}
-    <p class="muted" style="margin:0;font-size:12px">Green border: our chance beats the book's by 2+ points at ${esc(BS.book)}. Milestones far from a player's usual numbers are the least tested.</p>
+    <p class="muted" style="margin:0;font-size:12px">Green border: our chance beats the book's by 2+ points at ${esc(BS.book)}. Top right of each card: how many of his last 10 games he reached that number (last season counts too). Milestones far from a player's usual numbers are the least tested.</p>
     ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}
   </div><aside class="cart" aria-label="Your stack"><h3>Your stack (${BS.cart.length})</h3><div id="cart-body">${cartSummary()}</div></aside></div>`;
   const re=()=>{saveCart();fillBuilder()};
   $("#b-book").onchange=e=>{BS.book=e.target.value;re()};
+  const bsp=$("#b-sport");if(bsp)bsp.onchange=e=>{BS.sport=e.target.value;BS.game="";BS.stat="";re()};
   $("#b-game").onchange=e=>{BS.game=e.target.value;re()};
   $("#b-stat").onchange=e=>{BS.stat=e.target.value;re()};
   $("#b-q").onchange=e=>{BS.q=e.target.value.trim();re()};
@@ -890,7 +899,7 @@ function fillBuilder(){
     copyText(`${location.origin}${location.pathname}?slip=${enc}#build`,$("#slip-hold"))};
   const tx=$("#slip-text");if(tx)tx.onclick=()=>{const legs=BS.cart.map(findLeg).filter(Boolean);
     const lines=legs.map((x,i)=>`${i+1}. ${x.l.player} ${x.r.at}+ ${x.l.stat.toLowerCase()} (${x.r.books[BS.book]!=null?price(x.r.books[BS.book])+" "+BS.book:"not at "+BS.book}; our chance ${pct(x.r.ours)})`);
-    copyText(`MY STACK\n${lines.join("\n")}\n\nBuilt with Confident Picks: real prices, the book's chance and our model's. ${siteLink()}\n21+. Not a guarantee.`,$("#slip-hold"))};
+    copyText(`MY STACK\n${lines.join("\n")}\n\nProjected odds; not same-game pricing or promotions. Built with Confident Picks: ${siteLink()}\n21+. Not a guarantee.`,$("#slip-hold"))};
 }
 
 /* the side panel adds milestones to the Builder stack */
