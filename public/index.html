@@ -211,6 +211,9 @@ details.day>summary{list-style:none;cursor:pointer;display:flex;justify-content:
 details.day>summary::-webkit-details-marker{display:none}
 .hrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) 52px 40px;gap:10px;padding:8px 14px;border-top:1px solid var(--line);font-size:13.5px;align-items:center}
 .prose{max-width:75ch;display:grid;gap:10px}.prose p{margin:0;color:var(--ink-2)}
+.doc h3{font:700 18px/1.2 var(--disp);text-transform:uppercase;letter-spacing:.03em;margin:8px 0 0}.doc a{color:var(--turf)}
+.flinks{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:4px}.flinks a{color:var(--ink-2);font-weight:600}
+@media (max-width:760px){footer{padding-bottom:70px}}
 .pv-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:center;padding:7px;margin:0 -16px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);font-size:13px}
 .pv-bar button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;cursor:pointer}
 .pv-bar button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--surface)}
@@ -320,6 +323,7 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
     <div>Our picks are our models' opinion, not guarantees. Every number is either tested on past seasons or tracked live since Sep 26, 2026. Prices are real quotes from the books at the last odds update.</div>
     <div><b>Bet flat:</b> the same small stake on every pick, and never chase losses. Even a 60% record has losing streaks of 5 or more.</div>
     <div>21+ where legal. If you or someone you know has a gambling problem, call 1-800-GAMBLER.</div>
+    <nav class="flinks" aria-label="Site information"><a href="#guide">How to use</a><a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#refunds">Refunds</a></nav>
   </footer>
 </div>
 <nav class="bottom" id="bottom" aria-label="Sections"></nav>
@@ -832,6 +836,97 @@ function vAbout(){
   <p><button class="btn" id="back-picks">Back to picks</button></p></div>`;
 }
 
+/* ---------- Terms, Privacy, Refunds and the Guide (owner 2026-10-04; drafts for a lawyer's review before launch) ---------- */
+const CP_CO="Marshall Consultancy LLC",CP_MAIL="support@confident-picks.com",CP_EFFECTIVE="October 4, 2026";
+const DOCS={
+terms:{t:"Terms of Service",b:`
+<p>These terms are an agreement between you and ${CP_CO} ("we", "us"), which runs Confident Picks. By creating an account or buying Pro you agree to them. Effective ${CP_EFFECTIVE}.</p>
+<h3>1. What Confident Picks is</h3>
+<p>Confident Picks publishes sports analytics: model-based picks, our estimated chances, records and tools. It is information and entertainment, not betting, financial or legal advice. We are not a sportsbook, we do not take bets or hold money for betting, and we are not affiliated with any sportsbook unless we say so. No pick is a guarantee and past results do not promise future results. You decide whether and how much to bet, and you are responsible for following the law where you are.</p>
+<h3>2. Who can use it</h3>
+<p>You must be 21 or older (or the legal betting age where you live, if higher) and you may not use Confident Picks where sports betting content or paid picks are not allowed. One person per account. Pro works on up to 3 browsers or devices at a time; signing in on another one signs out the one used longest ago.</p>
+<h3>3. Pro, automatic renewal and cancelling</h3>
+<p>Pro is $19.99 per month or $199.99 per year, sales tax included. <b>Pro renews automatically</b> at the start of each month or year and your payment method is charged the then-current price until you cancel. You can cancel any time from My account → Manage billing; you keep Pro until the end of the period you already paid for and are not charged again. If we change the price, we will email you at least 30 days before the new price applies to you, and you can cancel before then. Payments are processed by Stripe; we never see or store your full card number.</p>
+<h3>4. Refunds</h3>
+<p>See the <a href="#refunds">Refund Policy</a>. In short: cancel any time, no refunds for partial periods.</p>
+<h3>5. Promo codes and referral credits</h3>
+<p>Promo codes are subject to the limits shown when you use them and can't be combined. Referral credits are account credit applied to your future Pro bills; they have no cash value, can't be transferred or exchanged, and end if your account closes. Credits earned through fake or duplicate accounts, self-referrals or spam are removed. We may change or end promotions and the referral program at any time; credits already earned stay on your account.</p>
+<h3>6. Using the picks</h3>
+<p>Your account and everything in it are for your personal use. Sharing a few picks with friends is fine. Copying, reposting the board, reselling picks or PDFs, running a paid group with them, or scraping the site is not. PDFs carry a watermark with your account email. We may suspend or close accounts that break these terms, including accounts that are shared or resold.</p>
+<h3>7. Sportsbook links and prices</h3>
+<p>Prices are real quotes from each book at the last odds update and can change at any time. "Open slip" links are a shortcut to the sportsbook's own website or app; nothing is placed until you confirm a bet there, and the sportsbook's terms apply.</p>
+<h3>8. No warranty; limits on liability</h3>
+<p>Confident Picks is provided "as is". To the fullest extent the law allows, we are not liable for any betting losses or for indirect or consequential damages, and our total liability for any claim is limited to what you paid us in the 3 months before the claim.</p>
+<h3>9. Changes and law</h3>
+<p>We may update these terms; if a change is significant we will tell you by email or on the site before it takes effect. New York law governs these terms.</p>
+<h3>10. Contact</h3>
+<p>${CP_MAIL}</p>
+<h3>Help with gambling</h3>
+<p>If gambling stops being fun, help is free and confidential: call or text 1-800-GAMBLER. In New York: HOPEline 1-877-8-HOPENY (1-877-846-7369) or text HOPENY (467369).</p>`},
+privacy:{t:"Privacy Policy",b:`
+<p>This explains what Confident Picks (run by ${CP_CO}) collects and why. Effective ${CP_EFFECTIVE}. We do not sell or rent your personal information, and the site has no advertising trackers.</p>
+<h3>What we collect</h3>
+<p><b>Account:</b> your email address, and your name and profile photo if you sign in with Google. Sign-in is handled by Clerk, which also keeps sign-in records (time, browser, approximate location from your internet address) for security.<br>
+<b>Payments:</b> Stripe handles checkout and billing. We receive your plan, payment status, billing country and postal code and invoices; we never see or store your full card number.<br>
+<b>Your settings:</b> your chosen sportsbook, your Builder stack and similar preferences, kept in your browser and, for the sportsbook, on your account.<br>
+<b>Devices:</b> a random browser id so Pro can be used on up to 3 devices.<br>
+<b>Technical:</b> Cloudflare, which hosts the site, keeps standard request logs (internet address, browser type, time) for security and to keep the site running.</p>
+<h3>How we use it</h3>
+<p>To run your account and Pro, process payments and receipts, enforce the device limit and our terms, prevent fraud, answer support requests, and send account or billing emails. If we ever send marketing email, every email will include an unsubscribe link.</p>
+<h3>Who we share it with</h3>
+<p>Only the companies that run parts of the service for us (Clerk for sign-in, Stripe for payments, Cloudflare for hosting and email forwarding), each limited to its own job, and anyone the law requires us to share with.</p>
+<h3>How long we keep it</h3>
+<p>While your account is open. When you close it we delete your account data, except billing records we must keep for tax and accounting (usually 7 years).</p>
+<h3>Your choices</h3>
+<p>Email ${CP_MAIL} to get a copy of your data, correct it, or close your account (we cancel any Pro subscription first). Depending on where you live you may have further rights; we honor them.</p>
+<h3>Cookies and storage</h3>
+<p>We use only what the site needs: sign-in cookies from Clerk, Stripe's cookies on its checkout pages, and browser storage for your settings. No ad or tracking cookies.</p>
+<h3>Age</h3>
+<p>Confident Picks is for people 21 and older. We do not knowingly collect information from anyone younger.</p>
+<h3>Changes and contact</h3>
+<p>We will post changes here and email you about significant ones. Questions: ${CP_MAIL}.</p>`},
+refunds:{t:"Refund Policy",b:`
+<p>Effective ${CP_EFFECTIVE}.</p>
+<h3>Cancel any time</h3>
+<p>Cancel from My account → Manage billing, any time. You keep Pro until the end of the month or year you already paid for, and you are not charged again.</p>
+<h3>No refunds for partial periods</h3>
+<p>Payments are not refunded for unused time, for a period you forgot to cancel, or because of how picks turned out. This applies to monthly and yearly plans, with or without a promo code.</p>
+<h3>Billing mistakes</h3>
+<p>If you were charged twice, charged after you cancelled, or charged the wrong amount, email ${CP_MAIL} within 30 days and we will refund the mistake.</p>
+<h3>Before a chargeback</h3>
+<p>Please contact us first. Most billing questions are fixed within a day.</p>`},
+guide:{t:"How to use Confident Picks",b:`
+<p>Everything on the site in one place. Short version: open <b>Picks</b>, start at the top of the list, and bet the same small amount on every pick.</p>
+<h3>Free and Pro</h3>
+<p><b>Visitors</b> see a few picks, the Lock of the Day and the full record. A <b>free account</b> adds the top 5 player props and touchdown picks, every game pick and the Builder for select stats. <b>Pro</b> unlocks every pick in every sport, tickets, ready-made stacks, full PDFs and member referral rewards.</p>
+<h3>The Picks table</h3>
+<p><b>#</b> is the rank: A and B grades first, then the rest, each by our chance.<br>
+<b>Our chance</b> is how often our model expects the pick to win. The letter is its grade. A and B held up in testing on seasons the model never saw; C and D are shown with less confidence; no letter means shown, not graded.<br>
+<b>Book</b> is the chance the sportsbook's price implies. <b>Edge</b> is our chance minus the book's, in points.<br>
+<b>Price</b> is a real quote and the book it came from, at the last odds update. Set <b>Price at</b> (or My sportsbook in My account) to see DraftKings or FanDuel.<br>
+<b>Last 5 / Last 10 / Season</b> show how often the player cleared this line. Last 5 and Last 10 can reach into last season; Season is this season only. They are context: in our testing, hot streaks did not carry into the next game.<br>
+<b>Game time (ET)</b> is Eastern time. Picks leave the board when their game starts.</p>
+<h3>Picks, prices and when to bet</h3>
+<p>The top of the page shows when picks were last updated (our models run several times a day) and when prices were last pulled. Prices move, so check your book before betting. Tap any pick for its details: the best time to bet it, its record, the last 10 games and other lines.</p>
+<h3>Lock of the Day</h3>
+<p>Our highest-chance prop at +100 or better, posted around 10 AM ET, with its own running record.</p>
+<h3>Games, Touchdowns, Tickets</h3>
+<p><b>Games</b>: winner, projected score, spread and total from one projected score, so they never contradict each other. Winners are graded; spreads and totals are shown, not graded, until they hold up in testing. <b>Touchdowns</b>: anytime touchdown picks. <b>Tickets &amp; more</b> (Pro): 2- and 3-leg tickets priced at one book, teaser legs and slow prices.</p>
+<h3>The Builder</h3>
+<p>Pick milestones (like 60+ receiving yards) and stack them. Choose your <b>Book</b>: milestones that book doesn't offer are hidden. The badge on each card shows how many of the player's games this season reached that number. Your stack shows an <b>estimated</b> payout: each leg's price multiplied together, without same-game parlay pricing or promotions, so your book's price may differ. <b>Open slip</b> sends the legs to that sportsbook's own betslip; nothing is placed until you confirm there. On a phone, tap <b>View stack</b> at the bottom. Free accounts get one stat per sport; Pro gets every stat and ready-made stacks.</p>
+<h3>Share and PDF</h3>
+<p><b>Share or PDF</b> makes a ranked list of what the table shows (same filters), as a PDF or text. PDFs include projected scores for games and carry a watermark with your email.</p>
+<h3>Results</h3>
+<p>Every graded pick since Sep 26, 2026, win or lose, plus how often our picks beat the closing line. Nothing is ever removed.</p>
+<h3>Your account</h3>
+<p><b>My sportsbook</b> sets the book used for prices and the Builder. <b>Manage billing</b> opens Stripe's secure page to switch monthly/yearly, update your card, get receipts or cancel. Pro works on up to 3 devices; signing in on a 4th signs out the one used longest ago. <b>Refer a friend</b> (Pro): your friend gets 10% off their first month, and you get $5 credit on your next bill once they pay.</p>
+<h3>Bet flat</h3>
+<p>Use the same small stake on every pick and never raise it to win back a loss. Even a 60% record has losing streaks of 5 or more. 21+. If gambling stops being fun, call 1-800-GAMBLER.</p>
+<h3>Questions</h3>
+<p>${CP_MAIL}</p>`},
+};
+function vDoc(k){const d=DOCS[k];return `<article class="prose doc"><h2 class="h2">${esc(d.t)}</h2>${d.b}<p><button class="btn" id="back-picks">Back to picks</button></p></article>`}
+
 /* ---------- Builder milestones, matched to our main pick (owner 2026-10-02) ----------
    The milestone chances come from the projection's spread, the main pick from the calibrated model, and they could differ
    by 5+ points.  Each ladder is shifted (same amount on the log-odds scale for every rung, so the order never changes)
@@ -995,12 +1090,28 @@ Object.defineProperty(window,"CP_CART",{get:()=>BS.cart,configurable:true});
    Sign-in: Clerk (email code or Google, no passwords).  Payment: Stripe's own checkout and billing pages.
    The picks come from /api/data, which sends each person only their tier's copy (visitor, free or Pro), so nothing
    on this page can unlock a Pro pick.  These functions replace the preview versions above (same names). */
-let CK=null,ME=null,CPCFG=null,CP_NOTICE="";
+let CK=null,ME=null,CPCFG=null,CP_NOTICE="",CP_PROMO="",CP_REF={code:"",ok:false};
+(function(){   // share links: ?promo=CODE (a Stripe promo code) and ?ref=CODE (a member's referral), kept 30 days
+  const q=new URLSearchParams(location.search),now=Date.now(),keep=30*864e5;
+  const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify({v,at:now}))}catch(e){}};
+  const get=k=>{try{const o=JSON.parse(localStorage.getItem(k)||"null");return o&&now-o.at<keep?o.v:""}catch(e){return ""}};
+  const p=(q.get("promo")||"").trim(),r=(q.get("ref")||"").trim().toUpperCase();
+  if(/^[A-Za-z0-9_-]{2,40}$/.test(p))put("cp_promo",p.toUpperCase());
+  if(/^[A-Z2-9]{6,12}$/.test(r))put("cp_ref",r);
+  CP_PROMO=get("cp_promo");CP_REF.code=get("cp_ref");
+  if(q.has("promo")||q.has("ref")){q.delete("promo");q.delete("ref");try{history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash)}catch(e){}}
+})();
+function cpOffer(short){
+  if(CP_PROMO)return short?`Code <b>${esc(CP_PROMO)}</b> will be applied when you start Pro.`:`<p class="note rec" style="margin:0 0 10px">Your code <b>${esc(CP_PROMO)}</b> will be applied at checkout.</p>`;
+  if(CP_REF.ok)return short?`A Confident Picks member invited you: <b>10% off</b> your first month of Pro.`:`<p class="note rec" style="margin:0 0 10px">Member invite: <b>10% off</b> your first month, applied at checkout.</p>`;
+  return "";
+}
 const CP_TEST=()=>!!(CPCFG&&String(CPCFG.clerkPublishableKey||"").startsWith("pk_test_"));
 function cpScript(src,attrs){return new Promise((ok,no)=>{const s=document.createElement("script");s.src=src;s.async=true;s.crossOrigin="anonymous";
   Object.entries(attrs||{}).forEach(([k,v])=>s.setAttribute(k,v));s.onload=ok;s.onerror=()=>no(new Error("load "+src));document.head.appendChild(s)})}
 async function cpBoot(){
   try{
+    if(CP_REF.code)fetch("/api/referral?check="+encodeURIComponent(CP_REF.code)).then(r=>r.json()).then(j=>{CP_REF.ok=!!j.valid;if(CP_REF.ok&&D)render()}).catch(()=>{});
     CPCFG=await fetch("/api/config",{cache:"no-store"}).then(r=>r.json());
     const pk=CPCFG.clerkPublishableKey;if(!pk)return;
     const fapi=atob(pk.split("_").slice(2).join("_")).replace(/\$$/,"");
@@ -1044,7 +1155,7 @@ async function cpCheckout(plan,btn){
   if(!CK)return cpNoSignIn();
   if(!CK.user){try{sessionStorage.setItem("cp_plan",plan)}catch(e){}cpSignUp();return}
   if(btn){btn.disabled=true;btn.textContent="Opening secure checkout…"}
-  const r=await cpApi("/api/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({plan})});
+  const r=await cpApi("/api/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({plan,promo:CP_PROMO||undefined,ref:CP_REF.ok?CP_REF.code:undefined})});
   const j=await r.json().catch(()=>({}));
   if(r.ok&&j.url){location.href=j.url;return}
   if(btn){btn.disabled=false;btn.textContent="Continue to secure checkout"}
@@ -1076,22 +1187,24 @@ function pvBar(){
   let h="";
   if(CP_NOTICE==="device_limit")h+=`<div class="cp-note warn" role="alert">This account is signed in on more than 3 devices, so this one was signed out. <button data-act="signin-again">Sign in again</button></div>`;
   if(ME&&ME.status==="past_due")h+=`<div class="cp-note warn" role="alert">Your last payment didn't go through. Update your card to keep Pro. <button data-act="portal">Update card</button></div>`;
+  if(tier!=="pro"&&(CP_PROMO||CP_REF.ok))h+=`<div class="cp-note info">${cpOffer(true)} <button class="lnk" data-go="plans">See Pro</button></div>`;
   if(CP_TEST())h+=`<div class="cp-note info">Test mode: no real charges. Pay with card 4242 4242 4242 4242, any future date, any CVC.</div>`;
   return h;
 }
-function vPlans(){
+function vPlans(){   // owner 2026-10-04: every sport, not just NFL
   const f=(ok,t)=>`<li class="${ok?"":"no"}">${t}</li>`,pro=tier==="pro";
   const proBtn=(plan,label,cls)=>pro?(ME&&ME.plan===plan?`<button class="btn ${cls}" disabled>Your plan</button>`:`<button class="btn" data-act="portal">Switch in Manage billing</button>`)
     :`<button class="btn ${cls}" data-modal="checkout" data-plan="${plan}">${label}</button>`;
-  return `<h2 class="h2">Plans</h2><p class="lede">Every plan shows the same honest record. Pro unlocks every pick, the tickets and full sharing. Cancel any time.</p>
+  const proList=`${f(1,"Everything in Free")}${f(1,"Every player prop we post, every sport")}${f(1,"Tickets and ready-made stacks")}${f(1,"Full PDFs and the share sheet")}${f(1,"Member referral rewards")}${f(1,"New sports and features as we add them")}${f(1,"Cancel any time")}`;
+  return `<h2 class="h2">Plans</h2><p class="lede">Every plan shows the same honest record. Pro unlocks every pick in every sport we cover. Cancel any time.</p>
   <div class="plans">
-    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Top 5 player props and touchdown picks")}${f(1,"Full record and results")}${f(1,"The Builder with real sportsbook prices")}${f(0,"Every player prop (700+ on NFL Sundays)")}${f(0,"Tickets and ready-made stacks")}${f(0,"Full PDF and share sheet")}</ul>
+    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Top 5 player props and touchdown picks every day")}${f(1,"Full record and results")}${f(1,"The Builder with real sportsbook prices for select stats")}${f(0,"Every player prop we post, every sport")}${f(0,"Tickets and ready-made stacks")}${f(0,"Full PDFs and the share sheet")}${f(0,"Member referral rewards")}</ul>
       ${tier==="visitor"?'<button class="btn pri" data-modal="signup">Create a free account</button>':'<button class="btn pri" disabled>'+(pro?"Included":"Your plan")+'</button>'}</section>
-    <section class="plan best"><span class="badge">Most popular</span><h3>Pro monthly</h3><div class="price">${PLAN_PRICES.month}<small> / month</small></div><ul>${f(1,"Everything in Free")}${f(1,"Every player prop, all sports, with Last 5 / Last 10 / Season")}${f(1,"Tickets and ready-made stacks")}${f(1,"Ranked PDFs and the share sheet")}${f(1,"Cancel any time")}</ul>
+    <section class="plan best"><span class="badge">Most popular</span><h3>Pro monthly</h3><div class="price">${PLAN_PRICES.month}<small> / month</small></div><ul>${proList}</ul>
       ${proBtn("month","Start Pro monthly","hot")}</section>
-    <section class="plan"><h3>Pro yearly</h3><div class="price">${PLAN_PRICES.year}<small> / year</small></div><small class="save">2 months free vs monthly</small><ul>${f(1,"Everything in Pro")}${f(1,"Every sport, all year")}${f(1,"One payment, renews yearly")}${f(1,"Cancel any time")}</ul>
+    <section class="plan"><h3>Pro yearly</h3><div class="price">${PLAN_PRICES.year}<small> / year</small></div><small class="save">2 months free vs monthly</small><ul>${proList}</ul>
       ${proBtn("year","Start Pro yearly","")}</section>
-  </div><p class="hint">Prices include sales tax. Payment runs on Stripe's secure checkout page; card numbers never touch this site. Promo codes go on the checkout page. Cancel any time and keep Pro until the end of the period you paid for. 21+ only. Picks are our models' opinion, not guarantees.</p>`;
+  </div><p class="hint">Prices include sales tax. Pro renews automatically each month or year until you cancel; cancel any time in My account and keep Pro until the end of the period you paid for. No refunds for partial periods (<a href="#refunds">Refund Policy</a>). Payment runs on Stripe's secure checkout page; card numbers never touch this site. 21+ only. Picks are our models' opinion, not guarantees. <a href="#terms">Terms</a> · <a href="#privacy">Privacy</a></p>`;
 }
 function vAccount(){
   if(tier==="visitor"||!ME)return gate('<div style="height:220px"></div>',"free","Sign in to see your account","Your plan, billing and devices live here.");
@@ -1103,6 +1216,7 @@ function vAccount(){
     <section class="card"><b>Plan</b><span>${pro?`${plan}${day?` · ${ME.cancelAtPeriodEnd?"ends":"renews"} ${esc(day)}`:""}${ME.status==="past_due"?" · last payment failed":""}`:"Free"}</span>
       <div class="btns">${pro?'<button class="btn" data-act="portal">Manage billing</button>':`<button class="btn hot" data-go="plans">Upgrade to Pro</button>${ME.customer?'<button class="btn" data-act="portal">Billing history</button>':""}`}</div>
       ${pro?'<small class="muted">Switch plans, update your card, cancel or get receipts on Stripe\'s secure billing page.</small>':""}</section>
+    ${pro?`<section class="card"><b>Refer a friend</b><span id="cp-ref">Loading your link…</span><small class="muted">Your friend gets 10% off their first month of Pro. You get $5 off your next bill once they pay. Credits are account credit only (<a href="#terms">Terms</a>).</small></section>`:""}
     <section class="card"><b>Devices</b><span>${ME.devices?`Signed in on ${ME.devices} of 3 devices.`:"Up to 3 devices."} Signing in on another device signs out the one used longest ago.</span></section>
     <section class="card"><b>My sportsbook</b><select class="cp-book" id="cp-book" aria-label="My sportsbook"><option value="">Best price across books</option>${CP_BOOKS.map(b=>`<option${b===mine?" selected":""}>${esc(b)}</option>`).join("")}</select>
       <small class="muted">Prices and the Builder open at this book. DraftKings and FanDuel show their own price in the Price column; for other books it shows the best price, and the Builder uses your book.</small></section>
@@ -1114,10 +1228,12 @@ function openModal(kind,plan){
   if(!CK)return cpNoSignIn();
   if(!CK.user){try{sessionStorage.setItem("cp_plan",plan==="year"?"year":"month")}catch(e){}return cpSignUp()}
   const y=plan==="year";
-  const body=`<dl class="kv"><dt>${y?"Pro yearly":"Pro monthly"}</dt><dd><b>${y?PLAN_PRICES.year+" / year":PLAN_PRICES.month+" / month"}</b></dd><dt>${y?"Renews yearly":"Renews monthly"}, tax included</dt><dd>Cancel any time</dd></dl>
-    <label class="cp-check"><input type="checkbox" id="cp-21"><span>I'm 21 or older, and I understand the picks are our models' opinion, not guarantees.</span></label>
+  const body=`<dl class="kv"><dt>${y?"Pro yearly":"Pro monthly"}</dt><dd><b>${y?PLAN_PRICES.year+" / year":PLAN_PRICES.month+" / month"}</b></dd><dt>Tax included</dt><dd>Cancel any time</dd></dl>
+    ${cpOffer()}
+    <p class="note"><b>Renews automatically:</b> ${y?PLAN_PRICES.year+" every year":PLAN_PRICES.month+" every month"} until you cancel. Cancel any time in My account → Manage billing; you keep Pro until the end of the period you paid for. No refunds for partial periods.</p>
+    <label class="cp-check"><input type="checkbox" id="cp-21"><span>I'm 21 or older, I agree to the <a href="#terms" target="_blank">Terms</a>, <a href="#privacy" target="_blank">Privacy Policy</a> and <a href="#refunds" target="_blank">Refund Policy</a>, and I understand picks are our models' opinion, not guarantees.</span></label>
     <div class="btns"><button class="btn hot" id="cp-go" disabled>Continue to secure checkout</button></div>
-    <p class="note">You'll pay on Stripe's checkout page (card, Apple Pay or Google Pay), then come back here as Pro. Card details never reach this site. Have a promo code? Enter it on the checkout page.</p>
+    <p class="note">You'll pay on Stripe's checkout page (card, Apple Pay or Google Pay), then come back here as Pro. Card details never reach this site.${CP_PROMO||CP_REF.ok?"":" Have a promo code? Enter it on the checkout page."}</p>
     ${CP_TEST()?'<p class="note"><b>Test mode:</b> card 4242 4242 4242 4242, any future date, any CVC. No real charge.</p>':""}`;
   openPanel(y?"Start Pro yearly":"Start Pro monthly","",body,P=>{const c=P.querySelector("#cp-21"),g=P.querySelector("#cp-go");
     c.onchange=()=>{g.disabled=!c.checked};g.onclick=()=>cpCheckout(y?"year":"month",g)});
@@ -1136,7 +1252,15 @@ function freeBanner(){
   const f=(LAD&&LAD.free)||{},st=f.stats||{},n=Object.values(f.locked||{}).reduce((a,b)=>a+b,0);
   return `<div class="cp-note info" style="margin:0;border:1px solid var(--line);border-radius:10px">Free accounts get ${Object.entries(st).map(([sp,x])=>`${esc(sp)} ${esc(String(x).toLowerCase())}`).join(" and ")}. Pro unlocks every stat${n?` (${n.toLocaleString()} more player milestones)`:""}. <button class="lnk" data-go="plans">See Pro</button></div>`;
 }
+async function cpFillRef(){
+  const el=document.getElementById("cp-ref");if(!el||el.dataset.done)return;el.dataset.done="1";
+  try{const r=await cpApi("/api/referral");const j=await r.json();if(!r.ok)throw new Error(j.message||r.status);
+    el.innerHTML=`<code style="word-break:break-all">${esc(j.link)}</code><span class="btns"><button class="btn sm" id="cp-ref-copy">Copy link</button></span><small class="muted">Credits earned: <b>${j.credits}</b> ($${(j.credits*j.creditEach).toFixed(2)})</small>`;
+    document.getElementById("cp-ref-copy").onclick=()=>copyText(j.link,el)}
+  catch(e){el.textContent="Your referral link isn't available right now."}
+}
 function bindPreview(){
+  cpFillRef();
   const bk=document.getElementById("cp-book");if(bk)bk.onchange=e=>cpSetBook(e.target.value);
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setTab(b.dataset.go));
   document.querySelectorAll("[data-modal]").forEach(b=>b.onclick=()=>openModal(b.dataset.modal,b.dataset.plan));
@@ -1149,7 +1273,7 @@ window.CP_ADD=(k,on)=>{BS.cart=on?[...new Set([...BS.cart,k])]:BS.cart.filter(x=
 /* ---------- render ---------- */
 function render(){
   nav();closePanel();
-  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount}[S.tab]||vPicks;
+  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount,terms:()=>vDoc("terms"),privacy:()=>vDoc("privacy"),refunds:()=>vDoc("refunds"),guide:()=>vDoc("guide")}[S.tab]||vPicks;
   let html=v();
   if(S.tab==="build"&&tier==="visitor")html=gate(html,"free","The Builder is free with an account","Stack milestones with real prices, see how often each player got there, and send the stack to your sportsbook.");
   $("#main").innerHTML=pvBar()+html;$("#acct").innerHTML=acctBtns();
@@ -1160,7 +1284,7 @@ function render(){
     ({props:fillProps,tds:fillProps,games:fillGames,more:fillMore}[S.seg]||fillProps)();
   }
   if(S.tab==="results")document.querySelectorAll("[data-hs]").forEach(b=>b.onclick=()=>{S.hs=b.dataset.hs;save();render()});
-  if(S.tab==="about"){const b=$("#back-picks");if(b)b.onclick=()=>setTab("picks")}
+  if(["about","terms","privacy","refunds","guide"].includes(S.tab)){const b=$("#back-picks");if(b)b.onclick=()=>setTab("picks")}
   if(S.tab==="build"&&tier!=="visitor")bindBuilder();
   bindPreview();
 }
@@ -1172,9 +1296,9 @@ function init(data){
   for(const p of D.picks){const k=nk(p),o=seen.get(k);if(!o||p.win_prob>o.win_prob||(p.win_prob===o.win_prob&&p.best_price!=null&&(o.best_price==null||dec(p.best_price)>dec(o.best_price))))seen.set(k,p)}
   D.picks=D.picks.filter(p=>seen.get(nk(p))===p);
   D.picks.forEach((p,i)=>p._id="p"+i);
-  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account"].includes(h))S.tab=h;
+  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account","terms","privacy","refunds","guide"].includes(h))S.tab=h;
   header();render();
-  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account"].includes(t)){S.tab=t;save();render()}});
+  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account","terms","privacy","refunds","guide"].includes(t)){S.tab=t;save();render();window.scrollTo({top:0})}});
   setInterval(()=>{if(S.tab==="picks"&&!$("#panel"))render()},120000);
   cpData("form",1).then(f=>{if(f&&f.rows){FORM=f.rows;REC=f.record||{};if(S.tab==="picks"&&!$("#panel"))render();if(S.tab==="build"&&LAD&&typeof fillBuilder==="function")fillBuilder()}}).catch(()=>{});
   (tier==="visitor"?Promise.resolve(null):cpData("ladders",1)).then(d=>{if(!d)return;LAD=LAD||reconcileLadders(d);LADI=new Map(d.ladders.map(l=>[`${l.player}~${l.stat}`,l]))}).catch(()=>{});
@@ -1202,4 +1326,4 @@ cpBoot().then(()=>cpData("picks")).then(init)
 </body>
 </html>
 
-<script>document.addEventListener('DOMContentLoaded',function(){document.body.insertAdjacentHTML('afterbegin','<div style="position:sticky;top:0;z-index:999;background:#B3261E;color:#fff;font:600 13px system-ui,sans-serif;text-align:center;padding:6px">TEST VERSION - sign-in and payments are in test mode (no real charges)</div>')})</script>
+<script>document.addEventListener('DOMContentLoaded',function(){document.body.insertAdjacentHTML('afterbegin','<div style="position:sticky;top:0;z-index:45;background:#B3261E;color:#fff;font:600 13px system-ui,sans-serif;text-align:center;padding:6px">TEST VERSION - sign-in and payments are in test mode (no real charges)</div>')})</script>

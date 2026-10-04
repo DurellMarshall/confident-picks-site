@@ -16,6 +16,8 @@
 //   STRIPE_SECRET_KEY     Stripe restricted key (secret)
 //   UPLOAD_TOKEN          long random string shared with the PC uploader (secret)
 //   SITE_ORIGINS          optional, comma list of allowed page origins for the token's azp claim
+//   STRIPE_WEBHOOK_SECRET whsec_... from the Stripe webhook endpoint (secret; member referral credits)
+//   REFERRAL_COUPON       Stripe coupon id for the friend's discount (public; 10% off the first month)
 //   STRIPE_API            optional, only for local tests (default https://api.stripe.com)
 // Bindings: PRO (R2 bucket), KV (KV namespace)
 
@@ -170,8 +172,8 @@ export async function stripe(env, method, path, body) {
 
 // The Stripe customer for this Clerk user (tagged with metadata.clerk_user_id so support can match the two).
 // KV is only a shortcut here: if it fails, ask Stripe directly.
-const kvGet = async (env, k) => { try { return env.KV ? await env.KV.get(k) : null; } catch { return null; } };
-const kvPut = async (env, k, v) => { try { if (env.KV) await env.KV.put(k, v); } catch (e) { console.error("kv put failed", e && e.message); } };
+export const kvGet = async (env, k) => { try { return env.KV ? await env.KV.get(k) : null; } catch { return null; } };
+export const kvPut = async (env, k, v) => { try { if (env.KV) await env.KV.put(k, v); } catch (e) { console.error("kv put failed", e && e.message); } };
 export async function findCustomer(env, user) {
   const cached = await kvGet(env, `cust:${user.userId}`);
   if (cached) return cached;
