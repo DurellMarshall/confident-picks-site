@@ -90,39 +90,50 @@ export async function verifySession(request, env) {
   const origins = (env.SITE_ORIGINS || "").split(",").map((s) => s.trim()).filter(Boolean);
   if (origins.length && claims.azp && !origins.includes(claims.azp)) throw new HttpError(401, "bad_token", "Please sign in again.");
   if (!claims.sub || !claims.sid) throw new HttpError(401, "bad_token", "Please sign in again.");
-  return { userId: claims.sub, sessionId: claims.sid, email: claims.email || "" };
+  // The browser's own device id (owner 2026-10-04: signing out and back in on one computer is still one device).
+  const dev = request.headers.get("x-cp-device") || "";
+  return { userId: claims.sub, sessionId: claims.sid, email: claims.email || "",
+           deviceId: /^[A-Za-z0-9_-]{16,64}$/.test(dev) ? dev : claims.sid };
 }
 
 // ---------------------------------------------------------------- devices: at most MAX_DEVICES per account
-// KV  dev:<userId>  -> [{sid, last}]  (only rewritten when the list changes or once a day per device)
-//     ev:<sid>      -> "1" (signed out of Pro because a newer device took its place), expires after 30 days
-//     evc:<userId>  -> how many times this account pushed a device out (for the weekly sharing report)
+// A device is a browser (its id lives in that browser's storage and comes in the x-cp-device header); signing out and
+// back in on it does not count again.  Older pages without the header count each sign-in session instead.
+// KV  dev:<userId>            -> [{id, sid, last}]  (rewritten only when the list changes or once a day per device)
+//     ev:<userId>:<deviceId>  -> the session that was signed out because a newer device took its place (30 days);
+//                                signing in again on that browser (a new session) clears it
+//     evc:<userId>            -> how many times this account pushed a device out (for the weekly sharing report)
 // Fail-safe (owner 2026-10-04): if KV is down or over its daily limit, members still get their picks; only the device
 // count pauses until KV is back.  A paying member is never locked out by our storage.
 export async function checkDevice(env, user) {
   if (!env.KV) return { ok: true };
-  let evicted = false;
-  try { evicted = !!(await env.KV.get(`ev:${user.sessionId}`)); }
+  const id = user.deviceId || user.sessionId, evKey = `ev:${user.userId}:${id}`;
+  let evicted = null;
+  try { evicted = await env.KV.get(evKey); }
   catch (e) { console.error("kv read failed", e && e.message); return { ok: true, devices: null, kvDown: true }; }
-  if (evicted) throw new HttpError(409, "device_limit",
+  if (evicted && evicted === user.sessionId) throw new HttpError(409, "device_limit",
     `This account is signed in on more than ${MAX_DEVICES} devices, so this one was signed out. Sign in again to use it here.`);
-  try { return await trackDevice(env, user); }
-  catch (e) { console.error("kv device update failed", e && e.message); return { ok: true, devices: null, kvDown: true }; }
+  try {
+    if (evicted) await env.KV.delete(evKey);          // signed in again on this browser: it becomes the newest device
+    return await trackDevice(env, user, id);
+  } catch (e) { console.error("kv device update failed", e && e.message); return { ok: true, devices: null, kvDown: true }; }
 }
-async function trackDevice(env, user) {
+async function trackDevice(env, user, id) {
   const key = `dev:${user.userId}`, now = Date.now(), day = 864e5;
-  let list = (await env.KV.get(key, "json")) || [];
+  let list = ((await env.KV.get(key, "json")) || []).map((d) => ({ id: d.id || d.sid, sid: d.sid, last: d.last }));
   list = list.filter((d) => now - d.last < DEVICE_IDLE_DAYS * day);
-  const mine = list.find((d) => d.sid === user.sessionId);
+  const mine = list.find((d) => d.id === id);
   if (mine) {
-    if (now - mine.last > day) { mine.last = now; await env.KV.put(key, JSON.stringify(list)); }
+    if (mine.sid !== user.sessionId || now - mine.last > day) {
+      mine.sid = user.sessionId; mine.last = now; await env.KV.put(key, JSON.stringify(list));
+    }
     return { ok: true, devices: list.length };
   }
-  list.push({ sid: user.sessionId, last: now });
+  list.push({ id, sid: user.sessionId, last: now });
   list.sort((a, b) => b.last - a.last);
   const out = list.slice(MAX_DEVICES);
   list = list.slice(0, MAX_DEVICES);
-  for (const d of out) await env.KV.put(`ev:${d.sid}`, "1", { expirationTtl: DEVICE_IDLE_DAYS * 86400 });
+  for (const d of out) await env.KV.put(`ev:${user.userId}:${d.id}`, d.sid, { expirationTtl: DEVICE_IDLE_DAYS * 86400 });
   if (out.length) {
     const n = parseInt((await env.KV.get(`evc:${user.userId}`)) || "0", 10) + out.length;
     await env.KV.put(`evc:${user.userId}`, String(n), { expirationTtl: 90 * 86400 });

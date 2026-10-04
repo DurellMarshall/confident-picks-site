@@ -977,8 +977,11 @@ async function cpBoot(){
   }catch(e){console.warn("Sign-in is unavailable right now",e);CK=null}
 }
 async function cpToken(fresh){try{return CK&&CK.session?await CK.session.getToken(fresh?{skipCache:true}:undefined):null}catch(e){return null}}
+let CP_DEV="";   // this browser's device id: signing out and back in here still counts as one device
+try{CP_DEV=localStorage.getItem("cp_dev")||"";if(!/^[A-Za-z0-9_-]{16,64}$/.test(CP_DEV)){const a=new Uint8Array(16);crypto.getRandomValues(a);
+  CP_DEV=btoa(String.fromCharCode(...a)).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");localStorage.setItem("cp_dev",CP_DEV)}}catch(e){CP_DEV=""}
 async function cpApi(path,opt){
-  const go=t=>fetch(path,Object.assign({cache:"no-store"},opt||{},{headers:Object.assign({},(opt||{}).headers||{},t?{authorization:"Bearer "+t}:{})}));
+  const go=t=>fetch(path,Object.assign({cache:"no-store"},opt||{},{headers:Object.assign({},(opt||{}).headers||{},t?{authorization:"Bearer "+t}:{},CP_DEV?{"x-cp-device":CP_DEV}:{})}));
   let r=await go(await cpToken());
   if(r.status===401&&CK&&CK.session)r=await go(await cpToken(true));   // the sign-in token lasts a minute; get a new one
   return r;
