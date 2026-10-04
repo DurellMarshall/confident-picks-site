@@ -72,7 +72,8 @@ small{font-size:12px}
   .bottom{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
   .bottom button{background:none;border:0;display:grid;justify-items:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--muted);padding:4px;cursor:pointer}
   .bottom button[aria-selected="true"]{color:var(--turf)}
-  .top-r .upd{display:none}
+  .top{flex-wrap:wrap}.top-r{flex-wrap:wrap;justify-content:flex-end}
+  .top-r .upd{order:3;flex:1 1 100%;text-align:right;font-size:11.5px}
   .brand b{font-size:19px}.mark{width:30px;height:30px}
   #go-about,.acct .badge{display:none}.top-r{gap:6px}
   .pv-bar{font-size:12px;gap:4px;padding:6px}.pv-bar .badge{display:none}.pv-bar button{padding:3px 8px;font-size:12px}
@@ -106,6 +107,8 @@ small{font-size:12px}
 .tools .tg[aria-pressed="true"]{background:var(--turf-soft);border-color:var(--turf);color:var(--ink)}
 .tools .tg.share{background:var(--pylon);border-color:var(--pylon);color:#fff}
 .tools .count{margin-left:auto;font-size:12.5px;color:var(--muted);align-self:center}
+.tools .sortm{display:none}
+@media (max-width:860px){.tools .sortm{display:grid}}
 @media (max-width:760px){.tools input[type=search]{width:100%}.tools label.q{flex:1 1 100%}.tools label{flex:1 1 45%}.tools label select{width:100%}}
 
 /* the table */
@@ -160,7 +163,8 @@ small{font-size:12px}
 .p-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:16px 18px 12px;border-bottom:1px solid var(--line)}
 .p-h h3{font-size:24px;line-height:1.05}
 .p-h small{color:var(--muted);display:block;margin-top:3px}
-.x{border:0;background:var(--surface-2);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px;flex:none}
+.x{border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;width:44px;height:44px;cursor:pointer;font-size:24px;line-height:1;flex:none}
+.panel .note,.panel .p-h small,.panel .kv dt,.panel .cmp span,.panel .p-sec h4{color:var(--ink-2)}
 .p-b{overflow:auto;overflow-x:hidden;padding:14px 18px 22px;display:grid;grid-template-columns:minmax(0,1fr);gap:16px;align-content:start}
 .p-b>*,.cmp>div{min-width:0}
 .p-sec h4{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
@@ -270,6 +274,12 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .btnrow button,.stack button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--ground);color:var(--ink);border-radius:8px;padding:6px 10px;cursor:pointer}
 
 .btnrow button.primary{background:var(--pylon);border-color:var(--pylon);color:#fff}
+/* phones (owner 2026-10-04): the stack is at the bottom of a long list, so a bar keeps it in reach */
+.stackbar{display:none}
+@media (max-width:900px){.bld{padding-bottom:76px}.lad{padding:12px}.mrungs{gap:10px}
+  .stackbar{display:flex;align-items:center;justify-content:space-between;gap:10px;position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:29;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:14px}
+  .stackbar button{border:0;background:var(--pylon);color:#fff;border-radius:8px;padding:8px 14px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}}
+@media (max-width:760px){.stackbar{bottom:calc(74px + env(safe-area-inset-bottom,0px))}.view .sec-h .lede,.bhint{display:none}}
 
 .sec-h h2{font-size:26px;text-transform:uppercase}.sec-h .lede{margin-top:4px}
 .pin{position:fixed;inset:0;z-index:200;background:var(--ground);display:grid;place-items:center;padding:16px}
@@ -284,6 +294,10 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .cp-note button{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
 .cp-check{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.4}.cp-check input{margin-top:3px;width:18px;height:18px;flex:0 0 auto}
 .plan small.save{display:block;font-size:12px;font-weight:700;color:var(--turf)}
+.btn.signout{width:100%;border:1.5px solid var(--bad);color:var(--bad);background:transparent;font-weight:700}
+.btn.signout:hover{background:var(--bad);color:#fff}
+.card select.cp-book{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);width:100%}
+.cp-note .lnk{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -374,7 +388,7 @@ const started=p=>{const t=Date.parse(p.kickoff_utc);return !isNaN(t)&&t<=Date.no
 /* ---------- header, nav ---------- */
 function header(){
   const oc=D.meta.odds_captured_at||{},od=Object.values(oc).filter(Boolean).sort().pop();
-  $("#updated").innerHTML=`Updated <b>${esc(stamp(D.meta.generated_at))}</b>${od?` · prices from <b>${esc(stamp(od))}</b>`:""}`;
+  $("#updated").innerHTML=`Picks updated <b>${esc(stamp(D.meta.generated_at))}</b>${od?` · prices from <b>${esc(stamp(od))}</b>`:""}`;
   $("#go-about").onclick=()=>setTab("about");
 }
 function nav(){
@@ -438,6 +452,7 @@ function toolbar(base,showMarket){
     <label>Game<select id="f-game"><option value="">All games</option>${games.map(([g,t])=>`<option value="${esc(g)}" ${g===S.game?"selected":""}>${esc(g)} · ${esc(when(t))}</option>`).join("")}</select></label>
     <label>Price at<select id="f-book">${BOOKS.map(([k,l])=>`<option value="${k}" ${S.book===k?"selected":""}>${l}</option>`).join("")}</select></label>
     <button class="tg" id="f-graded" aria-pressed="${S.graded}" title="Only the grades that held up in testing">A and B only</button>
+    <label class="sortm">Sort<select id="f-sort">${(S.seg==="games"?[["rank","Rank"],["chance","Our chance"],["price","Price"],["time","Game time"]]:[["rank","Rank"],["chance","Our chance"],["edge","Edge"],["price","Price"],["l5","Last 5"],["l10","Last 10"],["ssn","Season"],["time","Game time"]]).map(([k,l])=>`<option value="${k}" ${S.sort===k?"selected":""}>${l}</option>`).join("")}</select></label>
     <button class="tg share" id="f-share">Share or PDF</button>
     <span class="count" id="f-count"></span></div>`;
 }
@@ -462,7 +477,7 @@ function fillProps(){
   const {base,r}=propList();
   const B=$("#seg-body");
   B.innerHTML=toolbar(base,S.seg==="props")+(r.length||hidN(S.seg==="tds"?"tds":"props")?`<div class="tbl props" role="table" aria-label="Player props">
-    <div class="th" role="row">${sortBtn("rank","#")}<span>Player</span><span>Pick</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("edge","Edge","r h-ed")}${sortBtn("price","Price","r")}${sortBtn("l5","Last 5")}${sortBtn("l10","Last 10")}${sortBtn("ssn","Season")}<span class="h-gm">${sortBtn("time","Game")}</span></div>
+    <div class="th" role="row">${sortBtn("rank","#")}<span>Player</span><span>Pick</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("edge","Edge","r h-ed")}${sortBtn("price","Price","r")}${sortBtn("l5","Last 5")}${sortBtn("l10","Last 10")}${sortBtn("ssn","Season")}<span class="h-gm">${sortBtn("time","Game time (ET)")}</span></div>
     ${shownRows(r).map(propRow).join("")}${lockedRows(r,propRow)}
     ${r.length>S.shown&&S.shown<LIMIT[tier].props?`<button class="more" id="more">Show ${Math.min(50,r.length-S.shown)} more of ${r.length-S.shown}</button>`:""}</div>
     <p class="hint">Our chance comes from our model; the letter is its grade (A and B held up in testing; no letter = shown, not graded). Book = the chance the book's price implies. Edge = ours minus the book's, in points. Last 5 and Last 10 count back into last season; Season is this season only. They show how often he cleared this line: context only, since in our 2023-25 testing a hot streak did not carry into the next game. Ranked: A and B picks first (the grades that held up in testing), then the rest, each by our chance.</p>`
@@ -483,6 +498,7 @@ function bindTools(fill){
   on("#f-game","onchange",e=>{S.game=e.target.value;upd()});
   on("#f-book","onchange",e=>{S.book=e.target.value;upd()});
   on("#f-graded","onclick",()=>{S.graded=!S.graded;upd()});
+  on("#f-sort","onchange",e=>{S.sort=e.target.value;S.asc=S.sort==="time";upd()});
   on("#f-share","onclick",openShare);
 }
 
@@ -514,7 +530,7 @@ function fillGames(){
   const base=all.flatMap(g=>g.rows);
   const B=$("#seg-body");
   B.innerHTML=toolbar(base,false)+(gs.length||hidN("games")?`<div class="tbl games" role="table" aria-label="Games">
-    <div class="th" role="row">${sortBtn("rank","#")}${sortBtn("time","Game")}<span>Our winner</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("price","Price","r")}<span>Spread</span><span>Total</span></div>
+    <div class="th" role="row">${sortBtn("rank","#")}${sortBtn("time","Game · time (ET)")}<span>Our winner</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("price","Price","r")}<span>Spread</span><span>Total</span></div>
     ${gs.slice(0,Math.min(S.shown,LIMIT[tier].games)).map(gameRow).join("")}${gs.length>LIMIT[tier].games||hidN("games")?gate(gs.length>LIMIT[tier].games?gs.slice(LIMIT[tier].games,LIMIT[tier].games+3).map(gameRow).join(""):'<div style="height:160px"></div>',"free","See every game","A free account shows every game pick: winner, projected score, spread and total, all sports."):gs.length>S.shown?`<button class="more" id="more">Show more</button>`:""}</div>
     <p class="hint">Winner, spread and total all come from one projected score, so they never contradict each other. Winners are graded; spreads and totals are shown, not graded, until they hold up at 58% on seasons the model never saw.</p>`
     :`<div class="empty">No games match.</div>`);
@@ -647,6 +663,15 @@ function pdfLib(){
     .catch(e=>{PDFLIB=null;throw e}));
 }
 function logoData(){return new Promise(ok=>{const i=new Image();i.onload=()=>{try{const c=document.createElement("canvas");c.width=i.naturalWidth;c.height=i.naturalHeight;c.getContext("2d").drawImage(i,0,0);ok(c.toDataURL("image/png"))}catch(e){ok(null)}};i.onerror=()=>ok(null);i.src="data/logo_white.png"})}
+/* faint diagonal watermark on every page (owner 2026-10-04): the site name and, for members, who it was made for */
+function watermark(doc,W,H){
+  const who=window.CP_WM||siteLink().replace(/^https?:\/\//,"").replace(/\/$/,"");
+  try{doc.saveGraphicsState();if(doc.GState)doc.setGState(new doc.GState({opacity:.09}))}catch(e){}
+  doc.setTextColor(31,95,174);doc.setFont("helvetica","bold");
+  for(let y=150;y<H+120;y+=190)for(let x=-40;x<W;x+=330){doc.setFontSize(30);doc.text("CONFIDENT PICKS",x,y,{angle:22});doc.setFontSize(11);doc.text(who,x+14,y+20,{angle:22})}
+  try{doc.restoreGraphicsState()}catch(e){}
+  doc.setFont("helvetica","normal");
+}
 async function makePDF(list){
   await pdfLib();const logo=await logoData();
   const {jsPDF}=window.jspdf,doc=new jsPDF({orientation:"landscape",unit:"pt",format:"letter"}),W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
@@ -665,7 +690,7 @@ async function makePDF(list){
     didParseCell:d=>{if(d.section!=="body")return;const it=items[d.row.index],p=S.seg==="games"?it.W:it;
       if(d.column.index===3&&graded(p)){const C={A:[[220,240,227],[23,120,74]],B:[[224,233,246],[40,93,166]],C:[[245,234,210],[143,99,16]],D:[[230,234,240],[95,107,125]]}[p.grade];d.cell.styles.fillColor=C[0];d.cell.styles.textColor=C[1]}
       if(S.seg!=="games"&&d.column.index>=6&&d.column.index<=8){const m=String(d.cell.raw).match(/\((\d+)%\)/);if(m){const r=+m[1];d.cell.styles.fillColor=r>=70?[220,240,227]:r>=50?[255,244,222]:[248,225,222];d.cell.styles.halign="center"}}},
-    didDrawPage:()=>{head();doc.setFontSize(8.5);doc.setTextColor(224,96,15);doc.setFont("helvetica","bold");
+    didDrawPage:()=>{watermark(doc,W,H);head();doc.setFontSize(8.5);doc.setTextColor(224,96,15);doc.setFont("helvetica","bold");
       doc.text(TESTING,28,H-34);doc.setFont("helvetica","normal");doc.setFontSize(8);doc.setTextColor(102,116,138);
       doc.text(`${siteLink()} · Our models' opinion, not guarantees. ${S.seg==="games"?"Winners are graded; spreads and totals are shown, not graded.":"Grades A and B held up in testing. Last 5 / Last 10 count back into last season; Season is this season only."} 21+ · 1-800-GAMBLER`,28,H-20);
       doc.text(`Page ${doc.internal.getNumberOfPages()}`,W-28,H-20,{align:"right"})}});
@@ -902,6 +927,11 @@ function cartSummary(){
   h+=`<div class="btnrow"><button class="primary" id="slip-link">Copy share link</button><button id="slip-text">Copy as text</button><button id="slip-clear">Clear</button></div><div id="slip-hold"></div>`;
   return h;
 }
+function stackBar(){
+  const legs=BS.cart.map(findLeg).filter(Boolean);if(!legs.length)return "";
+  const priced=legs.every(x=>x.r.books[BS.book]!=null),d=priced?legs.reduce((a,x)=>a*decOf(x.r.books[BS.book]),1):null;
+  return `<div class="stackbar" role="region" aria-label="Your stack"><span><b>Your stack (${legs.length})</b>${d?` · pays ${price(amOf(d))} at ${esc(BS.book)}`:""}</span><button id="sb-view">View stack</button></div>`;
+}
 function fillBuilder(){
   const B=$("#bld-body");if(!B)return;
   if(!LAD.ladders.length){B.innerHTML='<div class="empty">No milestones posted yet. They appear once the books post this week\'s props.</div>';return}
@@ -921,9 +951,9 @@ function fillBuilder(){
     <div class="bseg" role="group" aria-label="Builder view"><button data-bview="milestones" aria-pressed="${BS.view!=="stacks"}">Milestones</button><button data-bview="stacks" aria-pressed="${BS.view==="stacks"}">Ready-made stacks${st.length?` <span class="ct">${st.length}</span>`:""}</button></div>
     ${BS.view!=="stacks"?"":tier!=="pro"?gate('<div style="height:160px"></div>',"pro","Ready-made stacks are Pro","Short-price stacks picked by our model, at the book you choose."):st.length?`<div><h3 style="margin:0 0 4px;font:700 18px var(--disp)">Short-price stacks</h3><p class="muted" style="margin:0 0 8px;font-size:13px">Built from milestones priced −150 to −1000 at ${esc(BS.book)}, one per game, paying +100 or more. Picked by our model.</p>
       <div class="stacks">${st.map((s,i)=>`<div class="stack"><b>${s.n} legs · pays ${price(amOf(s.d))}</b><ol>${s.ch.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} (${price(x.px)})</li>`).join("")}</ol><button data-stack="${i}">Add to cart</button></div>`).join("")}</div></div>`:'<div class="empty">No ready-made stacks at this book right now.</div>'}
-    <div style="display:${BS.view==="stacks"?"none":"grid"};gap:14px"><p class="muted" style="margin:0;font-size:12px">Top right of each card: how many of his games this season he reached that number.</p>
+    <div style="display:${BS.view==="stacks"?"none":"grid"};gap:14px">${LAD.free?freeBanner():""}<p class="muted bhint" style="margin:0;font-size:12px">Top right of each card: how many of his games this season he reached that number.</p>
     ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.filter(r=>r.books[BS.book]!=null).map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}</div>
-  </div><aside class="cart" aria-label="Your stack"><h3>Your stack (${BS.cart.length})</h3><div id="cart-body">${cartSummary()}</div></aside></div>`;
+  </div><aside class="cart" id="cart" aria-label="Your stack"><h3>Your stack (${BS.cart.length})</h3><div id="cart-body">${cartSummary()}</div></aside></div>${stackBar()}`;
   bindPreview();
   const re=()=>{saveCart();fillBuilder()};
   B.querySelectorAll("[data-bview]").forEach(b=>b.onclick=()=>{BS.view=b.dataset.bview;fillBuilder()});
@@ -936,6 +966,7 @@ function fillBuilder(){
   B.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{BS.cart=BS.cart.filter(x=>x!==b.dataset.rm);re()});
   B.querySelectorAll("[data-stack]").forEach(b=>b.onclick=()=>{const s=st[+b.dataset.stack];s.ch.forEach(x=>{const k=legKey(x.l,x.r);if(!BS.cart.includes(k))BS.cart.push(k)});re()});
   const cl=$("#slip-clear");if(cl)cl.onclick=()=>{BS.cart=[];re()};
+  const sv=$("#sb-view");if(sv)sv.onclick=()=>{const c=$("#cart");if(c)c.scrollIntoView({behavior:"smooth",block:"start"})};
   const sst=$("#slip-state");if(sst)sst.onchange=e=>{BS.state=e.target.value.toLowerCase();re()};
   B.querySelectorAll(".slipbtn.off").forEach(a=>a.onclick=e=>{e.preventDefault();toast("Pick your state first")});
   const lk=$("#slip-link");if(lk)lk.onclick=()=>{const enc=btoa(unescape(encodeURIComponent(BS.cart.join("|")))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
@@ -966,11 +997,12 @@ async function cpBoot(){
     CK=window.Clerk;await CK.load({ui:{ClerkUI:window.__internal_ClerkUICtor}});
     const uid=(CK.user&&CK.user.id)||null;
     CK.addListener(e=>{const u=(e&&e.user&&e.user.id)||null;if(u!==uid)location.reload()});   // signed in or out: start fresh
+    cpApplyBook(cpMyBook());
     if(!uid)return;
     const back=new URLSearchParams(location.search).get("checkout")==="done";
     const r=await cpApi("/api/me"+(back?"?fresh=1":""));
     if(r.status===409)CP_NOTICE="device_limit";
-    else if(r.ok){ME=await r.json();tier=ME.pro?"pro":"free"}
+    else if(r.ok){ME=await r.json();tier=ME.pro?"pro":"free";window.CP_WM="Made for "+cpMail()}
     if(back){try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}if(ME&&ME.pro)setTimeout(()=>toast("Welcome to Pro. Every pick is unlocked."),900)}
     let pend=null;try{pend=sessionStorage.getItem("cp_plan");sessionStorage.removeItem("cp_plan")}catch(e){}
     if(pend&&ME&&!ME.pro)setTimeout(()=>openModal("checkout",pend),300);
@@ -1053,15 +1085,16 @@ function vAccount(){
   if(tier==="visitor"||!ME)return gate('<div style="height:220px"></div>',"free","Sign in to see your account","Your plan, billing and devices live here.");
   const pro=ME.pro,plan=ME.plan==="year"?"Pro yearly":ME.plan==="month"?"Pro monthly":"Pro";
   const day=ME.renews?new Date(ME.renews*1000).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"";
-  const mail=ME.email||(CK&&CK.user&&CK.user.primaryEmailAddress&&CK.user.primaryEmailAddress.emailAddress)||"";
-  const name=CK&&CK.user&&CK.user.firstName?CK.user.firstName:"";
-  return `<h2 class="h2">My account</h2>${name?`<p class="lede">Hi ${esc(name)}.</p>`:""}<div class="cards" style="max-width:720px">
-    <section class="card"><b>Signed in as</b><span>${esc(mail)}</span><div class="btns"><button class="btn" data-act="profile">Name, email and sign-in</button></div></section>
+  const mail=cpMail(),mine=cpMyBook();
+  return `<h2 class="h2">My account</h2><div class="cards" style="max-width:720px">
+    <section class="card"><b>Signed in as</b><span>${esc(mail)}</span></section>
     <section class="card"><b>Plan</b><span>${pro?`${plan}${day?` · ${ME.cancelAtPeriodEnd?"ends":"renews"} ${esc(day)}`:""}${ME.status==="past_due"?" · last payment failed":""}`:"Free"}</span>
       <div class="btns">${pro?'<button class="btn" data-act="portal">Manage billing</button>':`<button class="btn hot" data-go="plans">Upgrade to Pro</button>${ME.customer?'<button class="btn" data-act="portal">Billing history</button>':""}`}</div>
       ${pro?'<small class="muted">Switch plans, update your card, cancel or get receipts on Stripe\'s secure billing page.</small>':""}</section>
     <section class="card"><b>Devices</b><span>${ME.devices?`Signed in on ${ME.devices} of 3 devices.`:"Up to 3 devices."} Signing in on another device signs out the one used longest ago.</span></section>
-    <section class="card"><button class="btn" data-act="signout">Sign out</button></section></div>`;
+    <section class="card"><b>My sportsbook</b><select class="cp-book" id="cp-book" aria-label="My sportsbook"><option value="">Best price across books</option>${CP_BOOKS.map(b=>`<option${b===mine?" selected":""}>${esc(b)}</option>`).join("")}</select>
+      <small class="muted">Prices and the Builder open at this book. DraftKings and FanDuel show their own price in the Price column; for other books it shows the best price, and the Builder uses your book.</small></section>
+    <section class="card"><button class="btn signout" data-act="signout">Sign out</button></section></div>`;
 }
 function openModal(kind,plan){
   if(kind==="signin")return cpSignIn();
@@ -1077,7 +1110,22 @@ function openModal(kind,plan){
   openPanel(y?"Start Pro yearly":"Start Pro monthly","",body,P=>{const c=P.querySelector("#cp-21"),g=P.querySelector("#cp-go");
     c.onchange=()=>{g.disabled=!c.checked};g.onclick=()=>cpCheckout(y?"year":"month",g)});
 }
+const CP_BOOKS=["DraftKings","FanDuel","BetMGM","Caesars","ESPN BET","BetRivers","Fanatics","Hard Rock"];
+const cpMail=()=>(ME&&ME.email)||(CK&&CK.user&&CK.user.primaryEmailAddress&&CK.user.primaryEmailAddress.emailAddress)||"";
+function cpMyBook(){let b="";try{b=(CK&&CK.user&&CK.user.unsafeMetadata&&CK.user.unsafeMetadata.book)||localStorage.getItem("cp_mybook")||""}catch(e){}return CP_BOOKS.includes(b)?b:""}
+function cpApplyBook(b){if(!b)return;S.book=b==="DraftKings"?"dk":b==="FanDuel"?"fd":"best";BS.book=b;try{saveCart()}catch(e){}save()}
+async function cpSetBook(b){
+  try{localStorage.setItem("cp_mybook",b)}catch(e){}
+  if(b)cpApplyBook(b);else{S.book="best";save()}
+  try{if(CK&&CK.user)await CK.user.update({unsafeMetadata:Object.assign({},CK.user.unsafeMetadata||{},{book:b})})}catch(e){}
+  toast(b?`Prices and the Builder now open at ${b}.`:"Showing the best price across books.");
+}
+function freeBanner(){
+  const f=(LAD&&LAD.free)||{},st=f.stats||{},n=Object.values(f.locked||{}).reduce((a,b)=>a+b,0);
+  return `<div class="cp-note info" style="margin:0;border:1px solid var(--line);border-radius:10px">Free accounts get ${Object.entries(st).map(([sp,x])=>`${esc(sp)} ${esc(String(x).toLowerCase())}`).join(" and ")}. Pro unlocks every stat${n?` (${n.toLocaleString()} more player milestones)`:""}. <button class="lnk" data-go="plans">See Pro</button></div>`;
+}
 function bindPreview(){
+  const bk=document.getElementById("cp-book");if(bk)bk.onchange=e=>cpSetBook(e.target.value);
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setTab(b.dataset.go));
   document.querySelectorAll("[data-modal]").forEach(b=>b.onclick=()=>openModal(b.dataset.modal,b.dataset.plan));
   document.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>cpAct(b.dataset.act,b));
