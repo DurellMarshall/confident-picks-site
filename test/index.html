@@ -312,7 +312,7 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
     <div>Our picks are our models' opinion, not guarantees. Every number is either tested on past seasons or tracked live since Sep 26, 2026. Prices are real quotes from the books at the last odds update.</div>
     <div><b>Bet flat:</b> the same small stake on every pick, and never chase losses. Even a 60% record has losing streaks of 5 or more.</div>
     <div>21+ where legal. If you or someone you know has a gambling problem, call 1-800-GAMBLER.</div>
-    <nav class="flinks" aria-label="Site information"><a href="#guide">How to use</a><a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#refunds">Refunds</a></nav>
+    <nav class="flinks" aria-label="Site information"><a href="#guide">How to use</a><a href="#terms">Terms</a><a href="#privacy">Privacy</a><a href="#refunds">Refunds</a><a href="#contact">Contact</a></nav>
   </footer>
 </div>
 <nav class="bottom" id="bottom" aria-label="Sections"></nav>
@@ -842,14 +842,16 @@ terms:{t:"Terms of Service",b:`
 <p>Promo codes are subject to the limits shown when you use them and can't be combined. Referral credits are account credit applied to your future Pro bills; they have no cash value, can't be transferred or exchanged, and end if your account closes. Credits earned through fake or duplicate accounts, self-referrals or spam are removed. We may change or end promotions and the referral program at any time; credits already earned stay on your account.</p>
 <h3>6. Using the picks</h3>
 <p>Your account and everything in it are for your personal use. Sharing a few picks with friends is fine. Copying, reposting the board, reselling picks or PDFs, running a paid group with them, or scraping the site is not. PDFs carry a watermark with your account email. We may suspend or close accounts that break these terms, including accounts that are shared or resold.</p>
-<h3>7. Sportsbook links and prices</h3>
+<h3>7. Breaking these terms</h3>
+<p>For a first or minor issue we may warn you. For serious or repeated issues, such as reposting or reselling picks or PDFs, sharing your account, or abusing promotions or referrals, we may close your account and cancel Pro immediately. If we close a paid account for breaking these terms, we refund any full months left on your plan; referral credits and promo benefits are forfeited, and we may refuse future accounts.</p>
+<h3>8. Sportsbook links and prices</h3>
 <p>Prices are real quotes from each book at the last odds update and can change at any time. "Open slip" links are a shortcut to the sportsbook's own website or app; nothing is placed until you confirm a bet there, and the sportsbook's terms apply.</p>
-<h3>8. No warranty; limits on liability</h3>
+<h3>9. No warranty; limits on liability</h3>
 <p>Confident Picks is provided "as is". To the fullest extent the law allows, we are not liable for any betting losses or for indirect or consequential damages, and our total liability for any claim is limited to what you paid us in the 3 months before the claim.</p>
-<h3>9. Changes and law</h3>
+<h3>10. Changes and law</h3>
 <p>We may update these terms; if a change is significant we will tell you by email or on the site before it takes effect. New York law governs these terms.</p>
-<h3>10. Contact</h3>
-<p>${CP_MAIL}</p>
+<h3>11. Contact</h3>
+<p>Use the <a href="#contact">Contact page</a> when signed in, or email ${CP_MAIL}.</p>
 <h3>Help with gambling</h3>
 <p>If gambling stops being fun, help is free and confidential: call or text 1-800-GAMBLER. In New York: HOPEline 1-877-8-HOPENY (1-877-846-7369) or text HOPENY (467369).</p>`},
 privacy:{t:"Privacy Policy",b:`
@@ -859,6 +861,7 @@ privacy:{t:"Privacy Policy",b:`
 <b>Payments:</b> Stripe handles checkout and billing. We receive your plan, payment status, billing country and postal code and invoices; we never see or store your full card number.<br>
 <b>Your settings:</b> your chosen sportsbook, your Builder stack and similar preferences, kept in your browser and, for the sportsbook, on your account.<br>
 <b>Devices:</b> a random browser id so Pro can be used on up to 3 devices.<br>
+<b>Messages:</b> what you send us through the Contact page, with your account email so we can reply (kept up to 180 days on the site, then in our support inbox).<br>
 <b>Technical:</b> Cloudflare, which hosts the site, keeps standard request logs (internet address, browser type, time) for security and to keep the site running.</p>
 <h3>How we use it</h3>
 <p>To run your account and Pro, process payments and receipts, enforce the device limit and our terms, prevent fraud, answer support requests, and send account or billing emails. If we ever send marketing email, every email will include an unsubscribe link.</p>
@@ -912,8 +915,9 @@ guide:{t:"How to use Confident Picks",b:`
 <h3>Bet flat</h3>
 <p>Use the same small stake on every pick and never raise it to win back a loss. Even a 60% record has losing streaks of 5 or more. 21+. If gambling stops being fun, call 1-800-GAMBLER.</p>
 <h3>Questions</h3>
-<p>${CP_MAIL}</p>`},
+<p>Use the <a href="#contact">Contact page</a> or email ${CP_MAIL}.</p>`},
 };
+function vContact(){return `<article class="prose doc"><h2 class="h2">Contact</h2><p>Questions about your account, billing or the picks, or to report someone sharing picks: email <b>${CP_MAIL}</b>. We reply within one business day.</p><p><button class="btn" id="back-picks">Back to picks</button></p></article>`}
 function vDoc(k){const d=DOCS[k];return `<article class="prose doc"><h2 class="h2">${esc(d.t)}</h2>${d.b}<p><button class="btn" id="back-picks">Back to picks</button></p></article>`}
 
 /* ---------- Builder milestones, matched to our main pick (owner 2026-10-02) ----------
@@ -1079,7 +1083,7 @@ window.CP_ADD=(k,on)=>{BS.cart=on?[...new Set([...BS.cart,k])]:BS.cart.filter(x=
 /* ---------- render ---------- */
 function render(){
   nav();closePanel();
-  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount,terms:()=>vDoc("terms"),privacy:()=>vDoc("privacy"),refunds:()=>vDoc("refunds"),guide:()=>vDoc("guide")}[S.tab]||vPicks;
+  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount,terms:()=>vDoc("terms"),privacy:()=>vDoc("privacy"),refunds:()=>vDoc("refunds"),guide:()=>vDoc("guide"),contact:()=>vContact()}[S.tab]||vPicks;
   let html=v();
   if(S.tab==="build"&&tier==="visitor")html=gate(html,"free","The Builder is free with an account","Stack milestones with real prices, see the book's chance next to ours, and share your stack.");
   $("#main").innerHTML=pvBar()+html;$("#acct").innerHTML=acctBtns();
@@ -1090,7 +1094,7 @@ function render(){
     ({props:fillProps,tds:fillProps,games:fillGames,more:fillMore}[S.seg]||fillProps)();
   }
   if(S.tab==="results")document.querySelectorAll("[data-hs]").forEach(b=>b.onclick=()=>{S.hs=b.dataset.hs;save();render()});
-  if(["about","terms","privacy","refunds","guide"].includes(S.tab)){const b=$("#back-picks");if(b)b.onclick=()=>setTab("picks")}
+  if(["about","terms","privacy","refunds","guide","contact"].includes(S.tab)){const b=$("#back-picks");if(b)b.onclick=()=>setTab("picks")}
   if(S.tab==="build"&&tier!=="visitor")bindBuilder();
   bindPreview();
 }
@@ -1102,9 +1106,9 @@ function init(data){
   for(const p of D.picks){const k=nk(p),o=seen.get(k);if(!o||p.win_prob>o.win_prob||(p.win_prob===o.win_prob&&p.best_price!=null&&(o.best_price==null||dec(p.best_price)>dec(o.best_price))))seen.set(k,p)}
   D.picks=D.picks.filter(p=>seen.get(nk(p))===p);
   D.picks.forEach((p,i)=>p._id="p"+i);
-  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account","terms","privacy","refunds","guide"].includes(h))S.tab=h;
+  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact"].includes(h))S.tab=h;
   header();render();
-  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account","terms","privacy","refunds","guide"].includes(t)){S.tab=t;save();render();window.scrollTo({top:0})}});
+  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact"].includes(t)){S.tab=t;save();render();window.scrollTo({top:0})}});
   setInterval(()=>{if(S.tab==="picks"&&!$("#panel"))render()},120000);
   fetch("../data/form.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(f=>{if(f&&f.rows){FORM=f.rows;REC=f.record||{};if(S.tab==="picks"&&!$("#panel"))render();if(S.tab==="build"&&LAD&&typeof fillBuilder==="function")fillBuilder()}}).catch(()=>{});
   fetch("../data/ladders.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(d=>{if(!d)return;LAD=LAD||reconcileLadders(d);LADI=new Map(d.ladders.map(l=>[`${l.player}~${l.stat}`,l]))}).catch(()=>{});
