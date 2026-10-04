@@ -279,6 +279,14 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 @media (max-width:900px){.bld{padding-bottom:76px}.lad{padding:12px}.mrungs{gap:10px}
   .stackbar{display:flex;align-items:center;justify-content:space-between;gap:10px;position:fixed;left:12px;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:29;background:var(--ink);color:var(--surface);border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px rgba(0,0,0,.25);font-size:14px}
   .stackbar button{border:0;background:var(--pylon);color:#fff;border-radius:8px;padding:8px 14px;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap}}
+.cart-h{display:flex;justify-content:space-between;align-items:center;gap:8px}.cart-x{display:none}.cart-scrim{display:none}
+.stackbar small{display:block;font-size:11.5px;opacity:.8;font-weight:400}
+@media (max-width:900px){
+  .cart{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:53;max-height:82vh;overflow:auto;border-radius:16px 16px 0 0;transform:translateY(105%);visibility:hidden;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+  .cart.open{transform:none;visibility:visible}
+  .cart-x{display:grid;place-items:center;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);border-radius:10px;width:44px;height:44px;font-size:24px;cursor:pointer}
+  .cart-scrim:not([hidden]){display:block;position:fixed;inset:0;background:rgba(10,18,32,.45);z-index:52}}
+@media (max-width:900px) and (prefers-reduced-motion:no-preference){.cart{transition:transform .25s ease,visibility .25s}}
 @media (max-width:760px){.stackbar{bottom:calc(74px + env(safe-area-inset-bottom,0px))}.view .sec-h .lede,.bhint{display:none}}
 
 .sec-h h2{font-size:26px;text-transform:uppercase}.sec-h .lede{margin-top:4px}
@@ -930,7 +938,7 @@ function cartSummary(){
 function stackBar(){
   const legs=BS.cart.map(findLeg).filter(Boolean);if(!legs.length)return "";
   const priced=legs.every(x=>x.r.books[BS.book]!=null),d=priced?legs.reduce((a,x)=>a*decOf(x.r.books[BS.book]),1):null;
-  return `<div class="stackbar" role="region" aria-label="Your stack"><span><b>Your stack (${legs.length})</b>${d?` · pays ${price(amOf(d))} at ${esc(BS.book)}`:""}</span><button id="sb-view">View stack</button></div>`;
+  return `<div class="stackbar" role="region" aria-label="Your stack"><span><b>Your stack · ${legs.length} leg${legs.length===1?"":"s"}${d?` · ${price(amOf(d))}`:""}</b><small>${d?`Estimated at ${esc(BS.book)}`:`Not every leg is offered at ${esc(BS.book)}`}</small></span><button id="sb-view">View stack</button></div>`;
 }
 function fillBuilder(){
   const B=$("#bld-body");if(!B)return;
@@ -953,7 +961,7 @@ function fillBuilder(){
       <div class="stacks">${st.map((s,i)=>`<div class="stack"><b>${s.n} legs · pays ${price(amOf(s.d))}</b><ol>${s.ch.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} (${price(x.px)})</li>`).join("")}</ol><button data-stack="${i}">Add to cart</button></div>`).join("")}</div></div>`:'<div class="empty">No ready-made stacks at this book right now.</div>'}
     <div style="display:${BS.view==="stacks"?"none":"grid"};gap:14px">${LAD.free?freeBanner():""}<p class="muted bhint" style="margin:0;font-size:12px">Top right of each card: how many of his games this season he reached that number.</p>
     ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.filter(r=>r.books[BS.book]!=null).map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}</div>
-  </div><aside class="cart" id="cart" aria-label="Your stack"><h3>Your stack (${BS.cart.length})</h3><div id="cart-body">${cartSummary()}</div></aside></div>${stackBar()}`;
+  </div><aside class="cart${BS.sheet?" open":""}" id="cart" aria-label="Your stack"><div class="cart-h"><h3>Your stack (${BS.cart.length})</h3><button class="cart-x" id="cart-x" aria-label="Close">×</button></div><div id="cart-body">${cartSummary()}</div></aside></div><div class="cart-scrim" id="cart-scrim"${BS.sheet?"":" hidden"}></div>${stackBar()}`;
   bindPreview();
   const re=()=>{saveCart();fillBuilder()};
   B.querySelectorAll("[data-bview]").forEach(b=>b.onclick=()=>{BS.view=b.dataset.bview;fillBuilder()});
@@ -966,7 +974,11 @@ function fillBuilder(){
   B.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>{BS.cart=BS.cart.filter(x=>x!==b.dataset.rm);re()});
   B.querySelectorAll("[data-stack]").forEach(b=>b.onclick=()=>{const s=st[+b.dataset.stack];s.ch.forEach(x=>{const k=legKey(x.l,x.r);if(!BS.cart.includes(k))BS.cart.push(k)});re()});
   const cl=$("#slip-clear");if(cl)cl.onclick=()=>{BS.cart=[];re()};
-  const sv=$("#sb-view");if(sv)sv.onclick=()=>{const c=$("#cart");if(c)c.scrollIntoView({behavior:"smooth",block:"start"})};
+  const sheet=on=>{BS.sheet=on;const c=$("#cart"),sc=$("#cart-scrim");if(c)c.classList.toggle("open",on);if(sc)sc.hidden=!on};
+  const sv=$("#sb-view");if(sv)sv.onclick=()=>sheet(true);
+  const cx=$("#cart-x");if(cx)cx.onclick=()=>sheet(false);
+  const sc=$("#cart-scrim");if(sc)sc.onclick=()=>sheet(false);
+  if(BS.sheet&&!BS.cart.length)BS.sheet=false;
   const sst=$("#slip-state");if(sst)sst.onchange=e=>{BS.state=e.target.value.toLowerCase();re()};
   B.querySelectorAll(".slipbtn.off").forEach(a=>a.onclick=e=>{e.preventDefault();toast("Pick your state first")});
   const lk=$("#slip-link");if(lk)lk.onclick=()=>{const enc=btoa(unescape(encodeURIComponent(BS.cart.join("|")))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
