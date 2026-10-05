@@ -241,7 +241,7 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .bld-tools select,.bld-tools input{font:inherit;font-size:14px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
 .lad{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:8px;min-width:0}
 .lad-h{display:flex;justify-content:space-between;gap:8px;align-items:baseline;flex-wrap:wrap}
-.lad-h b{font-size:15px}.lad-h span{font-size:12px;color:var(--muted)}
+.lad-h b{font-size:15px}.lad-h span{font-size:12px;color:var(--muted)}.lad-h .lad-t{font-size:12px;color:var(--ink-2);font-weight:600}
 .mrungs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
 .mrungs .mrung{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:2px;flex:0 0 auto;min-width:104px;scroll-snap-align:start;border:1px solid var(--line);border-radius:10px;background:var(--ground);color:var(--ink);padding:7px 9px;text-align:left;cursor:pointer;display:grid;gap:2px;font:inherit}
 .mrungs .mrung{position:relative;min-width:118px}
@@ -1019,7 +1019,7 @@ function rungChip(l,r){
 function stacks(){
   // short-price stacks at the chosen book: rungs priced -1000 to -150, different games, the stack pays +100 or more;
   // ranked by our chance x payout (the stacks our numbers like best)
-  const pool=[];LAD.ladders.filter(l=>!BS.sport||(l.sport||"NFL")===BS.sport).forEach(l=>l.rungs.forEach(r=>{const px=r.books[BS.book];if(px!=null&&px<=-150&&px>=-1000)pool.push({l,r,px,d:decOf(px)})}));
+  const pool=[];LAD.ladders.filter(l=>(!BS.sport||(l.sport||"NFL")===BS.sport)&&!(Date.parse(l.kickoff)<=Date.now())).forEach(l=>l.rungs.forEach(r=>{const px=r.books[BS.book];if(px!=null&&px<=-150&&px>=-1000)pool.push({l,r,px,d:decOf(px)})}));
   pool.sort((a,b)=>(b.r.ours*b.d)-(a.r.ours*a.d));
   const top=pool.slice(0,40), out=[];
   for(const n of [3,4]){let best=[];
@@ -1052,22 +1052,24 @@ function fillBuilder(){
   if(!LAD.ladders.length){B.innerHTML='<div class="empty">No milestones posted yet. They appear once the books post this week\'s props.</div>';return}
   const books=booksIn();if(!books.includes(BS.book))BS.book=books[0];
   const sportsL=[...new Set(LAD.ladders.map(l=>l.sport||"NFL"))].sort();if(BS.sport&&!sportsL.includes(BS.sport))BS.sport="";
-  const inS=LAD.ladders.filter(l=>!BS.sport||(l.sport||"NFL")===BS.sport);
-  const gamesL=[...new Set(inS.map(l=>l.game))], stats=[...new Set(inS.map(l=>l.stat))].sort();
+  const now=Date.now(), live=l=>!(Date.parse(l.kickoff)<=now);   // owner 2026-10-04: games that started leave the Builder
+  const inS=LAD.ladders.filter(l=>(!BS.sport||(l.sport||"NFL")===BS.sport)&&live(l));
+  const ko=new Map();inS.forEach(l=>{if(!ko.has(l.game))ko.set(l.game,l.kickoff)});
+  const gamesL=[...ko.keys()].sort((a,b)=>Date.parse(ko.get(a))-Date.parse(ko.get(b))), stats=[...new Set(inS.map(l=>l.stat))].sort();
   const q=BS.q.toLowerCase();
   const list=inS.filter(l=>l.rungs.some(r=>r.books[BS.book]!=null)&&(!BS.game||l.game===BS.game)&&(!BS.stat||l.stat===BS.stat)&&(!q||l.player.toLowerCase().includes(q)||String(l.team).toLowerCase()===q));
   const st=tier==="pro"?stacks():[];
   B.innerHTML=`<div class="bld"><div style="display:grid;gap:14px;min-width:0">
     ${BS.fromLink?'<div class="verdict ok">Someone shared this stack with you. It is in your cart on the right; prices are today\'s.</div>':""}
     <div class="bld-tools">${sportsL.length>1?`<label for="b-sport">Sport<select id="b-sport"><option value="">All sports</option>${sportsL.map(x=>`<option${x===BS.sport?" selected":""}>${esc(x)}</option>`).join("")}</select></label>`:""}<label for="b-book">Book<select id="b-book">${books.map(b=>`<option${b===BS.book?" selected":""}>${esc(b)}</option>`).join("")}</select></label>
-      <label for="b-game">Game<select id="b-game"><option value="">All games</option>${gamesL.map(g=>`<option${g===BS.game?" selected":""}>${esc(g)}</option>`).join("")}</select></label>
+      <label for="b-game">Game<select id="b-game"><option value="">All games</option>${gamesL.map(g=>`<option value="${esc(g)}"${g===BS.game?" selected":""}>${esc(g)} · ${esc(when(ko.get(g)))}</option>`).join("")}</select></label>
       <label for="b-stat">Stat<select id="b-stat"><option value="">All stats</option>${stats.map(s=>`<option${s===BS.stat?" selected":""}>${esc(s)}</option>`).join("")}</select></label>
       <label for="b-q">Find<input id="b-q" type="search" placeholder="Player or team" value="${esc(BS.q)}"></label></div>
     <div class="bseg" role="group" aria-label="Builder view"><button data-bview="milestones" aria-pressed="${BS.view!=="stacks"}">Milestones</button><button data-bview="stacks" aria-pressed="${BS.view==="stacks"}">Ready-made stacks${st.length?` <span class="ct">${st.length}</span>`:""}</button></div>
     ${BS.view!=="stacks"?"":tier!=="pro"?gate('<div style="height:160px"></div>',"pro","Ready-made stacks are Pro","Short-price stacks picked by our model, at the book you choose."):st.length?`<div><h3 style="margin:0 0 4px;font:700 18px var(--disp)">Short-price stacks</h3><p class="muted" style="margin:0 0 8px;font-size:13px">Built from milestones priced −150 to −1000 at ${esc(BS.book)}, one per game, paying +100 or more. Picked by our model.</p>
       <div class="stacks">${st.map((s,i)=>`<div class="stack"><b>${s.n} legs · pays ${price(amOf(s.d))}</b><ol>${s.ch.map(x=>`<li>${esc(x.l.player)} ${x.r.at}+ ${esc(x.l.stat.toLowerCase())} (${price(x.px)})</li>`).join("")}</ol><button data-stack="${i}">Add to cart</button></div>`).join("")}</div></div>`:'<div class="empty">No ready-made stacks at this book right now.</div>'}
     <div style="display:${BS.view==="stacks"?"none":"grid"};gap:14px">${LAD.free?freeBanner():""}<p class="muted bhint" style="margin:0;font-size:12px">Top right of each card: how many of his games this season he reached that number.</p>
-    ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.filter(r=>r.books[BS.book]!=null).map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}</div>
+    ${list.slice(0,150).map(l=>`<div class="lad"><div class="lad-h"><b>${esc(l.player)} · ${esc(l.stat)}</b><span>${esc(l.pos||"")} ${esc(l.team||"")} · ${esc(l.game)} · <b class="lad-t">${esc(when(l.kickoff))} ET</b> · our projection ${l.proj}</span></div><div class="mrungs">${l.rungs.filter(r=>r.books[BS.book]!=null).map(r=>rungChip(l,r)).join("")}</div></div>`).join("")||'<div class="empty">No milestones match.</div>'}</div>
   </div><aside class="cart${BS.sheet?" open":""}" id="cart" aria-label="Your stack"><div class="cart-h"><h3>Your stack (${BS.cart.length})</h3><button class="cart-x" id="cart-x" aria-label="Close">×</button></div><div id="cart-body">${cartSummary()}</div></aside></div><div class="cart-scrim" id="cart-scrim"${BS.sheet?"":" hidden"}></div>${stackBar()}`;
   bindPreview();
   const re=()=>{saveCart();fillBuilder()};
