@@ -19,6 +19,7 @@
   --gA:#17784A; --gA-bg:#DCF0E3; --gB:#285DA6; --gB-bg:#E0E9F6; --gC:#8F6310; --gC-bg:#F5EAD2; --gD:#5F6B7D; --gD-bg:#E6EAF0;
   --good:#17784A; --good-bg:#DCF0E3; --bad:#B4342A; --bad-bg:#F8E1DE; --warn-bg:#FFF4DE; --warn-ink:#72500A;
   --shadow:0 1px 2px rgba(15,26,43,.06),0 4px 14px rgba(15,26,43,.05);
+  --glow:none; --row-hover:var(--surface-2);
   --disp:"Saira Condensed","Arial Narrow",system-ui,sans-serif;
   --body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -26,27 +27,32 @@
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
     color-scheme:dark;
-    --ground:#0A1220; --surface:#111B2B; --surface-2:#152236; --ink:#E4EAF4; --ink-2:#BAC7DA; --muted:#8F9FB6;
-    --line:#22324A; --line-2:#2E4260;
-    --turf:#6FA8F0; --turf-ink:#06101F; --turf-soft:#172A44;
+    --ground:#081120; --surface:#101C2E; --surface-2:#16243A; --ink:#E6ECF5; --ink-2:#BCC8DA; --muted:#8E9EB5;
+    --line:#22344D; --line-2:#2F4563;
+    --turf:#6FA8F0; --turf-ink:#06101F; --turf-soft:#172C48;
     --pylon:#FF8A3D; --pylon-soft:#3A2415;
     --gA:#6CD6A1; --gA-bg:#123626; --gB:#86B6F2; --gB-bg:#172F4F; --gC:#E9B85E; --gC-bg:#3A2C12; --gD:#A9B5C6; --gD-bg:#1E2837;
     --good:#6CD6A1; --good-bg:#123626; --bad:#FF8B80; --bad-bg:#3A1A17; --warn-bg:#33290F; --warn-ink:#F0CF80;
-    --shadow:0 1px 2px rgba(0,0,0,.3);
+    --shadow:inset 0 1px 0 rgba(255,255,255,.045),0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32);
+    --glow:radial-gradient(1100px 520px at 50% -160px,rgba(98,150,230,.16),rgba(98,150,230,0) 70%),radial-gradient(900px 700px at 100% 0%,rgba(255,138,61,.05),rgba(255,138,61,0) 60%);
+    --row-hover:rgba(111,168,240,.07);
   }
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --ground:#0A1220; --surface:#111B2B; --surface-2:#152236; --ink:#E4EAF4; --ink-2:#BAC7DA; --muted:#8F9FB6;
-  --line:#22324A; --line-2:#2E4260;
-  --turf:#6FA8F0; --turf-ink:#06101F; --turf-soft:#172A44;
+  --ground:#081120; --surface:#101C2E; --surface-2:#16243A; --ink:#E6ECF5; --ink-2:#BCC8DA; --muted:#8E9EB5;
+  --line:#22344D; --line-2:#2F4563;
+  --turf:#6FA8F0; --turf-ink:#06101F; --turf-soft:#172C48;
   --pylon:#FF8A3D; --pylon-soft:#3A2415;
   --gA:#6CD6A1; --gA-bg:#123626; --gB:#86B6F2; --gB-bg:#172F4F; --gC:#E9B85E; --gC-bg:#3A2C12; --gD:#A9B5C6; --gD-bg:#1E2837;
   --good:#6CD6A1; --good-bg:#123626; --bad:#FF8B80; --bad-bg:#3A1A17; --warn-bg:#33290F; --warn-ink:#F0CF80;
-  --shadow:0 1px 2px rgba(0,0,0,.3);
+  --shadow:inset 0 1px 0 rgba(255,255,255,.045),0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32);
+  --glow:radial-gradient(1100px 520px at 50% -160px,rgba(98,150,230,.16),rgba(98,150,230,0) 70%),radial-gradient(900px 700px at 100% 0%,rgba(255,138,61,.05),rgba(255,138,61,0) 60%);
+  --row-hover:rgba(111,168,240,.07);
 }
 *{box-sizing:border-box}
 html,body{background:var(--ground);margin:0}
+body{background-image:var(--glow);background-repeat:no-repeat;background-attachment:fixed}
 body{color:var(--ink);font:400 15px/1.45 var(--body);padding:0 16px 96px;-webkit-font-smoothing:antialiased}
 .wrap{max-width:1240px;margin:0 auto}
 h1,h2,h3,h4{font-family:var(--disp);font-weight:700;letter-spacing:.01em;margin:0}
@@ -62,6 +68,8 @@ small{font-size:12px}
 .mark{width:34px;height:34px;border-radius:8px;background:var(--turf);display:grid;place-items:center;flex:none}
 .brand b{font:700 23px/1 var(--disp);letter-spacing:.04em;text-transform:uppercase}
 .top-r{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--muted)}
+.themebtn{display:inline-grid;place-items:center;width:32px;height:32px;border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--ink-2);cursor:pointer;padding:0;flex:none}
+.themebtn:hover{color:var(--ink);border-color:var(--line-2)}.themebtn svg{display:block}
 .linkbtn{background:none;border:0;padding:0;color:var(--turf);font-weight:600;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:14px}
 .tabs button{background:none;border:0;border-bottom:3px solid transparent;padding:10px 14px 9px;font:700 19px var(--disp);text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer}
@@ -124,7 +132,7 @@ small{font-size:12px}
 .th .r,.tr .r{text-align:right;justify-self:end}
 .tr{width:100%;background:none;border:0;border-top:1px solid var(--line);text-align:left;cursor:pointer;font-size:14px}
 .tr:first-of-type{border-top:0}
-.tr:hover{background:var(--surface-2)}
+.tr:hover{background:var(--row-hover)}
 .tr b{font-weight:700}
 .cell{min-width:0;display:grid;gap:1px}
 .cell>span,.cell>b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -318,12 +326,13 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .card select.cp-book{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);width:100%}
 .cp-note .lnk{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
 </style>
+<script>try{var cpT=localStorage.getItem("cp_theme");if(cpT==="light"||cpT==="dark")document.documentElement.setAttribute("data-theme",cpT)}catch(e){}</script>
 </head>
 <body>
 <div class="wrap">
   <header class="top">
     <div class="brand"><span class="mark" aria-hidden="true"><img src="data/logo_white.png" alt="" width="24" height="28" style="width:24px;height:auto"></span><b>Confident Picks</b></div>
-    <div class="top-r"><span class="upd" id="updated"></span><button class="linkbtn" id="go-about">How it works</button><span class="acct" id="acct"></span></div>
+    <div class="top-r"><span class="upd" id="updated"></span><button class="themebtn" id="theme-btn" type="button"></button><button class="linkbtn" id="go-about">How it works</button><span class="acct" id="acct"></span></div>
   </header>
   <nav class="tabs" id="tabs" role="tablist" aria-label="Sections"></nav>
   <main id="main"></main>
@@ -406,7 +415,17 @@ const hrText=a=>a&&a[1]?`${a[0]}/${a[1]} (${Math.round(a[0]/a[1]*100)}%)`:"–";
 const started=p=>{const t=Date.parse(p.kickoff_utc);return !isNaN(t)&&t<=Date.now()};
 
 /* ---------- header, nav ---------- */
+/* Light / Dark / Auto (owner 2026-10-04): Auto follows the device, which is why a phone in dark mode looked different */
+const THEME_ICON={auto:'<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></svg>',
+  light:'<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
+  dark:'<svg viewBox="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="currentColor"/></svg>'};
+const THEME_NAME={auto:"Auto (matches your device)",light:"Light",dark:"Dark"};
+function themeNow(){try{const t=localStorage.getItem("cp_theme");return t==="light"||t==="dark"?t:"auto"}catch(e){return "auto"}}
+function themeButton(){const b=$("#theme-btn");if(!b)return;const t=themeNow();b.innerHTML=THEME_ICON[t];b.title="Theme: "+THEME_NAME[t]+". Click to change.";b.setAttribute("aria-label","Theme: "+THEME_NAME[t]);
+  b.onclick=()=>{const n={auto:"light",light:"dark",dark:"auto"}[themeNow()];try{n==="auto"?localStorage.removeItem("cp_theme"):localStorage.setItem("cp_theme",n)}catch(e){}
+    if(n==="auto")document.documentElement.removeAttribute("data-theme");else document.documentElement.setAttribute("data-theme",n);themeButton();toast("Theme: "+THEME_NAME[n])}}
 function header(){
+  themeButton();
   const oc=D.meta.odds_captured_at||{},od=Object.values(oc).filter(Boolean).sort().pop();
   $("#updated").innerHTML=`Picks updated <b>${esc(stamp(D.meta.generated_at))}</b>${od?` · prices from <b>${esc(stamp(od))}</b>`:""}`;
   $("#go-about").onclick=()=>setTab("about");
