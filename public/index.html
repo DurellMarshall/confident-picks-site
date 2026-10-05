@@ -305,8 +305,16 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .cp-note button{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
 .cp-check{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.4}.cp-check input{margin-top:3px;width:18px;height:18px;flex:0 0 auto}
 .plan small.save{display:block;font-size:12px;font-weight:700;color:var(--turf)}
-.btn.signout{width:100%;border:1.5px solid var(--bad);color:var(--bad);background:transparent;font-weight:700}
-.btn.signout:hover{background:var(--bad);color:#fff}
+.acct-h+.cards .card{align-content:start}
+.acct-h{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:720px;margin-bottom:10px}.acct-h .h2{margin:0}
+.btn.signout{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-weight:600}
+.btn.signout:hover{border-color:var(--bad);color:var(--bad)}
+.bookchips{display:flex;flex-wrap:wrap;gap:6px}
+.bchip{position:relative}.bchip input{position:absolute;opacity:0;width:1px;height:1px}
+.bchip span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--surface-2);color:var(--ink-2)}
+.bchip input:checked+span{background:var(--turf);border-color:var(--turf);color:var(--turf-ink)}
+.bchip input:checked+span::before{content:"✓ "}
+.bchip input:focus-visible+span{outline:2px solid var(--turf);outline-offset:2px}
 .card select.cp-book{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);width:100%}
 .cp-note .lnk{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
 </style>
@@ -1124,7 +1132,7 @@ async function cpBoot(){
     CK=window.Clerk;await CK.load({ui:{ClerkUI:window.__internal_ClerkUICtor}});
     const uid=(CK.user&&CK.user.id)||null;
     CK.addListener(e=>{const u=(e&&e.user&&e.user.id)||null;if(u!==uid)location.reload()});   // signed in or out: start fresh
-    cpApplyBook(cpMyBook());
+    cpApplyBooks(cpMyBooks());
     if(!uid)return;
     const back=new URLSearchParams(location.search).get("checkout")==="done";
     const r=await cpApi("/api/me"+(back?"?fresh=1":""));
@@ -1214,17 +1222,16 @@ function vAccount(){
   if(tier==="visitor"||!ME)return gate('<div style="height:220px"></div>',"free","Sign in to see your account","Your plan, billing and devices live here.");
   const pro=ME.pro,plan=ME.plan==="year"?"Pro yearly":ME.plan==="month"?"Pro monthly":"Pro";
   const day=ME.renews?new Date(ME.renews*1000).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"";
-  const mail=cpMail(),mine=cpMyBook();
-  return `<h2 class="h2">My account</h2><div class="cards" style="max-width:720px">
+  const mail=cpMail(),mine=cpMyBooks();
+  return `<div class="acct-h"><h2 class="h2">My account</h2><button class="btn sm signout" data-act="signout">Sign out</button></div><div class="cards" style="max-width:720px">
     <section class="card"><b>Signed in as</b><span>${esc(mail)}</span></section>
     <section class="card"><b>Plan</b><span>${pro?`${plan}${day?` · ${ME.cancelAtPeriodEnd?"ends":"renews"} ${esc(day)}`:""}${ME.status==="past_due"?" · last payment failed":""}`:"Free"}</span>
       <div class="btns">${pro?'<button class="btn" data-act="portal">Manage billing</button>':`<button class="btn hot" data-go="plans">Upgrade to Pro</button>${ME.customer?'<button class="btn" data-act="portal">Billing history</button>':""}`}</div>
       ${pro?'<small class="muted">Switch plans, update your card, cancel or get receipts on Stripe\'s secure billing page.</small>':""}</section>
     ${pro?`<section class="card"><b>Refer a friend</b><span id="cp-ref">Loading your link…</span><small class="muted">Your friend gets 10% off their first month of Pro. You get $5 off your next bill once they pay. Credits are account credit only (<a href="#terms">Terms</a>).</small></section>`:""}
-    <section class="card"><b>Devices</b><span>${ME.devices?`Signed in on ${ME.devices} of 3 devices.`:"Up to 3 devices."} Signing in on another device signs out the one used longest ago.</span></section>
-    <section class="card"><b>My sportsbook</b><select class="cp-book" id="cp-book" aria-label="My sportsbook"><option value="">Best price across books</option>${CP_BOOKS.map(b=>`<option${b===mine?" selected":""}>${esc(b)}</option>`).join("")}</select>
-      <small class="muted">Prices and the Builder open at this book. DraftKings and FanDuel show their own price in the Price column; for other books it shows the best price, and the Builder uses your book.</small></section>
-    <section class="card"><button class="btn signout" data-act="signout">Sign out</button></section></div>`;
+    <section class="card"><b>My sportsbooks</b><div class="bookchips" id="cp-books" role="group" aria-label="My sportsbooks">${CP_BOOKS.map(b=>`<label class="bchip"><input type="checkbox" value="${esc(b)}"${mine.includes(b)?" checked":""}><span>${esc(b)}</span></label>`).join("")}</div>
+      <small class="muted">Pick every book you use. The Price column shows the best price among your books where we have one (otherwise the best price anywhere, with its book), and the Builder lists your books first.</small></section>
+    <section class="card"><b>Devices</b><span>${ME.devices?`Signed in on ${ME.devices} of 3 devices.`:"Up to 3 devices."} Signing in on another device signs out the one used longest ago.</span></section></div>`;
 }
 function openModal(kind,plan){
   if(kind==="signin")return cpSignIn();
@@ -1244,13 +1251,42 @@ function openModal(kind,plan){
 }
 const CP_BOOKS=["DraftKings","FanDuel","BetMGM","Caesars","ESPN BET","BetRivers","Fanatics","Hard Rock"];
 const cpMail=()=>(ME&&ME.email)||(CK&&CK.user&&CK.user.primaryEmailAddress&&CK.user.primaryEmailAddress.emailAddress)||"";
-function cpMyBook(){let b="";try{b=(CK&&CK.user&&CK.user.unsafeMetadata&&CK.user.unsafeMetadata.book)||localStorage.getItem("cp_mybook")||""}catch(e){}return CP_BOOKS.includes(b)?b:""}
-function cpApplyBook(b){if(!b)return;S.book=b==="DraftKings"?"dk":b==="FanDuel"?"fd":"best";BS.book=b;try{saveCart()}catch(e){}save()}
-async function cpSetBook(b){
-  try{localStorage.setItem("cp_mybook",b)}catch(e){}
-  if(b)cpApplyBook(b);else{S.book="best";save()}
-  try{if(CK&&CK.user)await CK.user.update({unsafeMetadata:Object.assign({},CK.user.unsafeMetadata||{},{book:b})})}catch(e){}
-  toast(b?`Prices and the Builder now open at ${b}.`:"Showing the best price across books.");
+/* My sportsbooks (owner 2026-10-04: pick several): saved on the account (Clerk profile) and on this browser */
+function cpMyBooks(){
+  let v=null;try{const m=CK&&CK.user&&CK.user.unsafeMetadata;v=m&&(Array.isArray(m.books)?m.books:m.book?[m.book]:null)}catch(e){}
+  if(!v)try{v=JSON.parse(localStorage.getItem("cp_mybooks")||"null")||(localStorage.getItem("cp_mybook")?[localStorage.getItem("cp_mybook")]:[])}catch(e){v=[]}
+  return CP_BOOKS.filter(b=>(v||[]).includes(b));
+}
+function cpApplyBooks(list){
+  const i=BOOKS.findIndex(b=>b[0]==="mine");
+  if(list.length){if(i<0)BOOKS.splice(1,0,["mine","My books"]);S.book="mine";if(!list.includes(BS.book)){BS.book=list[0];try{saveCart()}catch(e){}}}
+  else{if(i>=0)BOOKS.splice(i,1);if(S.book==="mine")S.book="best"}
+  save();
+}
+async function cpSetBooks(list){
+  try{localStorage.setItem("cp_mybooks",JSON.stringify(list))}catch(e){}
+  cpApplyBooks(list);
+  clearTimeout(cpSetBooks.t);cpSetBooks.t=setTimeout(async()=>{
+    try{if(CK&&CK.user)await CK.user.update({unsafeMetadata:Object.assign({},CK.user.unsafeMetadata||{},{books:list,book:undefined})})}catch(e){}
+    toast(list.length?`Saved: ${list.join(", ")}.`:"Showing the best price across all books.")},700);
+}
+function quote(p){   // "My books": the best price among the member's books that we have a quote for
+  if(S.book==="dk")return p.dk_price!=null?{px:p.dk_price,bk:"DraftKings"}:null;
+  if(S.book==="fd")return p.fd_price!=null?{px:p.fd_price,bk:"FanDuel"}:null;
+  const xs=[];
+  if(S.book==="mine"){const my=cpMyBooks();
+    if(p.best_price!=null&&my.includes(p.best_book))xs.push({px:p.best_price,bk:p.best_book});
+    if(my.includes("DraftKings")&&p.dk_price!=null)xs.push({px:p.dk_price,bk:"DraftKings"});
+    if(my.includes("FanDuel")&&p.fd_price!=null)xs.push({px:p.fd_price,bk:"FanDuel"});
+    if(xs.length)return xs.reduce((a,b)=>dec(b.px)>dec(a.px)?b:a);
+  }
+  if(p.best_price!=null)xs.push({px:p.best_price,bk:p.best_book||""});
+  if(p.price!=null&&!MULTI.has(p.market_label))xs.push({px:p.price,bk:p.best_price==null?(p.best_book||""):""});
+  return xs.length?xs.reduce((a,b)=>dec(b.px)>dec(a.px)?b:a):null;
+}
+function booksIn(){   // the Builder's book list, the member's books first
+  const s=new Set(),my=cpMyBooks();LAD.ladders.forEach(l=>l.rungs.forEach(r=>Object.keys(r.books).forEach(b=>s.add(b))));
+  return [...s].sort((a,b)=>(my.includes(b)-my.includes(a))||(a==="DraftKings"?-1:b==="DraftKings"?1:a.localeCompare(b)));
 }
 function freeBanner(){
   const f=(LAD&&LAD.free)||{},st=f.stats||{},n=Object.values(f.locked||{}).reduce((a,b)=>a+b,0);
@@ -1288,7 +1324,7 @@ async function cpFillRef(){
 }
 function bindPreview(){
   cpFillRef();cpBindContact();
-  const bk=document.getElementById("cp-book");if(bk)bk.onchange=e=>cpSetBook(e.target.value);
+  const bk=document.getElementById("cp-books");if(bk)bk.onchange=()=>cpSetBooks([...bk.querySelectorAll("input:checked")].map(x=>x.value));
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setTab(b.dataset.go));
   document.querySelectorAll("[data-modal]").forEach(b=>b.onclick=()=>openModal(b.dataset.modal,b.dataset.plan));
   document.querySelectorAll("[data-act]").forEach(b=>b.onclick=()=>cpAct(b.dataset.act,b));
