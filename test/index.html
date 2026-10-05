@@ -163,6 +163,10 @@ small{font-size:12px}
   .c-meta .hr{min-width:0;font-size:12px}
 }
 @media (min-width:861px){.c-meta{display:none!important}}
+/* phones (owner 2026-10-04): Last 5 / Last 10 / Season in three fixed spots on every row */
+.c-meta .c-form{flex:1 1 100%;display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr) minmax(0,1.25fr);gap:4px 6px;margin-top:2px}
+.c-meta .c-form>span{display:flex;align-items:center;gap:5px;min-width:0;white-space:nowrap}
+.c-meta .c-form i{font-style:normal;font-size:10.5px;font-weight:700;letter-spacing:.02em;color:var(--muted);min-width:20px}
 
 /* side panel */
 .scrim{position:fixed;inset:0;background:rgba(6,12,22,.45);z-index:50}
@@ -490,7 +494,7 @@ function propRow(p,i){
     <span class="c-fm">${f?hrChip(f.l10):'<span class="hr none">–</span>'}</span>
     <span class="c-fm">${f?hrChip(f.ssn):'<span class="hr none">–</span>'}</span>
     <span class="cell c-gm"><span>${esc(p.game)}</span><small>${esc(when(p.kickoff_utc))}</small></span>
-    <span class="c-meta"><span>${esc(p.game)} · ${esc(when(p.kickoff_utc))}</span>${p.book_prob!=null?`<span>Book ${pct(p.book_prob)}</span>`:""}${f?`<span>L5 ${hrChip(f.l5)}</span><span>L10 ${hrChip(f.l10)}</span><span>Season ${hrChip(f.ssn)}</span>`:""}</span>
+    <span class="c-meta"><span>${esc(p.game)} · ${esc(when(p.kickoff_utc))}</span>${p.book_prob!=null?`<span>Book ${pct(p.book_prob)}</span>`:""}${f?`<span class="c-form"><span><i>L5</i>${hrChip(f.l5)}</span><span><i>L10</i>${hrChip(f.l10)}</span><span><i>Season</i>${hrChip(f.ssn)}</span></span>`:""}</span>
   </button>`;
 }
 function fillProps(){
