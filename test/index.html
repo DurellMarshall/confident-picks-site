@@ -396,6 +396,11 @@ function formOf(p){
 }
 const fr=a=>a&&a[1]?a[0]/a[1]:-1;
 const hrChip=a=>{if(!a||!a[1])return '<span class="hr none">–</span>';const r=a[0]/a[1];return `<span class="hr ${r>=.7?"g":r>=.5?"y":"r"}">${a[0]}/${a[1]} <b>${Math.round(r*100)}%</b></span>`};
+/* Plus money (owner 2026-10-06): our picks priced +100 or better where he cleared the line in 70%+ of this season's games */
+const PLUS_MIN=3;   // games this season before the season rate counts
+const isPlus=p=>{if(segOf(p)!=="props"&&segOf(p)!=="tds")return false;const q=quote(p);if(!q||q.px<100)return false;const f=formOf(p);return !!(f&&f.ssn[1]>=PLUS_MIN&&f.ssn[0]/f.ssn[1]>=.7)};
+const inSeg=p=>S.seg==="plus"?isPlus(p):segOf(p)===S.seg;
+const PLUS_TIP="Our picks priced +100 or better where the player cleared this line in 70% or more of this season’s games (at least 3)";
 const hrText=a=>a&&a[1]?`${a[0]}/${a[1]} (${Math.round(a[0]/a[1]*100)}%)`:"–";
 const started=p=>{const t=Date.parse(p.kickoff_utc);return !isNaN(t)&&t<=Date.now()};
 
@@ -446,19 +451,19 @@ function dayOpts(list){const ds=[...new Set(list.map(p=>etDay(p.kickoff_utc)))].
   return `<option value="all">All upcoming</option>${ds.map(d=>`<option value="${d}" ${S.day===d?"selected":""}>${d===today?"Today":dayLabel(d)}</option>`).join("")}`}
 function vPicks(){
   const P=pool().filter(p=>!S.sport||p.sport===S.sport);
-  const cnt=k=>k==="games"?new Set(P.filter(isGame).map(p=>p.game)).size:P.filter(p=>segOf(p)===k).length;
-  const segs=[["props","Props"],["games","Games"],["tds","Touchdowns"],["more","Tickets & more"]].filter(([k])=>k==="props"||k==="games"||cnt(k));
+  const cnt=k=>k==="games"?new Set(P.filter(isGame).map(p=>p.game)).size:k==="plus"?P.filter(isPlus).length:P.filter(p=>segOf(p)===k).length;
+  const segs=[["props","Props"],["plus","Plus money"],["games","Games"],["tds","Touchdowns"],["more","Tickets & more"]].filter(([k])=>k==="props"||k==="plus"||k==="games"||cnt(k));
   if(!segs.some(s=>s[0]===S.seg))S.seg="props";
-  const sp=SPORTS.filter(([k])=>!k||pool().some(p=>p.sport===k&&segOf(p)===S.seg));
+  const sp=SPORTS.filter(([k])=>!k||pool().some(p=>p.sport===k&&inSeg(p)));
   if(S.sport&&!sp.some(s=>s[0]===S.sport))S.sport="";
-  return lockStrip()+`<div class="bar1"><div class="seg" role="group" aria-label="Pick type">${segs.map(([k,l])=>`<button data-seg="${k}" aria-pressed="${S.seg===k}">${l}<span class="ct">${cnt(k)}</span></button>`).join("")}</div>
+  return lockStrip()+`<div class="bar1"><div class="seg" role="group" aria-label="Pick type">${segs.map(([k,l])=>`<button data-seg="${k}" aria-pressed="${S.seg===k}"${k==="plus"?` title="${PLUS_TIP}"`:""}>${l}<span class="ct">${cnt(k)}</span></button>`).join("")}</div>
     <div class="pills" role="group" aria-label="Sport">${sp.map(([k,l])=>`<button data-sport="${k}" aria-pressed="${S.sport===k}">${l}</button>`).join("")}</div></div>
     <div id="seg-body"></div>`;
 }
 function inDay(p){return S.day==="all"||etDay(p.kickoff_utc)===S.day}
 function propList(){
   const q=S.q.trim().toLowerCase();
-  const base=pool().filter(p=>segOf(p)===(S.seg==="tds"?"tds":"props")&&(!S.sport||p.sport===S.sport));
+  const base=pool().filter(p=>(S.seg==="plus"?isPlus(p):segOf(p)===(S.seg==="tds"?"tds":"props"))&&(!S.sport||p.sport===S.sport));
   let r=base.filter(p=>inDay(p)&&(!S.market||p.market_label===S.market)&&(!S.game||p.game===S.game)&&(!S.graded||p.grade==="A"||p.grade==="B")
     &&(!q||[p.player,p.team,p.game].join(" ").toLowerCase().includes(q)));
   const key={rank:rankScore,chance:p=>p.win_prob,edge:p=>edgeOf(p)??-9,price:p=>{const x=quote(p);return x?dec(x.px):0},l5:p=>fr((formOf(p)||{}).l5),l10:p=>fr((formOf(p)||{}).l10),ssn:p=>fr((formOf(p)||{}).ssn),time:p=>Date.parse(p.kickoff_utc)}[S.sort]||(p=>p.win_prob);
@@ -500,12 +505,12 @@ function propRow(p,i){
 function fillProps(){
   const {base,r}=propList();
   const B=$("#seg-body");
-  B.innerHTML=toolbar(base,S.seg==="props")+(r.length?`<div class="tbl props" role="table" aria-label="Player props">
+  B.innerHTML=toolbar(base,S.seg!=="tds")+(S.seg==="plus"?`<p class="bhint">${PLUS_TIP}. Prices follow the Price at setting.</p>`:"")+(r.length?`<div class="tbl props" role="table" aria-label="Player props">
     <div class="th" role="row">${sortBtn("rank","#")}<span>Player</span><span>Pick</span>${sortBtn("chance","Our chance")}<span class="r">Book</span>${sortBtn("edge","Edge","r h-ed")}${sortBtn("price","Price","r")}${sortBtn("l5","Last 5")}${sortBtn("l10","Last 10")}${sortBtn("ssn","Season")}<span class="h-gm">${sortBtn("time","Game time (ET)")}</span></div>
     ${shownRows(r).map(propRow).join("")}${lockedRows(r,propRow)}
     ${r.length>S.shown&&S.shown<LIMIT[tier].props?`<button class="more" id="more">Show ${Math.min(50,r.length-S.shown)} more of ${r.length-S.shown}</button>`:""}</div>
     <p class="hint">Our chance comes from our model; the letter is its grade (A and B held up in testing; no letter = shown, not graded). Book = the chance the book's price implies. Edge = ours minus the book's, in points. Last 5 and Last 10 count back into last season; Season is this season only. They show how often he cleared this line: context only, since in our 2023-25 testing a hot streak did not carry into the next game. Ranked: A and B picks first (the grades that held up in testing), then the rest, each by our chance.</p>`
-    :`<div class="empty">No picks match. Clear the search or a filter.</div>`);
+    :`<div class="empty">${S.seg==="plus"&&!S.q.trim()&&!S.market&&!S.game&&S.day==="all"&&!S.graded?"No plus-money picks right now. They show up when one of our picks is priced +100 or better and the player has cleared the line in most of his games this season.":"No picks match. Clear the search or a filter."}</div>`);
   $("#f-count").textContent=`${r.length} pick${r.length===1?"":"s"}`;
   bindTools(fillProps);
   const mb=$("#more");if(mb)mb.onclick=()=>{S.shown+=50;fillProps()};
@@ -520,7 +525,7 @@ function bindTools(fill){
   on("#f-day","onchange",e=>{S.day=e.target.value;upd()});
   on("#f-market","onchange",e=>{S.market=e.target.value;upd()});
   on("#f-game","onchange",e=>{S.game=e.target.value;upd()});
-  on("#f-book","onchange",e=>{S.book=e.target.value;upd()});
+  on("#f-book","onchange",e=>{S.book=e.target.value;if(S.seg==="plus"){S.shown=50;save();render()}else upd()});
   on("#f-graded","onclick",()=>{S.graded=!S.graded;upd()});
   on("#f-sort","onchange",e=>{S.sort=e.target.value;S.asc=S.sort==="time";upd()});
   on("#f-share","onclick",openShare);
@@ -650,7 +655,7 @@ function openGame(game){
 
 /* ---------- share or PDF (owner 2026-10-02: "pdf export or some way people can share, sorted by rank") ---------- */
 const TESTING="Our models are new and still being tested: every pick is graded live since Sep 26, 2026, and the record decides what stays.";
-const SEG_NAME={props:"player props",tds:"anytime touchdowns",games:"games"};
+const SEG_NAME={props:"player props",plus:"plus-money picks",tds:"anytime touchdowns",games:"games"};
 function rankedNow(){   // what the table shows (same filters), ranked by our chance
   if(S.seg==="games"){
     const q=S.q.trim().toLowerCase();
@@ -1116,7 +1121,7 @@ function render(){
     document.querySelectorAll("[data-seg]").forEach(b=>b.onclick=()=>{S.seg=b.dataset.seg;S.market="";S.game="";S.sort="rank";S.asc=false;S.shown=50;save();render()});
     document.querySelectorAll("[data-sport]").forEach(b=>b.onclick=()=>{S.sport=b.dataset.sport;S.market="";S.game="";S.shown=50;save();render()});
     const sl=$("#share-lock");if(sl)sl.onclick=()=>{const L=D.meta.lock||D.picks.find(p=>p.lock);if(L)copyText(`LOCK OF THE DAY\n${L.player}: ${pickText(L)} · our chance ${pct(L.win_prob)} · ${L.game}, ${when(L.kickoff_utc)} ET\n(+100 or better when picked; prices move.)\n\n${siteLink()}\n21+. Not a guarantee.`,null)};
-    ({props:fillProps,tds:fillProps,games:fillGames,more:fillMore}[S.seg]||fillProps)();
+    ({props:fillProps,plus:fillProps,tds:fillProps,games:fillGames,more:fillMore}[S.seg]||fillProps)();
   }
   if(S.tab==="results")document.querySelectorAll("[data-hs]").forEach(b=>b.onclick=()=>{S.hs=b.dataset.hs;save();render()});
   if(["about","terms","privacy","refunds","guide","contact"].includes(S.tab)){const b=$("#back-picks");if(b)b.onclick=()=>setTab("picks")}
