@@ -1209,7 +1209,11 @@ async function cpCheckout(plan,btn){
   if(btn){btn.disabled=true;btn.textContent="Opening secure checkout…"}
   const r=await cpApi("/api/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({plan,promo:CP_PROMO||undefined,ref:CP_REF.ok?CP_REF.code:undefined})});
   const j=await r.json().catch(()=>({}));
-  if(r.ok&&j.url){location.href=j.url;return}
+  if(r.ok&&j.url){
+    const why={promo_other_plan:`Code ${CP_PROMO} isn't for the ${plan==="year"?"yearly":"monthly"} plan, so it wasn't applied. You can enter another code on the checkout page.`,
+               referral_monthly_only:"Your invite's 10% off is for the monthly plan. You can enter a code on the checkout page."}[j.note];
+    if(why){toast(why);setTimeout(()=>{location.href=j.url},2400);return}
+    location.href=j.url;return}
   if(btn){btn.disabled=false;btn.textContent="Continue to secure checkout"}
   toast(j.message||"Checkout is unavailable right now. Please try again.");
 }
