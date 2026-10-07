@@ -772,12 +772,12 @@ function gate(inner,need,title,why){
 }
 const shownRows=r=>r.slice(0,Math.min(S.shown,LIMIT[tier].props));
 function lockedRows(r,row){const lim=LIMIT[tier].props;if(r.length<=lim)return "";
-  return gate(r.slice(lim,lim+3).map(row).join(""),tier==="visitor"?"free":"pro",`${r.length-lim} more picks`,tier==="visitor"?"Create a free account for 5 props a day, or go Pro for every prop we make.":"Pro unlocks every prop we grade, all sports, plus tickets and the share sheet.")}
+  return gate(r.slice(lim,lim+3).map(row).join(""),tier==="visitor"?"free":"pro",`${r.length-lim} more picks`,tier==="visitor"?"Create a free account for up to 5 props a day, or go Pro for every prop we make.":"Pro unlocks every prop we grade, all sports, plus tickets and the share sheet.")}
 function vPlans(){
   const f=(ok,t)=>`<li class="${ok?"":"no"}">${t}</li>`;
   return `<h2 class="h2">Plans</h2><p class="lede">Every plan shows the same honest record. Pro unlocks every pick, the tickets and full sharing. Cancel any time. <span class="badge">Prices are placeholders</span></p>
   <div class="plans">
-    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Top 5 player props a day")}${f(1,"Full record and results")}${f(1,"The Builder")}${f(0,"Every player prop (700+ on NFL Sundays)")}${f(0,"Tickets")}${f(0,"Full PDF and share sheet")}</ul>
+    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Up to 5 player props a day")}${f(1,"Full record and results")}${f(1,"The Builder")}${f(0,"Every player prop (700+ on NFL Sundays)")}${f(0,"Tickets")}${f(0,"Full PDF and share sheet")}</ul>
       <button class="btn pri" data-modal="signup" ${tier!=="visitor"?"disabled":""}>${tier==="visitor"?"Create a free account":"Your plan"}</button></section>
     <section class="plan best"><span class="badge">Most popular</span><h3>Pro monthly</h3><div class="price">${PLAN_PRICES.month}<small> / month</small></div><ul>${f(1,"Everything in Free")}${f(1,"Every player prop, all sports, with Last 5 / Last 10 / Season")}${f(1,"2- and 3-leg tickets")}${f(1,"Ranked PDFs and the share sheet")}${f(1,"Cancel any time")}</ul>
       <button class="btn hot" data-modal="checkout" data-plan="month" ${tier==="pro"?"disabled":""}>${tier==="pro"?"Your plan":"Start Pro"}</button></section>
@@ -799,7 +799,7 @@ function openModal(kind,plan){
   let body="";
   if(kind==="signin"||kind==="signup")body=`<label class="note" style="display:grid;gap:4px">Email<input type="email" placeholder="you@example.com" disabled style="font:inherit;padding:9px;border:1px solid var(--line);border-radius:8px"></label>
     <div class="btns"><button class="btn pri" disabled>Email me a sign-in code</button><button class="btn" disabled>Continue with Google</button></div>
-    <p class="note">${kind==="signup"?"Free: Lock of the Day, every game pick, the Builder and 5 props a day. You must be 21+.":"No password to remember: we email you a one-time code."}</p>
+    <p class="note">${kind==="signup"?"Free: Lock of the Day, every game pick, the Builder and up to 5 props a day. You must be 21+.":"No password to remember: we email you a one-time code."}</p>
     <div class="btns"><button class="btn" data-demo="free">Show me as signed in</button></div>${note}`;
   else{const season=plan==="season";body=`<dl class="kv"><dt>${season?"Pro season":"Pro monthly"}</dt><dd><b>${season?PLAN_PRICES.season:PLAN_PRICES.month+"/mo"}</b></dd><dt>${season?"One payment, through the Super Bowl":"Renews monthly"}</dt><dd>Cancel any time</dd></dl>
     <div class="btns"><button class="btn hot" disabled>Continue to secure checkout</button></div><p class="note">You'd pay on Stripe's checkout page (card, Apple Pay, Google Pay), then come back here as Pro. Card details never reach this site.</p>
@@ -918,7 +918,7 @@ refunds:{t:"Refund Policy",b:`
 guide:{t:"How to use Confident Picks",b:`
 <p>Everything on the site in one place. Short version: open <b>Picks</b>, start at the top of the list, and bet the same small amount on every pick.</p>
 <h3>Free and Pro</h3>
-<p><b>Visitors</b> see a few picks, the Lock of the Day and the full record. A <b>free account</b> adds the top 5 player props and touchdown picks, every game pick and the Builder for select stats. <b>Pro</b> unlocks every pick in every sport, tickets, ready-made stacks, full PDFs and member referral rewards.</p>
+<p><b>Visitors</b> see a few picks, the Lock of the Day and the full record. A <b>free account</b> adds up to 5 of our top player props and touchdown picks a day, every game pick and the Builder for select stats. <b>Pro</b> unlocks every pick in every sport, tickets, ready-made stacks, full PDFs and member referral rewards.</p>
 <h3>The Picks table</h3>
 <p><b>#</b> is the rank: A and B grades first, then the rest, each by our chance.<br>
 <b>Our chance</b> is how often our model expects the pick to win. The letter is its grade. A and B held up in testing on seasons the model never saw; C and D are shown with less confidence; no letter means shown, not graded.<br>
