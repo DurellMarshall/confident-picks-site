@@ -791,12 +791,12 @@ function gate(inner,need,title,why){
 }
 const shownRows=r=>r.slice(0,Math.min(S.shown,LIMIT[tier].props));
 function lockedRows(r,row){const lim=LIMIT[tier].props;if(r.length<=lim)return "";
-  return gate(r.slice(lim,lim+3).map(row).join(""),tier==="visitor"?"free":"pro",`${r.length-lim} more picks`,tier==="visitor"?"Create a free account for 5 props a day, or go Pro for every prop we make.":"Pro unlocks every prop we grade, all sports, plus tickets and the share sheet.")}
+  return gate(r.slice(lim,lim+3).map(row).join(""),tier==="visitor"?"free":"pro",`${r.length-lim} more picks`,tier==="visitor"?"Create a free account for up to 5 props a day, or go Pro for every prop we make.":"Pro unlocks every prop we grade, all sports, plus tickets and the share sheet.")}
 function vPlans(){
   const f=(ok,t)=>`<li class="${ok?"":"no"}">${t}</li>`;
   return `<h2 class="h2">Plans</h2><p class="lede">Every plan shows the same honest record. Pro unlocks every pick, the tickets and full sharing. Cancel any time. <span class="badge">Prices are placeholders</span></p>
   <div class="plans">
-    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Top 5 player props a day")}${f(1,"Full record and results")}${f(1,"The Builder")}${f(0,"Every player prop (700+ on NFL Sundays)")}${f(0,"Tickets")}${f(0,"Full PDF and share sheet")}</ul>
+    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Up to 5 player props a day")}${f(1,"Full record and results")}${f(1,"The Builder")}${f(0,"Every player prop (700+ on NFL Sundays)")}${f(0,"Tickets")}${f(0,"Full PDF and share sheet")}</ul>
       <button class="btn pri" data-modal="signup" ${tier!=="visitor"?"disabled":""}>${tier==="visitor"?"Create a free account":"Your plan"}</button></section>
     <section class="plan best"><span class="badge">Most popular</span><h3>Pro monthly</h3><div class="price">${PLAN_PRICES.month}<small> / month</small></div><ul>${f(1,"Everything in Free")}${f(1,"Every player prop, all sports, with Last 5 / Last 10 / Season")}${f(1,"2- and 3-leg tickets")}${f(1,"Ranked PDFs and the share sheet")}${f(1,"Cancel any time")}</ul>
       <button class="btn hot" data-modal="checkout" data-plan="month" ${tier==="pro"?"disabled":""}>${tier==="pro"?"Your plan":"Start Pro"}</button></section>
@@ -818,7 +818,7 @@ function openModal(kind,plan){
   let body="";
   if(kind==="signin"||kind==="signup")body=`<label class="note" style="display:grid;gap:4px">Email<input type="email" placeholder="you@example.com" disabled style="font:inherit;padding:9px;border:1px solid var(--line);border-radius:8px"></label>
     <div class="btns"><button class="btn pri" disabled>Email me a sign-in code</button><button class="btn" disabled>Continue with Google</button></div>
-    <p class="note">${kind==="signup"?"Free: Lock of the Day, every game pick, the Builder and 5 props a day. You must be 21+.":"No password to remember: we email you a one-time code."}</p>
+    <p class="note">${kind==="signup"?"Free: Lock of the Day, every game pick, the Builder and up to 5 props a day. You must be 21+.":"No password to remember: we email you a one-time code."}</p>
     <div class="btns"><button class="btn" data-demo="free">Show me as signed in</button></div>${note}`;
   else{const season=plan==="season";body=`<dl class="kv"><dt>${season?"Pro season":"Pro monthly"}</dt><dd><b>${season?PLAN_PRICES.season:PLAN_PRICES.month+"/mo"}</b></dd><dt>${season?"One payment, through the Super Bowl":"Renews monthly"}</dt><dd>Cancel any time</dd></dl>
     <div class="btns"><button class="btn hot" disabled>Continue to secure checkout</button></div><p class="note">You'd pay on Stripe's checkout page (card, Apple Pay, Google Pay), then come back here as Pro. Card details never reach this site.</p>
@@ -937,7 +937,7 @@ refunds:{t:"Refund Policy",b:`
 guide:{t:"How to use Confident Picks",b:`
 <p>Everything on the site in one place. Short version: open <b>Picks</b>, start at the top of the list, and bet the same small amount on every pick.</p>
 <h3>Free and Pro</h3>
-<p><b>Visitors</b> see a few picks, the Lock of the Day and the full record. A <b>free account</b> adds the top 5 player props and touchdown picks, every game pick and the Builder for select stats. <b>Pro</b> unlocks every pick in every sport, tickets, ready-made stacks, full PDFs and member referral rewards.</p>
+<p><b>Visitors</b> see a few picks, the Lock of the Day and the full record. A <b>free account</b> adds up to 5 of our top player props and touchdown picks a day, every game pick and the Builder for select stats. <b>Pro</b> unlocks every pick in every sport, tickets, ready-made stacks, full PDFs and member referral rewards.</p>
 <h3>The Picks table</h3>
 <p><b>#</b> is the rank: A and B grades first, then the rest, each by our chance.<br>
 <b>Our chance</b> is how often our model expects the pick to win. The letter is its grade. A and B held up in testing on seasons the model never saw; C and D are shown with less confidence; no letter means shown, not graded.<br>
@@ -1132,7 +1132,7 @@ Object.defineProperty(window,"CP_CART",{get:()=>BS.cart,configurable:true});
    Sign-in: Clerk (email code or Google, no passwords).  Payment: Stripe's own checkout and billing pages.
    The picks come from /api/data, which sends each person only their tier's copy (visitor, free or Pro), so nothing
    on this page can unlock a Pro pick.  These functions replace the preview versions above (same names). */
-let CK=null,ME=null,CPCFG=null,CP_NOTICE="",CP_PROMO="",CP_REF={code:"",ok:false};
+let CK=null,ME=null,CPCFG=null,CP_NOTICE="",CP_PROMO="",CP_REF={code:"",ok:false},CP_UID=null;
 (function(){   // share links: ?promo=CODE (a Stripe promo code) and ?ref=CODE (a member's referral), kept 30 days
   const q=new URLSearchParams(location.search),now=Date.now(),keep=30*864e5;
   const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify({v,at:now}))}catch(e){}};
@@ -1141,8 +1141,18 @@ let CK=null,ME=null,CPCFG=null,CP_NOTICE="",CP_PROMO="",CP_REF={code:"",ok:false
   if(/^[A-Za-z0-9_-]{2,40}$/.test(p))put("cp_promo",p.toUpperCase());
   if(/^[A-Z2-9]{6,12}$/.test(r))put("cp_ref",r);
   CP_PROMO=get("cp_promo");CP_REF.code=get("cp_ref");
-  if(q.has("promo")||q.has("ref")){q.delete("promo");q.delete("ref");try{history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash)}catch(e){}}
+  if(q.has("promo")||q.has("ref")||q.has("signedin")){q.delete("promo");q.delete("ref");q.delete("signedin");try{history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash)}catch(e){}}
 })();
+function cpClearOffer(){   // owner 2026-10-06: an invite or code belongs to one sign-up, not to whoever signs in next
+  try{localStorage.removeItem("cp_promo");localStorage.removeItem("cp_ref")}catch(e){}
+  CP_PROMO="";CP_REF={code:"",ok:false};
+}
+function cpBack(){   // after signing in or up, Clerk sends the person back here and the page reloads with their account
+  const q=new URLSearchParams(location.search);q.set("signedin","1");return location.pathname+"?"+q+location.hash;
+}
+function cpWatch(){   // and if Clerk does not navigate, notice the new account ourselves
+  clearInterval(cpWatch.t);cpWatch.t=setInterval(()=>{const u=(CK&&CK.user&&CK.user.id)||null;if(u!==CP_UID){clearInterval(cpWatch.t);location.reload()}},1000);
+}
 function cpOffer(short){
   if(CP_PROMO)return short?`Code <b>${esc(CP_PROMO)}</b> will be applied when you start Pro.`:`<p class="note rec" style="margin:0 0 10px">Your code <b>${esc(CP_PROMO)}</b> will be applied at checkout.</p>`;
   if(CP_REF.ok)return short?`A Confident Picks member invited you: <b>10% off</b> your first month of Pro.`:`<p class="note rec" style="margin:0 0 10px">Member invite: <b>10% off</b> your first month, applied at checkout.</p>`;
@@ -1160,8 +1170,8 @@ async function cpBoot(){
     await cpScript(`https://${fapi}/npm/@clerk/ui@1/dist/ui.browser.js`);
     await cpScript(`https://${fapi}/npm/@clerk/clerk-js@6/dist/clerk.browser.js`,{"data-clerk-publishable-key":pk});
     CK=window.Clerk;await CK.load({ui:{ClerkUI:window.__internal_ClerkUICtor}});
-    const uid=(CK.user&&CK.user.id)||null;
-    CK.addListener(e=>{const u=(e&&e.user&&e.user.id)||null;if(u!==uid)location.reload()});   // signed in or out: start fresh
+    const uid=(CK.user&&CK.user.id)||null;CP_UID=uid;
+    CK.addListener(e=>{const u=(e&&e.user&&e.user.id)||null;if(u!==uid){if(uid)cpClearOffer();location.reload()}});   // signed in or out: start fresh
     cpApplyBooks(cpMyBooks());
     if(!uid)return;
     const back=new URLSearchParams(location.search).get("checkout")==="done";
@@ -1191,8 +1201,8 @@ async function cpData(f,soft){
   catch(e){if(soft)return null;throw e}
 }
 const cpNoSignIn=()=>toast("Sign-in is not available right now. Please try again in a minute.");
-function cpSignIn(){CK?CK.openSignIn({}):cpNoSignIn()}
-function cpSignUp(){CK?CK.openSignUp({}):cpNoSignIn()}
+function cpSignIn(){if(!CK)return cpNoSignIn();const u=cpBack();CK.openSignIn({forceRedirectUrl:u,signUpForceRedirectUrl:u});cpWatch()}
+function cpSignUp(){if(!CK)return cpNoSignIn();const u=cpBack();CK.openSignUp({forceRedirectUrl:u,signInForceRedirectUrl:u});cpWatch()}
 async function cpCheckout(plan,btn){
   if(!CK)return cpNoSignIn();
   if(!CK.user){try{sessionStorage.setItem("cp_plan",plan)}catch(e){}cpSignUp();return}
@@ -1212,8 +1222,8 @@ async function cpPortal(btn){
 function cpAct(a,b){
   if(a==="profile")return CK&&CK.openUserProfile();
   if(a==="portal")return cpPortal(b);
-  if(a==="signout")return CK&&CK.signOut().then(()=>location.reload());
-  if(a==="signin-again")return CK&&CK.signOut().then(()=>CK.openSignIn({}));
+  if(a==="signout"){cpClearOffer();return CK&&CK.signOut().then(()=>location.reload())}
+  if(a==="signin-again"){cpClearOffer();return CK&&CK.signOut().then(()=>cpSignIn())}
 }
 function hidN(seg,sp){const h=(((D&&D.meta&&D.meta.tier)||{}).hidden||{})[seg];return h?(h[(sp===undefined?S.sport:sp)||"all"]||0):0}
 const cpFiltered=()=>!!(S.q.trim()||S.market||S.game||S.day!=="all"||S.graded);
@@ -1223,7 +1233,7 @@ function lockedRows(r,row){
   const n=over+extra,what=plus?"plus-money picks":seg==="tds"?"touchdown picks":"picks";
   return gate(over?r.slice(lim,lim+3).map(row).join(""):'<div style="height:180px"></div>',tier==="visitor"?"free":"pro",
     cpFiltered()||plus?`More ${what} with ${tier==="visitor"?"an account":"Pro"}`:`${n} more ${what}`,
-    tier==="visitor"?"Create a free account for 5 props a day, or go Pro for every prop we make.":"Pro unlocks every prop we grade, all sports, plus tickets and the share sheet.");
+    tier==="visitor"?(plus?"A free account shows up to 5 of our top props a day, with any plus-money picks among them. Pro shows every plus-money pick.":"Create a free account for up to 5 props a day, or go Pro for every prop we make."):plus?"Pro shows every plus-money pick in every sport, plus tickets and the share sheet.":"Pro unlocks every prop we grade, all sports, plus tickets and the share sheet.");
 }
 function pvBar(){
   let h="";
@@ -1240,7 +1250,7 @@ function vPlans(){   // owner 2026-10-04: every sport, not just NFL
   const proList=`${f(1,"Everything in Free")}${f(1,"Every player prop we post, every sport")}${f(1,"Tickets and ready-made stacks")}${f(1,"Full PDFs and the share sheet")}${f(1,"Member referral rewards")}${f(1,"New sports and features as we add them")}${f(1,"Cancel any time")}`;
   return `<h2 class="h2">Plans</h2><p class="lede">Every plan shows the same honest record. Pro unlocks every pick in every sport we cover. Cancel any time.</p>
   <div class="plans">
-    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Top 5 player props and touchdown picks every day")}${f(1,"Full record and results")}${f(1,"The Builder with real sportsbook prices for select stats")}${f(0,"Every player prop we post, every sport")}${f(0,"Tickets and ready-made stacks")}${f(0,"Full PDFs and the share sheet")}${f(0,"Member referral rewards")}</ul>
+    <section class="plan"><h3>Free</h3><div class="price">$0</div><ul>${f(1,"Lock of the Day")}${f(1,"Every game: winner, projected score, spread and total")}${f(1,"Up to 5 of our top player props and touchdown picks a day")}${f(1,"Full record and results")}${f(1,"The Builder with real sportsbook prices for select stats")}${f(0,"Every player prop we post, every sport")}${f(0,"Tickets and ready-made stacks")}${f(0,"Full PDFs and the share sheet")}${f(0,"Member referral rewards")}</ul>
       ${tier==="visitor"?'<button class="btn pri" data-modal="signup">Create a free account</button>':'<button class="btn pri" disabled>'+(pro?"Included":"Your plan")+'</button>'}</section>
     <section class="plan best"><span class="badge">Most popular</span><h3>Pro monthly</h3><div class="price">${PLAN_PRICES.month}<small> / month</small></div><ul>${proList}</ul>
       ${proBtn("month","Start Pro monthly","hot")}</section>
@@ -1270,14 +1280,15 @@ function openModal(kind,plan){
   if(!CK.user){try{sessionStorage.setItem("cp_plan",plan==="year"?"year":"month")}catch(e){}return cpSignUp()}
   const y=plan==="year";
   const body=`<dl class="kv"><dt>${y?"Pro yearly":"Pro monthly"}</dt><dd><b>${y?PLAN_PRICES.year+" / year":PLAN_PRICES.month+" / month"}</b></dd><dt>Tax included</dt><dd>Cancel any time</dd></dl>
-    ${cpOffer()}
+    ${cpOffer()}${CP_PROMO||CP_REF.ok?`<p class="note" style="margin-top:-4px">Have a different code? <button class="lnk" id="cp-rm">Remove this offer</button> and enter yours on the checkout page.</p>`:""}
     <p class="note"><b>Renews automatically:</b> ${y?PLAN_PRICES.year+" every year":PLAN_PRICES.month+" every month"} until you cancel. Cancel any time in My account → Manage billing; you keep Pro until the end of the period you paid for. No refunds for partial periods.</p>
     <label class="cp-check"><input type="checkbox" id="cp-21"><span>I'm 21 or older, I agree to the <a href="#terms" target="_blank">Terms</a>, <a href="#privacy" target="_blank">Privacy Policy</a> and <a href="#refunds" target="_blank">Refund Policy</a>, and I understand picks are our models' opinion, not guarantees.</span></label>
     <div class="btns"><button class="btn hot" id="cp-go" disabled>Continue to secure checkout</button></div>
     <p class="note">You'll pay on Stripe's checkout page (card, Apple Pay or Google Pay), then come back here as Pro. Card details never reach this site.${CP_PROMO||CP_REF.ok?"":" Have a promo code? Enter it on the checkout page."}</p>
     ${CP_TEST()?'<p class="note"><b>Test mode:</b> card 4242 4242 4242 4242, any future date, any CVC. No real charge.</p>':""}`;
   openPanel(y?"Start Pro yearly":"Start Pro monthly","",body,P=>{const c=P.querySelector("#cp-21"),g=P.querySelector("#cp-go");
-    c.onchange=()=>{g.disabled=!c.checked};g.onclick=()=>cpCheckout(y?"year":"month",g)});
+    c.onchange=()=>{g.disabled=!c.checked};g.onclick=()=>cpCheckout(y?"year":"month",g);
+    const rm=P.querySelector("#cp-rm");if(rm)rm.onclick=()=>{cpClearOffer();render();openModal("checkout",y?"year":"month");toast("Offer removed. You can enter a code on the checkout page.")}});
 }
 const CP_BOOKS=["DraftKings","FanDuel","BetMGM","Caesars","ESPN BET","BetRivers","Fanatics","Hard Rock"];
 const cpMail=()=>(ME&&ME.email)||(CK&&CK.user&&CK.user.primaryEmailAddress&&CK.user.primaryEmailAddress.emailAddress)||"";
