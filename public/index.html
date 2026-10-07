@@ -958,7 +958,7 @@ guide:{t:"How to use Confident Picks",b:`
 <h3>Results</h3>
 <p>Every graded pick since Sep 26, 2026, win or lose, plus how often our picks beat the closing line. Nothing is ever removed.</p>
 <h3>Your account</h3>
-<p><b>My sportsbook</b> sets the book used for prices and the Builder. <b>Manage billing</b> opens Stripe's secure page to switch monthly/yearly, update your card, get receipts or cancel. Pro works on up to 3 devices; signing in on a 4th signs out the one used longest ago. <b>Refer a friend</b> (Pro): your friend gets 10% off their first month, and you get $5 credit on your next bill once they pay.</p>
+<p><b>My sportsbook</b> sets the book used for prices and the Builder. <b>Manage billing</b> opens Stripe's secure page to switch monthly/yearly, update your card, get receipts or cancel. Pro works on up to 3 devices; signing in on a 4th signs out the one used longest ago. <b>Refer a friend</b> (Pro): your friend gets 10% off their first payment, and you get $5 credit on your next bill once they pay.</p>
 <h3>Bet flat</h3>
 <p>Use the same small stake on every pick and never raise it to win back a loss. Even a 60% record has losing streaks of 5 or more. 21+. If gambling stops being fun, call 1-800-GAMBLER.</p>
 <h3>Questions</h3>
@@ -1155,7 +1155,7 @@ function cpWatch(){   // and if Clerk does not navigate, notice the new account 
 }
 function cpOffer(short){
   if(CP_PROMO)return short?`Code <b>${esc(CP_PROMO)}</b> will be applied when you start Pro.`:`<p class="note rec" style="margin:0 0 10px">Your code <b>${esc(CP_PROMO)}</b> will be applied at checkout.</p>`;
-  if(CP_REF.ok)return short?`A Confident Picks member invited you: <b>10% off</b> your first month of Pro.`:`<p class="note rec" style="margin:0 0 10px">Member invite: <b>10% off</b> your first month, applied at checkout.</p>`;
+  if(CP_REF.ok)return short?`A Confident Picks member invited you: <b>10% off</b> your first Pro payment (first month, or first year on yearly).`:`<p class="note rec" style="margin:0 0 10px">Member invite: <b>10% off</b> your first payment, applied at checkout.</p>`;
   return "";
 }
 const CP_TEST=()=>!!(CPCFG&&String(CPCFG.clerkPublishableKey||"").startsWith("pk_test_"));
@@ -1272,7 +1272,7 @@ function vAccount(){
     <section class="card"><b>Plan</b><span>${pro?`${plan}${day?` · ${ME.cancelAtPeriodEnd?"ends":"renews"} ${esc(day)}`:""}${ME.status==="past_due"?" · last payment failed":""}`:"Free"}</span>
       <div class="btns">${pro?'<button class="btn" data-act="portal">Manage billing</button>':`<button class="btn hot" data-go="plans">Upgrade to Pro</button>${ME.customer?'<button class="btn" data-act="portal">Billing history</button>':""}`}</div>
       ${pro?'<small class="muted">Switch plans, update your card, cancel or get receipts on Stripe\'s secure billing page.</small>':""}</section>
-    ${pro?`<section class="card"><b>Refer a friend</b><span id="cp-ref">Loading your link…</span><small class="muted">Your friend gets 10% off their first month of Pro. You get $5 off your next bill once they pay. Credits are account credit only (<a href="#terms">Terms</a>).</small></section>`:""}
+    ${pro?`<section class="card"><b>Refer a friend</b><span id="cp-ref">Loading your link…</span><small class="muted">Your friend gets 10% off their first Pro payment (month or year). You get $5 off your next bill once they pay. Credits are account credit only (<a href="#terms">Terms</a>).</small></section>`:""}
     <section class="card"><b>My sportsbook</b><div class="bookchips" id="cp-books" role="radiogroup" aria-label="My sportsbook">${["",...CP_BOOKS].map(b=>`<label class="bchip"><input type="radio" name="cp-book" value="${esc(b)}"${(mine[0]||"")===b?" checked":""}><span>${b?esc(b):"Any book"}</span></label>`).join("")}</div>
       <small class="muted">The Builder opens at your book. In the Price column, DraftKings and FanDuel show their own price; for other books it shows the best price anywhere, with its book. "Any book" always shows the best price.</small></section>
     <section class="card"><b>Devices</b><span>${ME.devices?`Signed in on ${ME.devices} of 3 devices.`:"Up to 3 devices."} Signing in on another device signs out the one used longest ago.</span></section></div>`;
