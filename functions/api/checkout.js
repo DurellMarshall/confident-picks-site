@@ -29,9 +29,12 @@ export const onRequestPost = guard(async ({ request, env }) => {
   if (!price) throw new HttpError(400, "bad_plan", "Pick monthly or yearly.");
   const st = await proStatus(env, user, { fresh: true });
   if (st.pro) throw new HttpError(409, "already_pro", "You already have Pro. Manage it from My account.");
+  const src = typeof body.src === "string" && /^[a-z0-9_.:-]{1,48}$/i.test(body.src) ? body.src.toLowerCase() : "";
   const customer = await ensureCustomer(env, user);
+  if (src) { try { await stripe(env, "POST", `/v1/customers/${customer}`, { metadata: { source: src } }); } catch (e) { /* tracking never blocks a sale */ } }
   const site = origin(request);
   const meta = { clerk_user_id: user.userId };
+  if (src) meta.source = src;      // first link/code that brought them (?src=, a promo or a referral), for marketing results
   let discount = null, note = null;
   const promo = typeof body.promo === "string" && /^[A-Za-z0-9_-]{2,40}$/.test(body.promo) ? body.promo : "";
   if (promo) {

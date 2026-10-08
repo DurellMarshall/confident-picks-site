@@ -310,25 +310,6 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .pin input{font:600 28px var(--mono);letter-spacing:.4em;text-align:center;padding:10px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);color:var(--ink)}
 .pin input{box-sizing:border-box;width:100%;border-color:var(--line)}
 .pin #pin-go{font:700 16px var(--body);padding:12px;border:0;border-radius:12px;background:var(--turf);color:var(--turf-ink);cursor:pointer}
-
-/* ---------- real accounts (Cloudflare site, owner 2026-10-04) ---------- */
-.cp-note{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;padding:8px 12px;margin:0 -16px 12px;font-size:13px;border-bottom:1px solid var(--line)}
-.cp-note.warn{background:var(--warn-bg);color:var(--warn-ink)}.cp-note.info{background:var(--surface-2);color:var(--ink-2)}
-.cp-note button{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
-.cp-check{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.4}.cp-check input{margin-top:3px;width:18px;height:18px;flex:0 0 auto}
-.plan small.save{display:block;font-size:12px;font-weight:700;color:var(--turf)}
-.acct-h+.cards .card{align-content:start}
-.acct-h{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:720px;margin-bottom:10px}.acct-h .h2{margin:0}
-.btn.signout{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-weight:600}
-.btn.signout:hover{border-color:var(--bad);color:var(--bad)}
-.bookchips{display:flex;flex-wrap:wrap;gap:6px}
-.bchip{position:relative}.bchip input{position:absolute;opacity:0;width:1px;height:1px}
-.bchip span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--surface-2);color:var(--ink-2)}
-.bchip input:checked+span{background:var(--turf);border-color:var(--turf);color:var(--turf-ink)}
-.bchip input:checked+span::before{content:"✓ "}
-.bchip input:focus-visible+span{outline:2px solid var(--turf);outline-offset:2px}
-.card select.cp-book{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);width:100%}
-.cp-note .lnk{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
 </style>
 <script>try{var cpT=localStorage.getItem("cp_theme");if(cpT==="light"||cpT==="dark")document.documentElement.setAttribute("data-theme",cpT)}catch(e){}</script>
 </head>
@@ -1132,7 +1113,7 @@ Object.defineProperty(window,"CP_CART",{get:()=>BS.cart,configurable:true});
    Sign-in: Clerk (email code or Google, no passwords).  Payment: Stripe's own checkout and billing pages.
    The picks come from /api/data, which sends each person only their tier's copy (visitor, free or Pro), so nothing
    on this page can unlock a Pro pick.  These functions replace the preview versions above (same names). */
-let CK=null,ME=null,CPCFG=null,CP_NOTICE="",CP_PROMO="",CP_REF={code:"",ok:false},CP_UID=null;
+let CK=null,ME=null,CPCFG=null,CP_NOTICE="",CP_PROMO="",CP_REF={code:"",ok:false},CP_UID=null,CP_SRC="";
 (function(){   // share links: ?promo=CODE (a Stripe promo code) and ?ref=CODE (a member's referral), kept 30 days
   const q=new URLSearchParams(location.search),now=Date.now(),keep=30*864e5;
   const put=(k,v)=>{try{localStorage.setItem(k,JSON.stringify({v,at:now}))}catch(e){}};
@@ -1140,8 +1121,10 @@ let CK=null,ME=null,CPCFG=null,CP_NOTICE="",CP_PROMO="",CP_REF={code:"",ok:false
   const p=(q.get("promo")||"").trim(),r=(q.get("ref")||"").trim().toUpperCase();
   if(/^[A-Za-z0-9_-]{2,40}$/.test(p))put("cp_promo",p.toUpperCase());
   if(/^[A-Z2-9]{6,12}$/.test(r))put("cp_ref",r);
-  CP_PROMO=get("cp_promo");CP_REF.code=get("cp_ref");
-  if(q.has("promo")||q.has("ref")||q.has("signedin")){q.delete("promo");q.delete("ref");q.delete("signedin");try{history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash)}catch(e){}}
+  const sr=(q.get("src")||"").trim().toLowerCase();   // owner 2026-10-07: where people come from (first touch wins)
+  if(!get("cp_src")){if(/^[a-z0-9_.-]{1,40}$/.test(sr))put("cp_src",sr);else if(/^[A-Za-z0-9_-]{2,40}$/.test(p))put("cp_src","promo:"+p.toLowerCase());else if(/^[A-Z2-9]{6,12}$/.test(r))put("cp_src","referral")}
+  CP_PROMO=get("cp_promo");CP_REF.code=get("cp_ref");CP_SRC=get("cp_src");
+  if(q.has("promo")||q.has("ref")||q.has("signedin")||q.has("src")){q.delete("promo");q.delete("ref");q.delete("signedin");q.delete("src");try{history.replaceState(null,"",location.pathname+(q.toString()?"?"+q:"")+location.hash)}catch(e){}}
 })();
 function cpClearOffer(){   // owner 2026-10-06: an invite or code belongs to one sign-up, not to whoever signs in next
   try{localStorage.removeItem("cp_promo");localStorage.removeItem("cp_ref")}catch(e){}
@@ -1174,6 +1157,7 @@ async function cpBoot(){
     CK.addListener(e=>{const u=(e&&e.user&&e.user.id)||null;if(u!==uid){if(uid)cpClearOffer();location.reload()}});   // signed in or out: start fresh
     cpApplyBooks(cpMyBooks());
     if(!uid)return;
+    try{const um=CK.user.unsafeMetadata||{};if(CP_SRC&&!um.src)CK.user.update({unsafeMetadata:Object.assign({},um,{src:CP_SRC,src_at:new Date().toISOString().slice(0,10)})})}catch(e){}
     const back=new URLSearchParams(location.search).get("checkout")==="done";
     const r=await cpApi("/api/me"+(back?"?fresh=1":""));
     if(r.status===409)CP_NOTICE="device_limit";
@@ -1207,7 +1191,7 @@ async function cpCheckout(plan,btn){
   if(!CK)return cpNoSignIn();
   if(!CK.user){try{sessionStorage.setItem("cp_plan",plan)}catch(e){}cpSignUp();return}
   if(btn){btn.disabled=true;btn.textContent="Opening secure checkout…"}
-  const r=await cpApi("/api/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({plan,promo:CP_PROMO||undefined,ref:CP_REF.ok?CP_REF.code:undefined})});
+  const r=await cpApi("/api/checkout",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({plan,promo:CP_PROMO||undefined,ref:CP_REF.ok?CP_REF.code:undefined,src:CP_SRC||undefined})});
   const j=await r.json().catch(()=>({}));
   if(r.ok&&j.url){
     const why={promo_other_plan:`Code ${CP_PROMO} isn't for the ${plan==="year"?"yearly":"monthly"} plan, so it wasn't applied. You can enter another code on the checkout page.`,
@@ -1275,7 +1259,8 @@ function vAccount(){
     ${pro?`<section class="card"><b>Refer a friend</b><span id="cp-ref">Loading your link…</span><small class="muted">Your friend gets 10% off their first Pro payment (month or year). You get $5 off your next bill once they pay. Credits are account credit only (<a href="#terms">Terms</a>).</small></section>`:""}
     <section class="card"><b>My sportsbook</b><div class="bookchips" id="cp-books" role="radiogroup" aria-label="My sportsbook">${["",...CP_BOOKS].map(b=>`<label class="bchip"><input type="radio" name="cp-book" value="${esc(b)}"${(mine[0]||"")===b?" checked":""}><span>${b?esc(b):"Any book"}</span></label>`).join("")}</div>
       <small class="muted">The Builder opens at your book. In the Price column, DraftKings and FanDuel show their own price; for other books it shows the best price anywhere, with its book. "Any book" always shows the best price.</small></section>
-    <section class="card"><b>Devices</b><span>${ME.devices?`Signed in on ${ME.devices} of 3 devices.`:"Up to 3 devices."} Signing in on another device signs out the one used longest ago.</span></section></div>`;
+    <section class="card"><b>Devices</b><span>${ME.devices?`Signed in on ${ME.devices} of 3 devices.`:"Up to 3 devices."} Signing in on another device signs out the one used longest ago.</span></section>
+    ${ME.admin?'<section class="card"><b>Admin</b><span>Members, messages, approvals, system health and the activity log.</span><div class="btns"><button class="btn pri" data-go="admin">Open admin</button></div></section>':""}</div>`;
 }
 function openModal(kind,plan){
   if(kind==="signin")return cpSignIn();
@@ -1367,8 +1352,159 @@ async function cpFillRef(){
     document.getElementById("cp-ref-copy").onclick=()=>copyText(j.link,el)}
   catch(e){el.textContent="Your referral link isn't available right now."}
 }
+/* ---------- Admin (owner 2026-10-07): both partners, same access. The server checks every request (ADMIN_USER_IDS);
+   this page holds no data or keys of its own. ---------- */
+const ADM={tab:"today",q:"",members:null};
+try{document.head.insertAdjacentHTML("beforeend",`<style>
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px}
+.adm-stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:2px}
+.adm-stat b{font-size:24px}.adm-stat small{color:var(--muted)}
+.adm-tbl{width:100%;border-collapse:collapse;font-size:14px}.adm-tbl th,.adm-tbl td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.adm-tbl th{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.adm-warn{border-color:#d9822b!important;background:rgba(217,130,43,.08)}.adm-ok{color:#2f8f4e}.adm-bad{color:#c0392b}
+.adm-msg{white-space:pre-wrap;margin:4px 0}.adm-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.adm-row input{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink)}
+
+/* ---------- real accounts (Cloudflare site, owner 2026-10-04) ---------- */
+.cp-note{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center;padding:8px 12px;margin:0 -16px 12px;font-size:13px;border-bottom:1px solid var(--line)}
+.cp-note.warn{background:var(--warn-bg);color:var(--warn-ink)}.cp-note.info{background:var(--surface-2);color:var(--ink-2)}
+.cp-note button{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
+.cp-check{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;line-height:1.4}.cp-check input{margin-top:3px;width:18px;height:18px;flex:0 0 auto}
+.plan small.save{display:block;font-size:12px;font-weight:700;color:var(--turf)}
+.acct-h+.cards .card{align-content:start}
+.acct-h{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:720px;margin-bottom:10px}.acct-h .h2{margin:0}
+.btn.signout{border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font-weight:600}
+.btn.signout:hover{border-color:var(--bad);color:var(--bad)}
+.bookchips{display:flex;flex-wrap:wrap;gap:6px}
+.bchip{position:relative}.bchip input{position:absolute;opacity:0;width:1px;height:1px}
+.bchip span{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13.5px;font-weight:600;cursor:pointer;background:var(--surface-2);color:var(--ink-2)}
+.bchip input:checked+span{background:var(--turf);border-color:var(--turf);color:var(--turf-ink)}
+.bchip input:checked+span::before{content:"✓ "}
+.bchip input:focus-visible+span{outline:2px solid var(--turf);outline-offset:2px}
+.card select.cp-book{font:inherit;font-size:15px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2);color:var(--ink);width:100%}
+.cp-note .lnk{font:inherit;font-weight:700;border:1px solid currentColor;background:none;color:inherit;border-radius:8px;padding:3px 10px;cursor:pointer}
+</style>`)}catch(e){}
+const admMoney=c=>"$"+((c||0)/100).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+const admT=s=>typeof s==="number"?(s>1e12?s:s*1000):s;
+const admDay=s=>s?new Date(admT(s)).toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}):"–";
+const admDate=s=>s?new Date(admT(s)).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"–";
+async function admGet(p){const r=await cpApi(p);const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||("Error "+r.status));return j}
+async function admPost(p,body){const r=await cpApi(p,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.message||("Error "+r.status));return j}
+function vAdmin(){
+  if(!ME||!ME.admin)return `<div class="empty" style="margin-top:20px">Not found.</div>`;
+  const tabs=[["today","Today"],["member","Members"],["inbox","Messages"],["approvals","Approvals"],["health","System"],["log","Activity log"]];
+  return `<div class="acct-h"><h2 class="h2">Admin</h2><button class="btn sm" data-go="account">My account</button></div>
+  <div class="seg" role="group" aria-label="Admin sections" style="margin-bottom:14px;flex-wrap:wrap">${tabs.map(([k,l])=>`<button data-adm="${k}" aria-pressed="${ADM.tab===k}">${l}</button>`).join("")}</div>
+  <div id="adm-body"><p class="muted">Loading…</p></div>`;
+}
+function cpBindAdmin(){
+  const B=document.getElementById("adm-body");if(!B||B.dataset.b)return;B.dataset.b="1";
+  document.querySelectorAll("[data-adm]").forEach(b=>b.onclick=()=>{ADM.tab=b.dataset.adm;render()});
+  ({today:admToday,member:admMember,inbox:admInbox,approvals:admApprovals,health:admHealth,log:admLog}[ADM.tab]||admToday)(B);
+}
+const admFail=(B,e)=>{B.innerHTML=`<div class="card adm-warn"><b>Couldn't load this.</b><span>${esc(e.message||String(e))}</span></div>`};
+async function admToday(B,fresh){
+  try{const t=await admGet("/api/admin/today"+(fresh?"?fresh=1":""));
+    const st=(n,l,warn)=>`<div class="adm-stat${warn?" adm-warn":""}"><small>${l}</small><b>${n}</b></div>`;
+    B.innerHTML=`<div class="adm-grid">
+      ${st(t.members,"Pro members")}${st(t.monthly,"Monthly")}${st(t.yearly,"Yearly")}
+      ${st(t.newThisWeek,"New this week")}${st(t.cancelledThisWeek,"Cancelled this week",t.cancelledThisWeek>0)}${st(t.cancelling,"Set to cancel",t.cancelling>0)}
+      ${st(t.pastDue,"Payment failed",t.pastDue>0)}${st(admMoney(t.mrrCents),"Monthly recurring revenue")}${st(admMoney(t.paidLast30Cents),"Paid, last 30 days")}
+      ${st(t.unhandledMessages,"Unanswered messages",t.unhandledMessages>0)}${st(t.pendingApprovals,"Waiting for approval",t.pendingApprovals>0)}</div>
+      <p class="hint">Updated ${esc(admDay(t.at))}. Numbers come from Stripe and are kept for 5 minutes. <button class="lnk" id="adm-fresh">Refresh now</button></p>`;
+    document.getElementById("adm-fresh").onclick=()=>{B.innerHTML='<p class="muted">Loading…</p>';admToday(B,true)}}
+  catch(e){admFail(B,e)}
+}
+function admMemberCard(m){
+  const live=x=>["active","trialing","past_due"].includes(x.status);
+  const s=m.subscriptions.find(live)||m.subscriptions[0];
+  const plan=s?`${s.plan==="year"?"Pro yearly":"Pro monthly"} · ${esc(s.status)}${s.cancelAtPeriodEnd?" · set to cancel":""}${live(s)?` · ${s.cancelAtPeriodEnd?"ends":"renews"} ${esc(admDate(s.renews))}`:""}`:"No subscription (free account)";
+  const last=m.devices.length?Math.max(...m.devices.map(d=>d.last)):0;
+  return `<section class="card" data-cus="${esc(m.customer)}">
+    <b>${esc(m.email||"(no email)")}</b>
+    <dl class="kv"><dt>Plan</dt><dd>${plan}</dd><dt>Joined</dt><dd>${esc(admDate(m.created))}</dd>
+      <dt>Came from</dt><dd>${esc(m.source||(s&&s.source)||"unknown")}${s&&s.referredBy?" · referred by a member":""}</dd>
+      <dt>Credit on account</dt><dd>${admMoney(m.creditCents)}${m.owesCents?` · owes ${admMoney(m.owesCents)}`:""}</dd>
+      <dt>Devices</dt><dd>${m.devices.length} of 3${last?` · last used ${esc(admDay(last))}`:""}</dd>
+      <dt>Friends referred</dt><dd>${m.referrals}</dd><dt>Stripe id</dt><dd><code>${esc(m.customer)}</code></dd></dl>
+    ${m.invoices.length?`<table class="adm-tbl"><tr><th>Date</th><th>Paid</th><th>Status</th><th></th></tr>${m.invoices.map(i=>`<tr><td>${esc(admDate(i.date))}</td><td>${admMoney(i.paidCents)}</td><td>${esc(i.status||"")}</td><td>${i.url?`<a href="${esc(i.url)}" target="_blank" rel="noopener">Invoice</a>`:""}</td></tr>`).join("")}</table>`:""}
+    ${m.notes.length?`<div><small class="muted">Notes</small>${m.notes.map(n=>`<p class="adm-msg"><b>${esc(admDate(n.at))}, ${esc(n.by)}:</b> ${esc(n.text)}</p>`).join("")}</div>`:""}
+    <div class="btns">${s&&live(s)?'<button class="btn" data-ma="free_month">Give a free month</button>':""}
+      <button class="btn" data-ma="credit">Add credit</button>${m.userId?'<button class="btn" data-ma="reset_devices">Reset devices</button>':""}<button class="btn" data-ma="note">Add note</button></div>
+  </section>`;
+}
+async function admMember(B){
+  B.innerHTML=`<form id="adm-find" class="adm-row" style="margin-bottom:12px"><input id="adm-q" type="email" placeholder="Member's email" value="${esc(ADM.q)}" style="min-width:260px" required><button class="btn pri" type="submit">Find</button></form><div id="adm-res"></div>`;
+  const R=document.getElementById("adm-res");
+  const show=()=>{R.innerHTML=ADM.members===null?"":ADM.members.length?`<div class="cards" style="grid-template-columns:1fr;max-width:760px">${ADM.members.map(admMemberCard).join("")}</div>`:`<p class="muted">No member with that email. Free accounts only appear here after they start a checkout.</p>`;
+    R.querySelectorAll("[data-ma]").forEach(b=>b.onclick=()=>admAct(b.closest("[data-cus]").dataset.cus,b.dataset.ma,find))};
+  const find=async()=>{ADM.q=document.getElementById("adm-q").value.trim();if(!ADM.q)return;R.innerHTML='<p class="muted">Looking…</p>';
+    try{ADM.members=(await admGet("/api/admin/member?q="+encodeURIComponent(ADM.q))).members;show()}catch(e){admFail(R,e)}};
+  document.getElementById("adm-find").onsubmit=e=>{e.preventDefault();find()};
+  if(ADM.q&&ADM.members)show();
+}
+async function admAct(customer,action,again){
+  const body={customer,action};
+  if(action==="free_month"){if(!confirm("Give this member a free month? It comes off their next bill."))return;body.note=prompt("Reason (optional):","")||""}
+  if(action==="credit"){const v=prompt("Credit amount in dollars (up to $500; over $50 needs your partner's approval):","5");if(v===null)return;
+    body.cents=Math.round(parseFloat(v)*100);if(!(body.cents>=100))return toast("Enter at least $1.");body.note=prompt("Reason:","")||""}
+  if(action==="reset_devices"&&!confirm("Clear this member's device list? They'll sign in again on up to 3 devices."))return;
+  if(action==="note"){body.note=prompt("Note for this member (your partner will see it):","");if(!body.note)return}
+  try{const j=await admPost("/api/admin/action",body);
+    toast(j.pending?"Sent to your partner for approval.":action==="free_month"?`Free month added (${admMoney(j.cents)} credit).`:action==="credit"?`Credit of ${admMoney(j.cents)} added.`:"Done.");again()}
+  catch(e){toast(e.message)}
+}
+async function admInbox(B){
+  try{const {messages}=await admGet("/api/admin/inbox");
+    if(!messages.length){B.innerHTML='<p class="muted">No messages yet.</p>';return}
+    B.innerHTML=`<div class="cards" style="grid-template-columns:1fr;max-width:760px">${messages.map(m=>`<section class="card${m.handled?"":" adm-warn"}"><b>${esc(m.topic)} · ${esc(m.email||"")}</b><small class="muted">${esc(admDay(m.at))}${m.handled?` · handled by ${esc(m.handled.by)} ${esc(admDay(m.handled.at))}`:" · not answered yet"}</small>
+      <p class="adm-msg">${esc(m.message)}</p><div class="btns"><a class="btn" href="mailto:${encodeURIComponent(m.email||"")}?subject=${encodeURIComponent("Re: "+m.topic)}">Reply by email</a>
+      <button class="btn" data-mk="${esc(m.key)}" data-h="${m.handled?"0":"1"}">${m.handled?"Reopen":"Mark handled"}</button></div></section>`).join("")}</div>`;
+    B.querySelectorAll("[data-mk]").forEach(b=>b.onclick=async()=>{try{await admPost("/api/admin/inbox",{key:b.dataset.mk,handled:b.dataset.h==="1"});admInbox(B)}catch(e){toast(e.message)}})}
+  catch(e){admFail(B,e)}
+}
+async function admApprovals(B){
+  try{const {approvals}=await admGet("/api/admin/approvals");
+    if(!approvals.length){B.innerHTML='<p class="muted">Nothing is waiting for approval.</p>';return}
+    const me=(CK&&CK.user&&CK.user.id)||"";
+    B.innerHTML=`<div class="cards" style="grid-template-columns:1fr;max-width:760px">${approvals.map(a=>`<section class="card adm-warn"><b>${a.action==="credit"?`Credit ${admMoney(a.cents)}`:a.action==="free_month"?"Free month (over this month's limit)":esc(a.action)} · <code>${esc(a.customer)}</code></b>
+      <small class="muted">Asked by ${esc(a.by)}, ${esc(admDay(a.at))}${a.note?` · "${esc(a.note)}"`:""}</small>
+      <div class="btns">${a.byId===me?'<span class="muted">Waiting for your partner.</span>':`<button class="btn pri" data-ap="${esc(a.id)}" data-d="approve">Approve</button><button class="btn" data-ap="${esc(a.id)}" data-d="reject">Reject</button>`}</div></section>`).join("")}</div>`;
+    B.querySelectorAll("[data-ap]").forEach(b=>b.onclick=async()=>{try{await admPost("/api/admin/approvals",{id:b.dataset.ap,decision:b.dataset.d});toast(b.dataset.d==="approve"?"Approved and done.":"Rejected.");admApprovals(B)}catch(e){toast(e.message)}})}
+  catch(e){admFail(B,e)}
+}
+async function admHealth(B){
+  try{const h=await admGet("/api/admin/health"),s=h.status||{},now=Date.parse(h.now);
+    const ts=x=>{if(!x)return null;const m=String(x).match(/^(\d{4})(\d\d)(\d\d)T(\d\d)(\d\d)(\d\d)Z$/);return m?`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z`:x};
+    const age=iso=>{const t=Date.parse(iso);return isNaN(t)?null:(now-t)/36e5};
+    const pu=h.files["picks.json"],pa=pu?age(pu.uploaded):null,lu=s.last_update||null,lo=s.last_odds||null;
+    const credits=lo&&lo.credits_remaining!=null?Number(lo.credits_remaining):null;
+    const row=(l,v,bad)=>`<dt>${l}</dt><dd class="${bad===true?"adm-bad":bad===false?"adm-ok":""}">${v}</dd>`;
+    B.innerHTML=`<div class="cards" style="grid-template-columns:1fr;max-width:760px"><section class="card${pa==null||pa>8?" adm-warn":""}"><b>Picks on the site</b><dl class="kv">
+      ${row("Last upload",pu?esc(admDay(pu.uploaded))+(pa!=null?` (${pa.toFixed(1)} h ago)`:""):"none yet",pa==null||pa>8)}
+      ${row("Picks made",s.picks?esc(admDay(s.picks.generated_at))+` · ${s.picks.count} picks`:"–")}
+      ${row("Prices from",s.picks&&s.picks.odds_at?esc(admDay(s.picks.odds_at)):"–")}</dl></section>
+      <section class="card${lu&&lu.ok===false?" adm-warn":""}"><b>Last model update</b><dl class="kv">
+      ${row("Finished",lu?esc(admDay(ts(lu.finished_utc)||ts(lu.started_utc))):"–")}
+      ${row("Result",lu?(lu.ok?"OK":"Failed, so the site kept the last good picks"):"–",lu?!lu.ok:undefined)}
+      ${row("Took",lu?`${lu.minutes} min · ${lu.steps} steps`:"–")}</dl>
+      ${(s.recent_runs||[]).length?`<small class="muted">Recent runs</small><pre style="font-size:12px;white-space:pre-wrap;margin:0">${esc(s.recent_runs.join("\n"))}</pre>`:""}</section>
+      <section class="card${credits!=null&&credits<500000?" adm-warn":""}"><b>Sportsbook prices (The Odds API)</b><dl class="kv">
+      ${row("Last pull",lo?esc(admDay(ts(lo.folder)))+` · ${lo.requests} requests`:"–")}
+      ${row("Credits left this month",credits!=null?credits.toLocaleString("en-US"):"–",credits!=null?credits<500000:undefined)}</dl></section></div>
+      <p class="hint">From the picks computer's last upload (status file ${h.files["status.json"]?esc(admDay(h.files["status.json"].uploaded)):"not uploaded yet"}).</p>`}
+  catch(e){admFail(B,e)}
+}
+async function admLog(B){
+  try{const {log}=await admGet("/api/admin/audit");
+    if(!log.length){B.innerHTML='<p class="muted">No admin actions yet.</p>';return}
+    const what=a=>({free_month:"Free month",credit:"Credit",reset_devices:"Reset devices",note:"Note",message_handled:"Message handled",message_reopened:"Message reopened",requested_approval:"Asked for approval",rejected:"Rejected a request"}[a]||a);
+    B.innerHTML=`<table class="adm-tbl"><tr><th>When</th><th>Who</th><th>What</th><th>Details</th></tr>${log.map(a=>`<tr><td>${esc(admDay(a.at))}</td><td>${esc(a.by)}</td><td>${esc(what(a.action))}</td><td>${[a.customer?`<code>${esc(a.customer)}</code>`:"",a.cents?admMoney(a.cents):"",a.note?`"${esc(a.note)}"`:"",a.approvedRequest?`approved a request by ${esc(a.requestedBy||"")}`:""].filter(Boolean).join(" · ")}</td></tr>`).join("")}</table>`}
+  catch(e){admFail(B,e)}
+}
 function bindPreview(){
-  cpFillRef();cpBindContact();
+  cpFillRef();cpBindContact();cpBindAdmin();
   const bk=document.getElementById("cp-books");if(bk)bk.onchange=()=>{const v=(bk.querySelector("input:checked")||{}).value||"";cpSetBooks(v?[v]:[])};
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>setTab(b.dataset.go));
   document.querySelectorAll("[data-modal]").forEach(b=>b.onclick=()=>openModal(b.dataset.modal,b.dataset.plan));
@@ -1381,7 +1517,7 @@ window.CP_ADD=(k,on)=>{BS.cart=on?[...new Set([...BS.cart,k])]:BS.cart.filter(x=
 /* ---------- render ---------- */
 function render(){
   nav();closePanel();
-  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount,terms:()=>vDoc("terms"),privacy:()=>vDoc("privacy"),refunds:()=>vDoc("refunds"),guide:()=>vDoc("guide"),contact:()=>vContact()}[S.tab]||vPicks;
+  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount,terms:()=>vDoc("terms"),privacy:()=>vDoc("privacy"),refunds:()=>vDoc("refunds"),guide:()=>vDoc("guide"),contact:()=>vContact(),admin:()=>typeof vAdmin==="function"?vAdmin():vPicks()}[S.tab]||vPicks;
   let html=v();
   if(S.tab==="build"&&tier==="visitor")html=gate(html,"free","The Builder is free with an account","Stack milestones with real prices, see how often each player got there, and send the stack to your sportsbook.");
   $("#main").innerHTML=pvBar()+html;$("#acct").innerHTML=acctBtns();
@@ -1404,9 +1540,9 @@ function init(data){
   for(const p of D.picks){const k=nk(p),o=seen.get(k);if(!o||p.win_prob>o.win_prob||(p.win_prob===o.win_prob&&p.best_price!=null&&(o.best_price==null||dec(p.best_price)>dec(o.best_price))))seen.set(k,p)}
   D.picks=D.picks.filter(p=>seen.get(nk(p))===p);
   D.picks.forEach((p,i)=>p._id="p"+i);
-  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact"].includes(h))S.tab=h;
+  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact","admin"].includes(h))S.tab=h;
   header();render();
-  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact"].includes(t)){S.tab=t;save();render();window.scrollTo({top:0})}});
+  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact","admin"].includes(t)){S.tab=t;save();render();window.scrollTo({top:0})}});
   setInterval(()=>{if(S.tab==="picks"&&!$("#panel"))render()},120000);
   cpData("form",1).then(f=>{if(f&&f.rows){FORM=f.rows;REC=f.record||{};if(S.tab==="picks"&&!$("#panel"))render();if(S.tab==="build"&&LAD&&typeof fillBuilder==="function")fillBuilder()}}).catch(()=>{});
   (tier==="visitor"?Promise.resolve(null):cpData("ladders",1)).then(d=>{if(!d)return;LAD=LAD||reconcileLadders(d);LADI=new Map(d.ladders.map(l=>[`${l.player}~${l.stat}`,l]))}).catch(()=>{});

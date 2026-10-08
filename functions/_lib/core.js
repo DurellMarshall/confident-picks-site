@@ -18,6 +18,7 @@
 //   SITE_ORIGINS          optional, comma list of allowed page origins for the token's azp claim
 //   STRIPE_WEBHOOK_SECRET whsec_... from the Stripe webhook endpoint (secret; member referral credits)
 //   REFERRAL_COUPON       Stripe coupon id for the friend's discount (public; 10% off the first month)
+//   ADMIN_USER_IDS        comma list of Clerk user ids allowed into the admin page (owner 2026-10-07; public ids)
 //   STRIPE_API            optional, only for local tests (default https://api.stripe.com)
 // Bindings: PRO (R2 bucket), KV (KV namespace)
 
