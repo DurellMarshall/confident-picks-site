@@ -77,7 +77,7 @@ small{font-size:12px}
 .bottom{display:none}
 @media (max-width:760px){
   .tabs{display:none}
-  .bottom{display:grid;grid-template-columns:repeat(3,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+  .bottom{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
   .bottom button{background:none;border:0;display:grid;justify-items:center;gap:2px;font-size:11.5px;font-weight:600;color:var(--muted);padding:4px;cursor:pointer}
   .bottom button[aria-selected="true"]{color:var(--turf)}
   .top{flex-wrap:wrap}.top-r{flex-wrap:wrap;justify-content:flex-end}
@@ -310,6 +310,29 @@ footer{margin-top:30px;font-size:12px;color:var(--muted);display:grid;gap:4px;ma
 .pin input{font:600 28px var(--mono);letter-spacing:.4em;text-align:center;padding:10px;border:1px solid var(--line-2);border-radius:12px;background:var(--surface);color:var(--ink)}
 .pin input{box-sizing:border-box;width:100%;border-color:var(--line)}
 .pin #pin-go{font:700 16px var(--body);padding:12px;border:0;border-radius:12px;background:var(--turf);color:var(--turf-ink);cursor:pointer}
+
+/* Reliable tab: steady floors (owner 2026-10-08) */
+.fl-intro{max-width:760px;margin:4px 0 12px}
+.fl-intro p{margin:6px 0;color:var(--ink-2)}
+.fl-tested{display:inline-block;background:var(--turf-soft);color:var(--ink);border-radius:12px;padding:5px 12px;font-size:13px;line-height:1.5}
+.fl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;margin-top:12px}
+.fl-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;min-width:0}
+.fl-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.fl-top b{display:block;font-size:15.5px}
+.fl-top small{color:var(--muted);font-size:12.5px}
+.fl-sport{font:700 11px var(--mono);letter-spacing:.06em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 6px;flex:none}
+.fl-floor{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.fl-n{font:800 30px/1 var(--mono);color:var(--turf)}
+.fl-stat{font-weight:600;color:var(--ink-2)}
+.fl-meta{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--muted)}
+.fl-meta b{color:var(--ink)}
+.fl-bars{width:100%;height:56px;display:block}
+.fl-bars .y{fill:var(--good)}.fl-bars .n{fill:var(--bad)}.fl-bars .fl{stroke:var(--ink-2);stroke-dasharray:4 3;stroke-width:1.5}
+.fl-cap{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-top:-6px}
+.fl-warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:8px;padding:6px 10px;font-size:12.5px}
+.fl-how{max-width:760px;margin-top:16px}
+.fl-how summary{cursor:pointer;font-weight:600}
+.fl-how li{margin:4px 0;color:var(--ink-2)}
 </style>
 <script>try{var cpT=localStorage.getItem("cp_theme");if(cpT==="light"||cpT==="dark")document.documentElement.setAttribute("data-theme",cpT)}catch(e){}</script>
 </head>
@@ -347,14 +370,15 @@ const dec=a=>a>0?1+a/100:1+100/Math.abs(a);
 const ICON={
   picks:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
   build:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
-  results:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>'};
-const TABS=[["picks","Picks"],["build","Builder"],["results","Results"]];
+  results:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M5 20V11M12 20V5M19 20v-7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>',
+  floors:'<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 19h16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M6 15V9M10 15V6M14 15V8M18 15V5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>'};
+const TABS=[["picks","Picks"],["build","Builder"],["floors","Reliable"],["results","Results"]];
 const MULTI=new Set(["2-leg ticket","3-leg ticket","Same-game pair","Game-script stack","Big-favorite combo"]);
 const SPORTS=[["","All"],["NFL","NFL"],["CFB","College"],["NHL","NHL"],["NBA","NBA"],["CBB","College hoops"],["SOC","Soccer"],["UFC","UFC"]];
 const SPORT_NAME={NFL:"NFL",CFB:"College",NHL:"NHL",NBA:"NBA",CBB:"College hoops",SOC:"Soccer",UFC:"UFC"};
 const BOOKS=[["best","Best price"],["dk","DraftKings"],["fd","FanDuel"]];
-let D=null,FORM={},REC={},LADI=null;
-let S=Object.assign({tab:"picks",seg:"props",sport:"",q:"",day:"all",market:"",game:"",book:"best",graded:false,sort:"rank",asc:false,shown:50},store.get("state",{}));
+let D=null,FORM={},REC={},LADI=null,FLO=null;
+let S=Object.assign({tab:"picks",seg:"props",sport:"",q:"",day:"all",market:"",game:"",book:"best",graded:false,sort:"rank",asc:false,shown:50,fsport:"",fstat:"",fgame:"",fq:"",fsort:"steady"},store.get("state",{}));
 S.shown=50;
 const save=()=>store.set("state",S);
 
@@ -969,6 +993,85 @@ function reconcileLadders(d){
   d._matched=true;d._dropped=dropped;return d;
 }
 
+
+/* ---------- Reliable: steady floors (owner 2026-10-08, Pro) ---------- */
+function loadFloors(){cpData("floors",1).then(d=>{FLO=d||{rows:[],tested:{}};if(S.tab==="floors")render()}).catch(()=>{FLO={rows:[],tested:{}};if(S.tab==="floors")render()})}
+const flNum=x=>Number.isInteger(x)?String(x):String(Math.round(x*10)/10);
+const flShort=l=>String(l||"").replace(/ vs .*$/,"");
+const FL_UNIT={"Rushing yards":"rush yds","Receiving yards":"rec yds","Passing yards":"pass yds","Rush + rec yards":"rush + rec yds","Receptions":"catches","Completions":"completions","Pass attempts":"pass attempts","Rush attempts":"carries","Points":"points","Rebounds":"rebounds","Assists":"assists","Pts + reb + ast":"PRA","Shots on goal":"shots","Hits":"hits","Blocked shots":"blocks"};
+function flBars(r){
+  const v=r.last.slice().reverse(),W=300,H=56,n=v.length,gap=4,bw=(W-gap*(n-1))/Math.max(n,1),mx=Math.max(r.floor*1.6,...v.map(x=>x[0]),1);
+  const y=x=>H-2-(Math.max(x,0)/mx)*(H-6),fy=y(r.floor);
+  return `<svg class="fl-bars" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" role="img" aria-label="Last ${n} games: ${esc(v.map(x=>flNum(x[0])).join(", "))}. Floor ${flNum(r.floor)}.">`+
+    v.map((x,i)=>`<rect class="${x[0]>=r.floor?"y":"n"}" x="${(i*(bw+gap)).toFixed(1)}" y="${y(x[0]).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H-2-y(x[0])).toFixed(1)}" rx="2"><title>${esc(x[1])}: ${flNum(x[0])}</title></rect>`).join("")+
+    `<line class="fl" x1="0" x2="${W}" y1="${fy.toFixed(1)}" y2="${fy.toFixed(1)}"/></svg><div class="fl-cap"><span>${esc(flShort((v[0]||[])[1]))}</span><span>${esc(flShort((v[n-1]||[])[1]))}</span></div>`;
+}
+function flCard(r){
+  const opp=r.game.startsWith(r.team+" @")?"@ "+r.opp:"vs "+r.opp;
+  return `<div class="fl-card"><div class="fl-top"><div><b>${esc(r.player)}</b><small>${esc([r.pos,r.team].filter(Boolean).join(" · "))} ${esc(opp)} · ${esc(when(r.kickoff_utc))} ET</small></div><span class="fl-sport">${esc(r.sport)}</span></div>
+    <div class="fl-floor"><span class="fl-n">${flNum(r.floor)}+</span><span class="fl-stat">${esc(FL_UNIT[r.stat]||r.stat)}</span></div>
+    <div class="fl-meta"><span>Chance <b>${pct(r.chance)}</b></span><span>Reached in <b>${r.hits} of ${r.n}</b></span><span>Typical <b>${flNum(r.typical)}</b></span></div>
+    ${flBars(r)}
+    ${r.warn?`<div class="fl-warn">Missed this in 2 of his last 3 games. Floors like that held less often in testing.</div>`:""}
+    ${r.status?`<div class="fl-warn">Listed ${esc(r.status)} on the injury report.</div>`:""}</div>`;
+}
+const FL_SAMPLE=[["Running back","Rushing yards",35,16,72],["Wide receiver","Receptions",4,15,7],["Quarterback","Passing yards",190,15,268]].map(([p,st,f,h,t])=>({player:p,pos:"",team:"",opp:"",game:"",kickoff_utc:"",sport:"NFL",stat:st,floor:f,chance:.88,hits:h,n:16,typical:t,last:[[t,""],[f+3,""],[t*1.2,""],[f+8,""],[t*.9,""],[t,""],[f+1,""],[t*1.4,""],[t*.8,""],[f+5,""]],warn:false,status:""}));
+function flTested(){
+  const T=(FLO&&FLO.tested)||{},parts=Object.entries(T).filter(([s,t])=>t&&t.picks>=50).map(([s,t])=>`${s} ${t.season}: <b>${pct(t.held)}</b> of ${t.picks.toLocaleString()}`);
+  return parts.length?`<span class="fl-tested">Tested on last season: floors held ${parts.join(" · ")}</span>`:"";
+}
+function vFloors(){
+  const intro=`<div class="fl-intro"><h2 class="h2" style="margin:6px 0">Reliable legs</h2>
+    <p>Each player's <b>steady floor</b>: the highest number he's very likely to reach, from his own last 8 to 16 games. Not his ceiling, not a guess at his total. Odds play no part in it.</p>
+    ${flTested()}
+    <p class="muted" style="font-size:13px">Bars are his last 10 games, oldest to newest: green reached the floor, red fell short. The dashed line is the floor.</p></div>`;
+  const how=`<details class="fl-how"><summary>How we pick a floor</summary><ul>
+    <li>We look at his last 8 to 16 regular-season games (preseason never counts).</li>
+    <li>For a few numbers he usually reaches, we estimate the chance he gets there next game. The estimate weighs how often he cleared it, whether he missed it lately, and how big the number is next to his typical game.</li>
+    <li>His floor is the highest number with an 85% or better chance. Floors under 30% of his typical game are too low to help, so we leave them out.</li>
+    <li>We tested this on last season's games the model never saw. The tested numbers above are how often those floors held.</li>
+    <li>A floor is not a guarantee. Injuries, blowouts and role changes happen, so check news before you play.</li></ul></details>`;
+  if(tier!=="pro"){
+    return intro+gate(`<div class="fl-grid">${FL_SAMPLE.map(flCard).join("")}</div>`,"pro","Reliable legs are a Pro tool","Every player's steady floor for today's games, with his last 10 games and how often floors held in testing.")+how;
+  }
+  if(!FLO)return intro+`<div class="empty">Loading…</div>`;
+  const rows=FLO.rows||[];
+  if(!rows.length)return intro+`<div class="empty">No steady floors right now. They show up for players in upcoming games once they have 8 or more regular-season games.</div>`+how;
+  const sports=[...new Set(rows.map(r=>r.sport))];
+  if(S.fsport&&!sports.includes(S.fsport))S.fsport="";
+  const inS=rows.filter(r=>!S.fsport||r.sport===S.fsport);
+  const stats=[...new Set(inS.map(r=>r.stat))].sort();
+  const games=[...new Map(inS.map(r=>[r.game,r.kickoff_utc])).entries()].sort((a,b)=>a[1]<b[1]?-1:1);
+  return intro+`<div class="bar1"><div class="seg" role="group" aria-label="Sport">${[["","All"],...sports.map(s=>[s,SPORT_NAME[s]||s])].map(([k,l])=>`<button data-fsport="${k}" aria-pressed="${S.fsport===k}">${esc(l)}<span class="ct">${k?rows.filter(r=>r.sport===k).length:rows.length}</span></button>`).join("")}</div></div>
+    <div class="tools" role="search">
+      <label class="q">Search<input type="search" id="fl-q" placeholder="Player or team" value="${esc(S.fq)}"></label>
+      <label>Stat<select id="fl-stat"><option value="">All stats</option>${stats.map(x=>`<option ${x===S.fstat?"selected":""}>${esc(x)}</option>`).join("")}</select></label>
+      <label>Game<select id="fl-game"><option value="">All games</option>${games.map(([g,t])=>`<option value="${esc(g)}" ${g===S.fgame?"selected":""}>${esc(g)} · ${esc(when(t))}</option>`).join("")}</select></label>
+      <label>Sort<select id="fl-sort">${[["steady","Steadiest first"],["chance","Highest chance"],["time","Game time"]].map(([k,l])=>`<option value="${k}" ${S.fsort===k?"selected":""}>${l}</option>`).join("")}</select></label>
+      <span class="count" id="fl-count"></span></div>
+    <div id="fl-list"></div>`+how;
+}
+function fillFloors(){
+  const el=$("#fl-list");if(!el||!FLO)return;
+  const q=S.fq.trim().toLowerCase();
+  let r=(FLO.rows||[]).filter(x=>(!S.fsport||x.sport===S.fsport)&&(!S.fstat||x.stat===S.fstat)&&(!S.fgame||x.game===S.fgame)&&(!q||(x.player+" "+x.team+" "+x.game).toLowerCase().includes(q)));
+  const by={steady:(a,b)=>(b.steady??b.ratio)-(a.steady??a.ratio)||b.chance-a.chance,chance:(a,b)=>b.chance-a.chance||b.ratio-a.ratio,time:(a,b)=>a.kickoff_utc<b.kickoff_utc?-1:a.kickoff_utc>b.kickoff_utc?1:b.ratio-a.ratio}[S.fsort]||((a,b)=>b.ratio-a.ratio);
+  r=r.slice().sort(by);
+  const c=$("#fl-count");if(c)c.textContent=`${r.length} floor${r.length===1?"":"s"}`;
+  el.innerHTML=r.length?`<div class="fl-grid">${r.slice(0,S.shown).map(flCard).join("")}</div>${r.length>S.shown?`<div style="text-align:center;margin:14px"><button class="btn" id="fl-more">Show more (${r.length-S.shown})</button></div>`:""}`
+    :`<div class="empty">No floors match. Clear the search or a filter.</div>`;
+  const m=$("#fl-more");if(m)m.onclick=()=>{S.shown+=50;fillFloors()};
+}
+function bindFloors(){
+  document.querySelectorAll("[data-fsport]").forEach(b=>b.onclick=()=>{S.fsport=b.dataset.fsport;S.fstat="";S.fgame="";S.shown=50;save();render()});
+  const on=(id,ev,fn)=>{const e=$(id);if(e)e[ev]=fn};
+  on("#fl-q","oninput",e=>{S.fq=e.target.value;S.shown=50;save();fillFloors()});
+  on("#fl-stat","onchange",e=>{S.fstat=e.target.value;S.shown=50;save();fillFloors()});
+  on("#fl-game","onchange",e=>{S.fgame=e.target.value;S.shown=50;save();fillFloors()});
+  on("#fl-sort","onchange",e=>{S.fsort=e.target.value;save();fillFloors()});
+  fillFloors();
+}
+
 /* ---------- Builder (shared with the old test page) ---------- */
 
 /* ---------- Builder: real milestone prices, the book's chance and ours; a cart you can share ---------- */
@@ -1517,7 +1620,7 @@ window.CP_ADD=(k,on)=>{BS.cart=on?[...new Set([...BS.cart,k])]:BS.cart.filter(x=
 /* ---------- render ---------- */
 function render(){
   nav();closePanel();
-  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount,terms:()=>vDoc("terms"),privacy:()=>vDoc("privacy"),refunds:()=>vDoc("refunds"),guide:()=>vDoc("guide"),contact:()=>vContact(),admin:()=>typeof vAdmin==="function"?vAdmin():vPicks()}[S.tab]||vPicks;
+  const v={picks:vPicks,results:vResults,about:vAbout,build:vBuilder,plans:vPlans,account:vAccount,terms:()=>vDoc("terms"),privacy:()=>vDoc("privacy"),refunds:()=>vDoc("refunds"),guide:()=>vDoc("guide"),contact:()=>vContact(),admin:()=>typeof vAdmin==="function"?vAdmin():vPicks(),floors:vFloors}[S.tab]||vPicks;
   let html=v();
   if(S.tab==="build"&&tier==="visitor")html=gate(html,"free","The Builder is free with an account","Stack milestones with real prices, see how often each player got there, and send the stack to your sportsbook.");
   $("#main").innerHTML=pvBar()+html;$("#acct").innerHTML=acctBtns();
@@ -1530,6 +1633,7 @@ function render(){
   if(S.tab==="results")document.querySelectorAll("[data-hs]").forEach(b=>b.onclick=()=>{S.hs=b.dataset.hs;save();render()});
   if(["about","terms","privacy","refunds","guide","contact"].includes(S.tab)){const b=$("#back-picks");if(b)b.onclick=()=>setTab("picks")}
   if(S.tab==="build"&&tier!=="visitor")bindBuilder();
+  if(S.tab==="floors")bindFloors();
   bindPreview();
 }
 function init(data){
@@ -1540,11 +1644,12 @@ function init(data){
   for(const p of D.picks){const k=nk(p),o=seen.get(k);if(!o||p.win_prob>o.win_prob||(p.win_prob===o.win_prob&&p.best_price!=null&&(o.best_price==null||dec(p.best_price)>dec(o.best_price))))seen.set(k,p)}
   D.picks=D.picks.filter(p=>seen.get(nk(p))===p);
   D.picks.forEach((p,i)=>p._id="p"+i);
-  const h=(location.hash||"").slice(1);if(["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact","admin"].includes(h))S.tab=h;
+  const h=(location.hash||"").slice(1);if(["picks","build","floors","results","about","plans","account","terms","privacy","refunds","guide","contact","admin"].includes(h))S.tab=h;
   header();render();
-  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","results","about","plans","account","terms","privacy","refunds","guide","contact","admin"].includes(t)){S.tab=t;save();render();window.scrollTo({top:0})}});
+  window.addEventListener("hashchange",()=>{const t=(location.hash||"").slice(1);if(t!==S.tab&&["picks","build","floors","results","about","plans","account","terms","privacy","refunds","guide","contact","admin"].includes(t)){S.tab=t;save();render();window.scrollTo({top:0})}});
   setInterval(()=>{if(S.tab==="picks"&&!$("#panel"))render()},120000);
   cpData("form",1).then(f=>{if(f&&f.rows){FORM=f.rows;REC=f.record||{};if(S.tab==="picks"&&!$("#panel"))render();if(S.tab==="build"&&LAD&&typeof fillBuilder==="function")fillBuilder()}}).catch(()=>{});
+  loadFloors();
   (tier==="visitor"?Promise.resolve(null):cpData("ladders",1)).then(d=>{if(!d)return;LAD=LAD||reconcileLadders(d);LADI=new Map(d.ladders.map(l=>[`${l.player}~${l.stat}`,l]))}).catch(()=>{});
 }
 cpBoot().then(()=>cpData("picks")).then(init)

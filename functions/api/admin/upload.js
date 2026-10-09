@@ -2,7 +2,8 @@
 // Authorized only by UPLOAD_TOKEN (a long random secret kept in Cloudflare and in the PC's environment, never on disk).
 import { guard, json, HttpError, sameSecret } from "../../_lib/core.js";
 const ALLOWED = new Set(["picks.json", "picks_free.json", "picks_visitor.json", "form.json", "form_free.json",
-  "form_visitor.json", "ladders.json", "ladders_free.json", "status.json"]);
+  "form_visitor.json", "ladders.json", "ladders_free.json", "status.json",
+  "floors.json", "floors_teaser.json"]);
 export const onRequestPut = guard(async ({ request, env }) => {
   const h = request.headers.get("authorization") || "";
   if (!env.UPLOAD_TOKEN || !sameSecret(h.replace(/^Bearer /, ""), env.UPLOAD_TOKEN)) throw new HttpError(401, "no", "Not allowed.");

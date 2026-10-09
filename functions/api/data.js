@@ -1,4 +1,4 @@
-// GET /api/data?f=picks|form|ladders -> the data file for whoever is asking (owner 2026-10-04: the picks are no longer
+// GET /api/data?f=picks|form|ladders|floors -> the data file for whoever is asking (owner 2026-10-04: the picks are no longer
 // a public file).  The PC uploads one copy per tier; this picks the copy, so a visitor's browser never receives a Pro pick.
 //   visitor (not signed in)      picks_visitor.json, form_visitor.json        (no Builder)
 //   free account                 picks_free.json,    form_free.json,  ladders_free.json
@@ -10,6 +10,7 @@ const FILES = {
   picks:   { visitor: "picks_visitor.json", free: "picks_free.json", pro: "picks.json" },
   form:    { visitor: "form_visitor.json",  free: "form_free.json",  pro: "form.json" },
   ladders: { visitor: null,                 free: "ladders_free.json", pro: "ladders.json" },
+  floors:  { visitor: "floors_teaser.json", free: "floors_teaser.json", pro: "floors.json" },   // Reliable tab (Pro)
 };
 
 export const onRequestGet = guard(async ({ request, env }) => {
